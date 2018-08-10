@@ -3936,6 +3936,10 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "http://registry.npm.taobao.org/kind-of/download/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
+konva@^2.1.8:
+  version "2.1.8"
+  resolved "http://registry.npm.taobao.org/konva/download/konva-2.1.8.tgz#2c96c300e05f00fae8a59b224fa9436511678e00"
+
 launch-editor-middleware@^2.2.1:
   version "2.2.1"
   resolved "http://registry.npm.taobao.org/launch-editor-middleware/download/launch-editor-middleware-2.2.1.tgz#e14b07e6c7154b0a4b86a0fd345784e45804c157"
@@ -6545,6 +6549,13 @@ vue-hot-reload-api@^2.3.0:
   version "2.3.0"
   resolved "http://registry.npm.taobao.org/vue-hot-reload-api/download/vue-hot-reload-api-2.3.0.tgz#97976142405d13d8efae154749e88c4e358cf926"
 
+vue-konva@^1.0.6:
+  version "1.0.6"
+  resolved "http://registry.npm.taobao.org/vue-konva/download/vue-konva-1.0.6.tgz#e427658d6be862f03ee3f3ff3664c84826004f07"
+  dependencies:
+    vue "^2.5.2"
+    vue-router "^3.0.1"
+
 vue-loader@^15.2.4:
   version "15.2.6"
   resolved "http://registry.npm.taobao.org/vue-loader/download/vue-loader-15.2.6.tgz#4ad4e56a0ca1fd89ebc4220f9e3bd4723097b397"
@@ -6554,6 +6565,10 @@ vue-loader@^15.2.4:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-router@^3.0.1:
+  version "3.0.1"
+  resolved "http://registry.npm.taobao.org/vue-router/download/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
 vue-style-loader@^4.1.0:
   version "4.1.1"
@@ -6573,9 +6588,13 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@^2.5.16:
+vue@^2.5.16, vue@^2.5.2:
   version "2.5.17"
   resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
+
+vuex@^3.0.1:
+  version "3.0.1"
+  resolved "http://registry.npm.taobao.org/vuex/download/vuex-3.0.1.tgz#e761352ebe0af537d4bb755a9b9dc4be3df7efd2"
 
 watchpack@^1.5.0:
   version "1.6.0"
