@@ -160,7 +160,13 @@
       const group = new Konva.Group({
         x: 0,
         y: 0,
-        draggable: true
+        draggable: true,
+        // dragBoundFunc: function (pos) {
+        //   return {
+        //     x: pos.x,
+        //     y: this.getAbsolutePosition().y
+        //   }
+        // }
       })
 
       this.shapes.forEach((shape) => {
@@ -169,12 +175,26 @@
       })
       layer.add(group)
 
+      let lastX = 0
+      let lastY = 0
+
+      group.on('mousedown', () => {
+        lastX = group.x()
+        lastY = group.y()
+      })
+
       group.on('dragend', () => {
         this.shapes.forEach((shape) => {
-          // group.add(shape.KonvaRect)
-          shape.KonvaRect.moveTo(layer)
+          // shape.KonvaRect.mo
+          // shape.KonvaRect.moveTo(layer)
+          shape.KonvaRect.x(shape.KonvaRect.x() + group.x() - lastX)
+          shape.KonvaRect.y(shape.KonvaRect.y() + group.y() - lastY)
+          updateLayout(shape)
         })
-        group.destroy()
+        group.x(0)
+        group.y(0)
+        layer.draw()
+        // group.destroy()
       })
 
       layer.on('transformend', function (evt) {
@@ -184,7 +204,7 @@
       });
 
 
-      layer.draw();
+      layer.draw()
 
       function addTransformer(node) {
         if (!node.hasName('rect')) {
