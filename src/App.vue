@@ -1,10 +1,11 @@
 <template>
   <section>
+
     <svg style="position: absolute; left: 0;top: 0;"
          :width="canvasLayout.width"
          :height="canvasLayout.height"
          :viewBox="svgViewbox">
-      <g v-for="item in shapes"
+      <g v-for="item in comps"
          :key="item.id"
          :width="item.width"
          :height="item.height"
@@ -28,12 +29,21 @@
       <!--/>-->
     </svg>
     <div id="workarea" style="height: 100vh; user-select: none"></div>
+    <div class="toolbar" style="position: fixed;top: 0;left: 0;">
+      <!--<button @click="btnClicked">add</button>-->
+      <!--<button @click="btnZoomInClicked">zoom+</button>-->
+      <!--<button @click="btnZoomOutClicked">zoom-</button>-->
+      <!--<button @click="btnClicked1">log</button>-->
+      <button @click="addRect">addRect</button>
+      <button @click="btnGroup">group</button>
+      <button @click="btnUnGroup">ungroup</button>
+    </div>
   </section>
 
 </template>
 
 <script>
-
+  import Guid from './utils/guid'
   import Konva from 'konva'
   import ScadaImage from './components/icon'
   import ScadaRect from './components/rect'
@@ -46,6 +56,9 @@
     name: 'Editor',
     data() {
       return {
+        comps: [],
+        stage: null,
+        layers: [],
         canvasLayout: {
           width: WIDTH,
           height: HEIGHT,
@@ -65,9 +78,9 @@
           offsetY: -40,
           rotation: 0,
           strokeWidth: 1,
-          stroke: '#F00',
+          // stroke: '#F00',
           name: 'rect',
-          // draggable: true,
+          draggable: true,
           KonvaRect: null,
           comp: {
             type: 'ScadaImage'
@@ -84,9 +97,9 @@
           offsetY: -30,
           rotation: 0,
           strokeWidth: 1,
-          stroke: '#F00',
+          // stroke: '#F00',
           name: 'rect',
-          // draggable: true,
+          draggable: true,
           KonvaRect: null,
           comp: {
             type: 'ScadaRect'
@@ -104,27 +117,28 @@
       }
     },
     mounted() {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      const width = window.innerWidth
+      const height = window.innerHeight
 
-      const stage = new Konva.Stage({
+      this.stage = new Konva.Stage({
         container: 'workarea',
         width: width,
         height: height
       });
 
-      const layer = new Konva.Layer();
-      stage.add(layer);
+      const layer = new Konva.Layer()
+      this.layers.push(layer)
+      this.stage.add(this.layers[0])
 
       // const rect1 = new Konva.Rect(this.shapes[0]);
 
-      function updateLayout(shape) {
-        shape.x = shape.KonvaRect.x()
-        shape.y = shape.KonvaRect.y()
-        shape.scaleX = shape.KonvaRect.scaleX()
-        shape.scaleY = shape.KonvaRect.scaleY()
-        shape.rotation = shape.KonvaRect.rotation()
-      }
+      // function updateLayout(shape) {
+      //   shape.x = shape.KonvaRect.x()
+      //   shape.y = shape.KonvaRect.y()
+      //   shape.scaleX = shape.KonvaRect.scaleX()
+      //   shape.scaleY = shape.KonvaRect.scaleY()
+      //   shape.rotation = shape.KonvaRect.rotation()
+      // }
 
       // this.shapes[0].KonvaRect = new Konva.Rect(this.shapes[0]);
       // this.shapes[0].KonvaRect.on('dragmove', () => {
@@ -139,80 +153,90 @@
       //
       // layer.add(this.shapes[0].KonvaRect);
 
-      this.shapes.forEach((shape) => {
-        shape.KonvaRect = new Konva.Rect(shape);
-        // shape.KonvaRect.on('dragmove', () => {
-        //   updateLayout(shape)
-        // })
-        shape.KonvaRect.on('dragend transformend', () => {
-          updateLayout(shape)
-        })
-        // shape.KonvaRect.on('transform', () => {
-        //   updateLayout(shape)
-        // })
-        // shape.KonvaRect.on('transformend', () => {
-        //   updateLayout(shape)
-        // })
+      // this.shapes.forEach((shape) => {
+      //   shape.KonvaRect = new Konva.Rect(shape);
+      //   // shape.KonvaRect.on('dragmove', () => {
+      //   //   updateLayout(shape)
+      //   // })
+      //   shape.KonvaRect.on('dragend transformend', () => {
+      //     this.updateLayout(shape)
+      //   })
+      //   // shape.KonvaRect.on('transform', () => {
+      //   //   updateLayout(shape)
+      //   // })
+      //   // shape.KonvaRect.on('transformend', () => {
+      //   //   updateLayout(shape)
+      //   // })
+      //
+      //   this.layers[0].add(shape.KonvaRect)
+      // })
 
-        layer.add(shape.KonvaRect)
-      })
+      this.layers[0].draw()
 
-      const group = new Konva.Group({
-        x: 0,
-        y: 0,
-        draggable: true,
-        // dragBoundFunc: function (pos) {
-        //   return {
-        //     x: pos.x,
-        //     y: this.getAbsolutePosition().y
-        //   }
-        // }
-      })
-
-      this.shapes.forEach((shape) => {
-        // group.add(shape.KonvaRect)
-        shape.KonvaRect.moveTo(group)
-      })
-      layer.add(group)
-
-      let lastX = 0
-      let lastY = 0
-
-      group.on('mousedown', () => {
-        lastX = group.x()
-        lastY = group.y()
-      })
-
-      group.on('dragend', () => {
-        this.shapes.forEach((shape) => {
-          // shape.KonvaRect.mo
-          // shape.KonvaRect.moveTo(layer)
-          shape.KonvaRect.x(shape.KonvaRect.x() + group.x() - lastX)
-          shape.KonvaRect.y(shape.KonvaRect.y() + group.y() - lastY)
-          updateLayout(shape)
-        })
-        group.x(0)
-        group.y(0)
-        layer.draw()
-        // group.destroy()
-      })
-
-      layer.on('transformend', function (evt) {
-        // get the shape that was clicked on
-        const shape = evt.target
-        console.log(`"${shape.getName()}" transformend`)
-      });
-
-
-      layer.draw()
-
-      function addTransformer(node) {
-        if (!node.hasName('rect')) {
-          return;
+      this.stage.on('click dragstart', (e) => {
+        // if click on empty area - remove all transformers
+        if (e.target === this.stage) {
+          // stage.find('Transformer').destroy();
+          this.layers[0].draw()
+          return
         }
+        this.addTransformer(e.target)
+      })
+    },
+    methods: {
+      addComp(comp) {
+        this.comps.unshift(comp)
+        comp.KonvaRect = new Konva.Rect(comp);
+        // comp.KonvaRect.on('dragmove', () => {
+        //   updateLayout(comp)
+        // })
+        comp.KonvaRect.on('dragend transformend', () => {
+          this.updateLayout(comp)
+        })
+        // comp.KonvaRect.on('transform', () => {
+        //   updateLayout(comp)
+        // })
+        // comp.KonvaRect.on('transformend', () => {
+        //   updateLayout(comp)
+        // })
+        this.layers[0].add(comp.KonvaRect)
+      },
+      addRect() {
+        this.addComp({
+          id: Guid(),
+          x: 200,
+          y: 200,
+          width: 80,
+          height: 60,
+          scaleX: 1,
+          scaleY: 1,
+          offsetX: -40,
+          offsetY: -30,
+          rotation: 0,
+          strokeWidth: 1,
+          // stroke: '#F00',
+          name: Guid(),
+          draggable: true,
+          KonvaRect: null,
+          comp: {
+            type: 'ScadaRect'
+          },
+        })
+      },
+      updateLayout(comp) {
+        comp.x = comp.KonvaRect.x()
+        comp.y = comp.KonvaRect.y()
+        comp.scaleX = comp.KonvaRect.scaleX()
+        comp.scaleY = comp.KonvaRect.scaleY()
+        comp.rotation = comp.KonvaRect.rotation()
+      },
+      addTransformer(node) {
+        // if (!node.hasName('rect')) {
+        //   return;
+        // }
         // remove old transformers
         // TODO: we can skip it if current rect is already selected
-        stage.find('Transformer').destroy()
+        this.stage.find('Transformer').destroy()
 
         // create new transformer
         const tr = new Konva.Transformer({
@@ -220,30 +244,71 @@
           anchorSize: 8,
           rotationSnaps: [0, 90, 180, 270]
         })
-        layer.add(tr)
+        this.layers[0].add(tr)
         tr.attachTo(node)
-        layer.draw()
-      }
+        this.layers[0].draw()
+      },
+      btnUnGroup() {
+      },
+      btnGroup() {
+        const group = new Konva.Group({
+          draggable: true,
+          // dragBoundFunc: function (pos) {
+          //   return {
+          //     x: pos.x,
+          //     y: this.getAbsolutePosition().y
+          //   }
+          // }
+        })
 
-      stage.on('click dragstart', function (e) {
-        // if click on empty area - remove all transformers
-        if (e.target === stage) {
-          stage.find('Transformer').destroy();
+        this.shapes.forEach((shape) => {
+          // group.add(shape.KonvaRect)
+          shape.KonvaRect.moveTo(group)
+        })
+        layer.add(group)
+
+        let lastX = 0
+        let lastY = 0
+
+        group.on('mousedown', () => {
+          lastX = group.x()
+          lastY = group.y()
+        })
+
+        // dragend
+
+        group.on('dragend transformend', () => {
+          this.shapes.forEach((shape) => {
+            // shape.KonvaRect.mo
+            // shape.KonvaRect.moveTo(layer)
+            console.log('gx: ' + group.x())
+            console.log('gy: ' + group.y())
+            console.log('gsx: ' + group.scaleX())
+            console.log('gsy: ' + group.scaleY())
+            // console.log(lastX)
+            // console.log(lastY)
+            shape.KonvaRect.x(shape.KonvaRect.x() + (group.x() - lastX) * group.scaleX())
+            shape.KonvaRect.y(shape.KonvaRect.y() + (group.y() - lastY) * group.scaleY())
+            updateLayout(shape)
+          })
+          group.x(0)
+          group.y(0)
           layer.draw()
-          return
-        }
-        // addTransformer(e.target)
-      })
+          lastX = group.x()
+          lastY = group.y()
+          // group.destroy()
+        })
 
-      // stage.on('dragstart', function (e) {
-      //   // if click on empty area - remove all transformers
-      //   if (e.target === stage) {
-      //     stage.find('Transformer').destroy();
-      //     layer.draw();
-      //     return;
-      //   }
-      //   addTransformer(e.target)
-      // })
+        const tr = new Konva.Transformer({
+          keepRatio: false,
+          anchorSize: 8,
+          rotationSnaps: [0, 90, 180, 270],
+          enabledAnchors: [],
+          rotateEnabled: false
+        })
+        layer.add(tr)
+        tr.attachTo(group)
+      },
     }
   }
 
