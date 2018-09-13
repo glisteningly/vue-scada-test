@@ -37,7 +37,7 @@
       <button @click="addRect">addRect</button>
       <button @click="addIcon">addIcon</button>
       <button @click="btnGroup">group</button>
-      <button @click="btnUnGroup">ungroup</button>
+      <button @click="btnUnSelGroup">ungroup</button>
     </div>
   </section>
 
@@ -140,7 +140,9 @@
       this.konvaObjs.stage.on('click dragstart', (e) => {
         // if click on empty area - remove all transformers
         if (e.target === this.konvaObjs.stage) {
-          this.konvaObjs.stage.find('Transformer').detach()
+          // this.konvaObjs.stage.find('Transformer').detach()
+          this.konvaObjs.transformer.detach()
+          this.btnUnSelGroup()
           this.konvaObjs.layers[0].draw()
         }
       })
@@ -254,8 +256,14 @@
         this.konvaObjs.transformer.attachTo(node)
         this.konvaObjs.layers[0].draw()
       },
-      btnUnGroup() {
-
+      btnUnSelGroup() {
+        this.curSelComps.forEach((comp) => {
+          comp.konvaRect.moveTo(this.konvaObjs.layers[0])
+          comp.konvaRect.draggable(true)
+        })
+        this.konvaObjs.groupTransformer.detach()
+        this.konvaObjs.layers[0].draw()
+        this.curSelComps = []
       },
       btnGroup() {
         this.konvaObjs.transformer.detach()
@@ -269,39 +277,6 @@
           // comp.konvaRect.setListening(false)
         })
         this.konvaObjs.layers[0].add(this.konvaObjs.selCompsGroup)
-
-        // let lastX = 0
-        // let lastY = 0
-
-        // group.on('mousedown', () => {
-        //   lastX = group.x()
-        //   lastY = group.y()
-        // })
-        //
-        // // dragend transformend
-        //
-        // group.on('dragend ', () => {
-        //   this.comps.forEach((comp) => {
-        //     // comp.konvaRect.mo
-        //     // comp.konvaRect.moveTo(layer)
-        //     console.log('gx: ' + group.x())
-        //     console.log('gy: ' + group.y())
-        //     console.log('gsx: ' + group.scaleX())
-        //     console.log('gsy: ' + group.scaleY())
-        //     // console.log(lastX)
-        //     // console.log(lastY)
-        //     comp.konvaRect.x(comp.konvaRect.x() + (group.x() - lastX) * group.scaleX())
-        //     comp.konvaRect.y(comp.konvaRect.y() + (group.y() - lastY) * group.scaleY())
-        //     updateLayout(comp)
-        //   })
-        //   group.x(0)
-        //   group.y(0)
-        //   layer.draw()
-        //   lastX = group.x()
-        //   lastY = group.y()
-        //   // group.destroy()
-        // })
-
         this.konvaObjs.layers[0].add(this.konvaObjs.groupTransformer)
         this.konvaObjs.groupTransformer.attachTo(this.konvaObjs.selCompsGroup)
         this.konvaObjs.groupTransformer.forceUpdate()
