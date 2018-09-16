@@ -58,10 +58,6 @@
     data() {
       return {
         comps: [],
-        // stage: null,
-        // layers: [],
-        // transformer: null,
-        // selCompsGroup: null,
         canvasLayout: {
           width: WIDTH,
           height: HEIGHT,
@@ -119,14 +115,14 @@
       this.konvaObjs.groupTransformer.on('transformend', () => {
         console.log('transformend ')
         this.curSelComps.forEach((comp) => {
-          const compScale = comp.konvaRect.getAbsoluteScale()
-          console.log(compScale)
-          // c1.moveTo(layer);
-          // c1.setAbsolutePosition(c1Position);
-          // comp.konvaRect.x(comp.konvaRect.x() + this.konvaObjs.selCompsGroup.x())
-          // comp.konvaRect.y(comp.konvaRect.y() + this.konvaObjs.selCompsGroup.y())
+          // console.log(compScale)
           this.updateLayout(comp)
+          if (comp.tempTr) {
+            comp.tempTr.forceUpdate()
+          }
         })
+        this.konvaObjs.groupTransformer.forceUpdate()
+        this.konvaObjs.layers[0].draw()
       })
 
       this.konvaObjs.selCompsGroup = new Konva.Group({
@@ -144,14 +140,8 @@
         this.curSelComps.forEach((comp) => {
           const compPosition = comp.konvaRect.getAbsolutePosition()
           console.log(compPosition)
-          // c1.moveTo(layer);
-          // c1.setAbsolutePosition(c1Position);
-          // comp.konvaRect.x(comp.konvaRect.x() + this.konvaObjs.selCompsGroup.x())
-          // comp.konvaRect.y(comp.konvaRect.y() + this.konvaObjs.selCompsGroup.y())
           this.updateLayout(comp)
         })
-        // this.konvaObjs.selCompsGroup.x(0)
-        // this.konvaObjs.selCompsGroup.y(0)
       })
 
       this.konvaObjs.layers[0].draw()
@@ -304,6 +294,10 @@
             y: comp.konvaRect.getAbsoluteScale().y
           })
           comp.konvaRect.draggable(true)
+          if (comp.tempTr) {
+            comp.tempTr.destroy()
+            comp.tempTr = null
+          }
         })
         this.konvaObjs.groupTransformer.detach()
         this.konvaObjs.selCompsGroup.remove()
@@ -315,15 +309,28 @@
         this.curSelComps = []
       },
       btnGroup() {
+        this.curSelComps = []
         this.konvaObjs.transformer.detach()
         this.curSelComps.push(this.comps[0])
         this.curSelComps.push(this.comps[1])
 
         this.curSelComps.forEach((comp) => {
           // group.add(comp.konvaRect)
+
           comp.konvaRect.moveTo(this.konvaObjs.selCompsGroup)
           comp.konvaRect.draggable(false)
-          // comp.konvaRect.setListening(false)
+          if (!comp.tempTr){
+            comp.tempTr = new Konva.Transformer({
+              node: comp.konvaRect,
+              name: 'tempTr',
+              keepRatio: true,
+              resizeEnabled: false,
+              rotateEnabled: false,
+            })
+            this.konvaObjs.selCompsGroup.add(comp.tempTr)
+          }
+
+          // console.log(tr)
         })
         this.konvaObjs.layers[0].add(this.konvaObjs.selCompsGroup)
         this.konvaObjs.layers[0].add(this.konvaObjs.groupTransformer)
