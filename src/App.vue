@@ -125,6 +125,19 @@
         this.konvaObjs.layers[0].draw()
       })
 
+      this.konvaObjs.groupTransformer.on('transform', () => {
+        // console.log('transform')
+        this.curSelComps.forEach((comp) => {
+          // console.log(compScale)
+          this.updateLayout(comp)
+          if (comp.tempTr) {
+            comp.tempTr.forceUpdate()
+          }
+        })
+        this.konvaObjs.groupTransformer.forceUpdate()
+        this.konvaObjs.layers[0].draw()
+      })
+
       this.konvaObjs.selCompsGroup = new Konva.Group({
         draggable: true,
         // dragBoundFunc: function (pos) {
@@ -315,9 +328,9 @@
         this.curSelComps.push(this.comps[1])
 
         this.curSelComps.forEach((comp) => {
-          // group.add(comp.konvaRect)
+          this.konvaObjs.selCompsGroup.add(comp.konvaRect)
 
-          comp.konvaRect.moveTo(this.konvaObjs.selCompsGroup)
+          // comp.konvaRect.moveTo(this.konvaObjs.selCompsGroup)
           comp.konvaRect.draggable(false)
           if (!comp.tempTr){
             comp.tempTr = new Konva.Transformer({
