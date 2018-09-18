@@ -43,8 +43,8 @@
       <button @click="addRect">addRect</button>
       <button @click="addIcon">add tw</button>
       <button @click="addIcon2">add gg</button>
-      <button @click="btnGroup">group</button>
-      <button @click="unGroupSelAll">ungroup</button>
+      <button @click="addAll">add all</button>
+      <!--<button @click="unGroupSelAll">ungroup</button>-->
     </div>
   </section>
 
@@ -104,12 +104,13 @@
       this.konvaObjs.stage.add(this.konvaObjs.layers[0])
       this.konvaObjs.transformer = new Konva.Transformer({
         keepRatio: false,
-        anchorSize: 8,
+        anchorSize: 6,
         rotationSnaps: [0, 90, 180, 270]
       })
 
       this.konvaObjs.groupTransformer = new Konva.Transformer({
         keepRatio: true,
+        anchorSize: 6,
         // resizeEnabled: false,
         rotateEnabled: false,
         // rotationSnaps: [],
@@ -176,9 +177,9 @@
 
       //click
       this.konvaObjs.stage.on('mousedown', (e) => {
-        console.log('mousedown')
         // if click on empty area - remove all transformers
         if (e.target === this.konvaObjs.stage) {
+          console.log('stage mousedown')
           // this.konvaObjs.stage.find('Transformer').detach()
           this.konvaObjs.transformer.detach()
           // if (this.curSelComps.length > 0) {
@@ -256,7 +257,7 @@
           if (comp.konvaRect.getParent().getType() !== 'Group') {
             // 不在多选组内
             if (!hotkeys.shift) {
-              this.curSelComps = []
+              this.unGroupSelAll()
               this.curSelComps.push(comp)
             } else {
               if (!this.isInSelGroup(comp)) {
@@ -276,7 +277,7 @@
 
         comp.konvaRect.on('dragstart', () => {
           if (comp.konvaRect.getParent().getType() !== 'Group') {
-            this.curSelComps = []
+            this.unGroupSelAll()
             this.curSelComps.push(comp)
           }
         })
@@ -353,6 +354,11 @@
           },
         }))
       },
+      addAll() {
+        this.addRect()
+        this.addIcon()
+        this.addIcon2()
+      },
       updateLayout(comp) {
         comp.x = comp.konvaRect.getAbsolutePosition().x
         comp.y = comp.konvaRect.getAbsolutePosition().y
@@ -407,43 +413,10 @@
         })
         this.curSelComps = []
       },
-      btnGroup() {
-        this.curSelComps = []
-        this.konvaObjs.transformer.detach()
-        this.curSelComps.push(this.comps[0])
-        this.curSelComps.push(this.comps[1])
-
-        this.curSelComps.forEach((comp) => {
-          this.konvaObjs.selCompsGroup.add(comp.konvaRect)
-
-          // comp.konvaRect.moveTo(this.konvaObjs.selCompsGroup)
-          comp.konvaRect.draggable(false)
-          if (!comp.tempTr) {
-            comp.tempTr = new Konva.Transformer({
-              node: comp.konvaRect,
-              name: 'tempTr',
-              keepRatio: true,
-              resizeEnabled: false,
-              rotateEnabled: false,
-            })
-            this.konvaObjs.selCompsGroup.add(comp.tempTr)
-          }
-
-          // console.log(tr)
-        })
-        this.konvaObjs.layers[0].add(this.konvaObjs.selCompsGroup)
-        this.konvaObjs.layers[0].add(this.konvaObjs.groupTransformer)
-        this.konvaObjs.groupTransformer.attachTo(this.konvaObjs.selCompsGroup)
-        this.konvaObjs.groupTransformer.forceUpdate()
-        this.konvaObjs.layers[0].draw()
-      },
       addToGroup() {
         this.konvaObjs.transformer.detach()
-        // this.konvaObjs.selCompsGroup.removeChildren()
         this.curSelComps.forEach((comp) => {
           this.konvaObjs.selCompsGroup.add(comp.konvaRect)
-
-          // comp.konvaRect.moveTo(this.konvaObjs.selCompsGroup)
           comp.konvaRect.draggable(false)
           if (!comp.tempTr) {
             comp.tempTr = new Konva.Transformer({
