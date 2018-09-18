@@ -118,12 +118,13 @@
 
       this.konvaObjs.groupTransformer.on('transformend', () => {
         console.log('transformend ')
+        this.refreashGroupSel()
         this.curSelComps.forEach((comp) => {
           // console.log(compScale)
           this.updateLayout(comp)
-          if (comp.tempTr) {
-            comp.tempTr.forceUpdate()
-          }
+          // if (comp.tempTr) {
+          //   comp.tempTr.forceUpdate()
+          // }
         })
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
@@ -165,9 +166,10 @@
 
       this.konvaObjs.selCompsGroup.on('dragend ', () => {
         console.log('dragend ')
+        this.refreashGroupSel()
         this.curSelComps.forEach((comp) => {
-          const compPosition = comp.konvaRect.getAbsolutePosition()
-          console.log(compPosition)
+          // const compPosition = comp.konvaRect.getAbsolutePosition()
+          // console.log(compPosition)
           this.updateLayout(comp)
         })
       })
@@ -476,6 +478,13 @@
       isInSelGroup(comp) {
         return _.findIndex(this.curSelComps, comp) >= 0
       },
+      refreashGroupSel() {
+        this.curSelComps.forEach((comp) => {
+          this.removeCompfromGroupSel(comp)
+        })
+        this.cancelSelGroup()
+        this.addToGroup()
+      }
     },
     computed: {
       // curSelComps() {
