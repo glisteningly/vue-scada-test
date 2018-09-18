@@ -1,6 +1,6 @@
 <template>
   <CompWrapper :layout="layout">
-    <rect fill="darkslategrey" :width="layout.width" :height="layout.height"/>
+    <image :xlink:href="options.url" :width="layout.width" :height="layout.height"/>
   </CompWrapper>
 </template>
 
@@ -8,11 +8,11 @@
   import BaseComp from './BaseComp'
 
   export default {
-    extends: BaseComp,
-    name: 'scadaRect',
     props: {
-      // layout: Object
-    }
+      options: Object
+    },
+    extends: BaseComp,
+    name: 'scadaImage'
   }
 </script>
 

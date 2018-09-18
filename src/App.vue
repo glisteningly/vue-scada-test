@@ -5,28 +5,34 @@
          :width="canvasLayout.width"
          :height="canvasLayout.height"
          :viewBox="svgViewbox">
-      <g v-for="item in comps"
-         :key="item.id"
-         :width="item.width"
-         :height="item.height"
-         :transform="`translate(${item.x - item.offsetX * item.scaleX} ${item.y - item.offsetY * item.scaleY})
-            rotate(${item.rotation} ${item.offsetX * item.scaleX} ${item.offsetY * item.scaleY})
-            scale(${item.scaleX} ${item.scaleY})`">
-        <!--<rect fill="#DDD" height="25" width="20"/>-->
-        <!--<rect fill="#0F0" x="30" y="20" height="35" width="40"/>-->
-        <!--<image xlink:href="./assets/twitter.svg" width="100" height="100"/>-->
-        <component :is="item.comp.type"/>
-      </g>
-
-      <!--<rect v-for="item in shapes"-->
+      <!--<g v-for="item in comps"-->
       <!--:key="item.id"-->
-      <!--fill="#DDD"-->
       <!--:width="item.width"-->
       <!--:height="item.height"-->
       <!--:transform="`translate(${item.x - item.offsetX * item.scaleX} ${item.y - item.offsetY * item.scaleY})-->
       <!--rotate(${item.rotation} ${item.offsetX * item.scaleX} ${item.offsetY * item.scaleY})-->
-      <!--scale(${item.scaleX} ${item.scaleY})`"-->
-      <!--/>-->
+      <!--scale(${item.scaleX} ${item.scaleY})`">-->
+      <!--&lt;!&ndash;<rect fill="#DDD" height="25" width="20"/>&ndash;&gt;-->
+      <!--&lt;!&ndash;<rect fill="#0F0" x="30" y="20" height="35" width="40"/>&ndash;&gt;-->
+      <!--&lt;!&ndash;<image xlink:href="./assets/twitter.svg" width="100" height="100"/>&ndash;&gt;-->
+      <!--<component :is="item.comp.type"/>-->
+      <!--</g>-->
+
+      <component v-for="item in comps"
+                 :key="item.id"
+                 :is="item.comp.type"
+                 :options="item.comp.options"
+                 :layout="{
+                  x: item.x,
+                  y: item.y,
+                  width: item.width,
+                  height: item.height,
+                  scaleX: item.scaleX,
+                  scaleY: item.scaleY,
+                  offsetX: item.offsetX,
+                  offsetY: item.offsetY,
+                  rotation: item.rotation,
+                 }"/>
     </svg>
     <div id="workarea" style="height: 100vh; user-select: none"></div>
     <div class="toolbar" style="position: fixed;top: 0;left: 0;">
@@ -35,9 +41,10 @@
       <!--<button @click="btnZoomOutClicked">zoom-</button>-->
       <!--<button @click="btnClicked1">log</button>-->
       <button @click="addRect">addRect</button>
-      <button @click="addIcon">addIcon</button>
+      <button @click="addIcon">add tw</button>
+      <button @click="addIcon2">add gg</button>
       <button @click="btnGroup">group</button>
-      <button @click="btnUnSelGroup">ungroup</button>
+      <button @click="unGroupSelAll">ungroup</button>
     </div>
   </section>
 
@@ -46,8 +53,9 @@
 <script>
   import Guid from './utils/guid'
   import Konva from 'konva'
-  import ScadaImage from './components/icon'
+  import ScadaImage from './components/image'
   import ScadaRect from './components/rect'
+  import _ from 'lodash'
 
   const WIDTH = window.innerWidth
   const HEIGHT = window.innerHeight
@@ -78,15 +86,6 @@
         curSelComps: [],
         groupLastPos: { x: 0, y: 0 },
         isRectSelecting: false
-      }
-    },
-    computed: {
-      svgViewbox() {
-        const x = (-this.canvasLayout.x / this.canvasLayout.scale).toFixed(2)
-        const y = (-this.canvasLayout.y / this.canvasLayout.scale).toFixed(2)
-        const w = (this.canvasLayout.width / this.canvasLayout.scale).toFixed(2)
-        const h = (this.canvasLayout.height / this.canvasLayout.scale).toFixed(2)
-        return `${x} ${y} ${w} ${h}`
       }
     },
     mounted() {
@@ -160,7 +159,8 @@
         width: 50,
         height: 50,
         strokeWidth: 1,
-        stroke: '#385f8d',
+        stroke: '#AAA',
+        dash: [3, 1]
       })
 
       this.konvaObjs.selCompsGroup.on('dragend ', () => {
@@ -179,7 +179,9 @@
         if (e.target === this.konvaObjs.stage) {
           // this.konvaObjs.stage.find('Transformer').detach()
           this.konvaObjs.transformer.detach()
-          this.btnUnSelGroup()
+          // if (this.curSelComps.length > 0) {
+          this.unGroupSelAll()
+          // }
           this.konvaObjs.layers[0].draw()
 
           this.isRectSelecting = true
@@ -203,21 +205,20 @@
           this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
           this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
           this.konvaObjs.layers[0].draw()
-          // this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
-          // this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
         }
       })
 
       this.konvaObjs.stage.on('mouseup', (e) => {
         console.log('mouseup')
+        // console.log(this.konvaObjs.selCompsRect.getAbsolutePosition())
+        console.log(this.konvaObjs.selCompsRect.x())
+        console.log(this.konvaObjs.selCompsRect.width())
         if (this.isRectSelecting) {
           // const mousePos = this.konvaObjs.stage.getPointerPosition()
           // const x = mousePos.x
           // const y = mousePos.y
           this.konvaObjs.selCompsRect.remove()
           this.konvaObjs.layers[0].draw()
-          // this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
-          // this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
         }
       })
 
@@ -251,21 +252,23 @@
 
         comp.konvaRect.on('click', () => {
           if (comp.konvaRect.getParent().getType() !== 'Group') {
-            console.log('shift press: ' + hotkeys.shift)
+            // 不在多选组内
             if (!hotkeys.shift) {
               this.curSelComps = []
               this.curSelComps.push(comp)
             } else {
-              this.curSelComps.push(comp)
+              if (!this.isInSelGroup(comp)) {
+                this.curSelComps.push(comp)
+              }
             }
-
-            // if (this.curSelComps.length === 0) {
-            //   // this.addTransformer(comp.konvaRect)
-            //   this.curSelComps.push(comp)
-            // } else {
-            //   this.curSelComps = []
-            //   this.curSelComps.push(comp)
-            // }
+          } else {
+            // 在多选组内
+            if (hotkeys.shift) {
+              if (this.isInSelGroup(comp)) {
+                this.removeCompfromGroupSel(comp)
+                this.curSelComps.splice(_.findIndex(this.curSelComps, comp), 1)
+              }
+            }
           }
         })
 
@@ -307,10 +310,10 @@
         this.addComp(this.getCompOptions({
           x: 200,
           y: 200,
-          width: 80,
-          height: 60,
-          offsetX: -40,
-          offsetY: -30,
+          width: 120,
+          height: 100,
+          offsetX: -60,
+          offsetY: -50,
           comp: {
             type: 'ScadaRect'
           }
@@ -325,17 +328,29 @@
           offsetX: -50,
           offsetY: -50,
           comp: {
-            type: 'ScadaImage'
+            type: 'ScadaImage',
+            options: {
+              url: '/images/twitter.svg'
+            }
           },
         }))
       },
-      // updateLayout(comp) {
-      //   comp.x = comp.konvaRect.x()
-      //   comp.y = comp.konvaRect.y()
-      //   comp.scaleX = comp.konvaRect.scaleX()
-      //   comp.scaleY = comp.konvaRect.scaleY()
-      //   comp.rotation = comp.konvaRect.rotation()
-      // },
+      addIcon2() {
+        this.addComp(this.getCompOptions({
+          x: 300,
+          y: 300,
+          width: 200,
+          height: 68,
+          offsetX: -100,
+          offsetY: -34,
+          comp: {
+            type: 'ScadaImage',
+            options: {
+              url: '/images/google.png'
+            }
+          },
+        }))
+      },
       updateLayout(comp) {
         comp.x = comp.konvaRect.getAbsolutePosition().x
         comp.y = comp.konvaRect.getAbsolutePosition().y
@@ -361,7 +376,7 @@
         this.konvaObjs.transformer.attachTo(node)
         this.konvaObjs.layers[0].draw()
       },
-      // btnUnSelGroup() {
+      // unGroupSelAll() {
       //   this.curSelComps.forEach((comp) => {
       //     comp.konvaRect.moveTo(this.konvaObjs.layers[0])
       //     comp.konvaRect.draggable(true)
@@ -370,28 +385,24 @@
       //   this.konvaObjs.layers[0].draw()
       //   this.curSelComps = []
       // },
-      btnUnSelGroup() {
-        this.curSelComps.forEach((comp) => {
-          const compPosition = comp.konvaRect.getAbsolutePosition()
-          comp.konvaRect.moveTo(this.konvaObjs.layers[0])
-          comp.konvaRect.setAbsolutePosition(compPosition)
-          comp.konvaRect.scale({
-            x: comp.konvaRect.getAbsoluteScale().x,
-            y: comp.konvaRect.getAbsoluteScale().y
-          })
-          comp.konvaRect.draggable(true)
-          if (comp.tempTr) {
-            comp.tempTr.destroy()
-            comp.tempTr = null
-          }
+      removeCompfromGroupSel(comp) {
+        if (comp.tempTr) {
+          comp.tempTr.destroy()
+          comp.tempTr = null
+        }
+        const compPosition = comp.konvaRect.getAbsolutePosition()
+        comp.konvaRect.moveTo(this.konvaObjs.layers[0])
+        comp.konvaRect.setAbsolutePosition(compPosition)
+        comp.konvaRect.scale({
+          x: comp.konvaRect.getAbsoluteScale().x,
+          y: comp.konvaRect.getAbsoluteScale().y
         })
-        // this.konvaObjs.groupTransformer.detach()
-        // this.konvaObjs.selCompsGroup.remove()
-        // this.konvaObjs.selCompsGroup.x(0)
-        // this.konvaObjs.selCompsGroup.y(0)
-        // this.konvaObjs.selCompsGroup.scaleX(1)
-        // this.konvaObjs.selCompsGroup.scaleY(1)
-        // this.konvaObjs.layers[0].draw()
+        comp.konvaRect.draggable(true)
+      },
+      unGroupSelAll() {
+        this.curSelComps.forEach((comp) => {
+          this.removeCompfromGroupSel(comp)
+        })
         this.curSelComps = []
       },
       btnGroup() {
@@ -426,7 +437,7 @@
       },
       addToGroup() {
         this.konvaObjs.transformer.detach()
-
+        // this.konvaObjs.selCompsGroup.removeChildren()
         this.curSelComps.forEach((comp) => {
           this.konvaObjs.selCompsGroup.add(comp.konvaRect)
 
@@ -449,46 +460,49 @@
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
       },
+      cancelSelGroup() {
+        this.konvaObjs.groupTransformer.detach()
+        this.konvaObjs.selCompsGroup.remove()
+        this.konvaObjs.selCompsGroup.x(0)
+        this.konvaObjs.selCompsGroup.y(0)
+        this.konvaObjs.selCompsGroup.scaleX(1)
+        this.konvaObjs.selCompsGroup.scaleY(1)
+        this.konvaObjs.layers[0].draw()
+      },
       initHotkeyBinding() {
         hotkeys('*', (e) => {
-          // console.log(e)
-          // if (e.ctrlKey) {
-          //   console.log('true')
-          // } else {
-          //   console.log('false')
-          // }
-
-          // hotkeys
-          // if (hotkeys.shift) console.log('shift is pressed!');
-          // if (hotkeys.ctrl) console.log('ctrl is pressed!');
-          // if (hotkeys.alt) console.log('alt is pressed!');
-          // if (hotkeys.option) console.log('option is pressed!');
-          // if (hotkeys.control) console.log('control is pressed!');
-          // if (hotkeys.cmd) console.log('cmd is pressed!');
-          // if (hotkeys.command) console.log('command is pressed!');
         })
+      },
+      isInSelGroup(comp) {
+        return _.findIndex(this.curSelComps, comp) >= 0
+      },
+    },
+    computed: {
+      // curSelComps() {
+      //
+      // },
+      svgViewbox() {
+        const x = (-this.canvasLayout.x / this.canvasLayout.scale).toFixed(2)
+        const y = (-this.canvasLayout.y / this.canvasLayout.scale).toFixed(2)
+        const w = (this.canvasLayout.width / this.canvasLayout.scale).toFixed(2)
+        const h = (this.canvasLayout.height / this.canvasLayout.scale).toFixed(2)
+        return `${x} ${y} ${w} ${h}`
       }
     },
     watch: {
       curSelComps() {
-        console.log(this.curSelComps.length)
+        console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
+            this.removeCompfromGroupSel(this.curSelComps[0])
             this.addTransformer(this.curSelComps[0].konvaRect)
-            // this.curSelComps.push(comp)
+            this.cancelSelGroup()
           } else {
             this.addToGroup()
-            // this.curSelComps.push(comp)
           }
         } else {
-          console.log('upgroup')
-          this.konvaObjs.groupTransformer.detach()
-          this.konvaObjs.selCompsGroup.remove()
-          this.konvaObjs.selCompsGroup.x(0)
-          this.konvaObjs.selCompsGroup.y(0)
-          this.konvaObjs.selCompsGroup.scaleX(1)
-          this.konvaObjs.selCompsGroup.scaleY(1)
-          this.konvaObjs.layers[0].draw()
+          // console.log('ungroup')
+          this.cancelSelGroup()
         }
       }
     }
@@ -499,6 +513,7 @@
   body {
     margin: 0;
     padding: 0;
+    background: #2B2B2B;
   }
 
   #workarea {
