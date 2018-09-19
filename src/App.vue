@@ -19,20 +19,10 @@
       <!--</g>-->
 
       <component v-for="item in comps"
-                 :key="item.id"
+                 :key="item.name"
                  :is="item.comp.type"
                  :options="item.comp.options"
-                 :layout="{
-                  x: item.x,
-                  y: item.y,
-                  width: item.width,
-                  height: item.height,
-                  scaleX: item.scaleX,
-                  scaleY: item.scaleY,
-                  offsetX: item.offsetX,
-                  offsetY: item.offsetY,
-                  rotation: item.rotation,
-                 }"/>
+                 :layout="item.layout()"/>
     </svg>
     <div id="workarea"></div>
     <div class="toolbar" style="position: fixed;top: 0;left: 0;">
@@ -135,7 +125,7 @@
         // this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // console.log(compScale)
-          this.updateLayout(comp)
+          comp.updateLayout()
           // if (comp.tempTr) {
           //   comp.tempTr.forceUpdate()
           // }
@@ -191,7 +181,7 @@
         this.curSelComps.forEach((comp) => {
           // const compPosition = comp.konvaRect.getAbsolutePosition()
           // console.log(compPosition)
-          this.updateLayout(comp)
+          comp.updateLayout()
         })
       })
 
@@ -276,32 +266,10 @@
       this.konvaObjs.layers[0].draw()
     },
     methods: {
-      getCompOptions(options) {
-        return {
-          id: Guid(),
-          x: options.x,
-          y: options.y,
-          width: options.width,
-          height: options.height,
-          scaleX: 1,
-          scaleY: 1,
-          offsetX: options.offsetX,
-          offsetY: options.offsetY,
-          rotation: 0,
-          strokeWidth: 1,
-          // stroke: '#F00',
-          name: Guid(),
-          draggable: true,
-          konvaRect: null,
-          comp: options.comp
-        }
-      },
       addComp(comp) {
-        this.comps.push(comp)
-        comp.konvaRect = new Konva.Rect(comp)
-
+        comp.setContext(this.konvaObjs)
         comp.konvaRect.on('click', () => {
-          if (comp.konvaRect.getParent().getType() !== 'Group') {
+          if (comp.isInSelGroup()) {
             // 不在多选组内
             if (!hotkeys.shift) {
               this.unGroupSelAll()
@@ -315,7 +283,7 @@
             // 在多选组内
             if (hotkeys.shift) {
               if (this.isInSelGroup(comp)) {
-                this.removeCompfromGroupSel(comp)
+                comp.removeCompfromGroupSel()
                 this.curSelComps.splice(_.findIndex(this.curSelComps, comp), 1)
               }
             }
@@ -323,41 +291,20 @@
         })
 
         comp.konvaRect.on('dragstart', () => {
-          if (comp.konvaRect.getParent().getType() !== 'Group') {
+          console.log('dragstart')
+          if (comp.isInSelGroup()) {
             this.unGroupSelAll()
             this.curSelComps.push(comp)
           }
         })
 
-        // comp.konvaRect.on('dragmove', () => {
-        //   this.updateLayout(comp)
-        // })
-
-
-        comp.konvaRect.on('dragend transformend', () => {
-          this.updateLayout(comp)
-          this.konvaObjs.transformer.rotateEnabled(true)
-          this.konvaObjs.transformer.resizeEnabled(true)
-          this.konvaObjs.transformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-        // comp.konvaRect.on('transform', () => {
-        //   this.updateLayout(comp)
-        // })
-        // comp.konvaRect.on('transformend', () => {
-        //   updateLayout(comp)
-        // })
-        comp.konvaRect.on('dragstart', () => {
-          this.konvaObjs.transformer.rotateEnabled(false)
-          this.konvaObjs.transformer.resizeEnabled(false)
-          this.konvaObjs.layers[0].draw()
-        })
-
-        this.konvaObjs.layers[0].add(comp.konvaRect)
-        this.konvaObjs.layers[0].draw()
+        this.comps.push(comp)
+        // this.konvaObjs.layers[0].add(comp.konvaRect)
+        // this.konvaObjs.layers[0].draw()
       },
       addLabel() {
-        this.addComp(this.getCompOptions({
+        this.addComp(new CompCtrl({
+          konvaContext: this.konvaObjs,
           x: 400,
           y: 400,
           width: 200,
@@ -373,7 +320,8 @@
         }))
       },
       addRect() {
-        this.addComp(this.getCompOptions({
+        this.addComp(new CompCtrl({
+          konvaContext: this.konvaObjs,
           x: 200,
           y: 200,
           width: 120,
@@ -386,7 +334,8 @@
         }))
       },
       addIcon() {
-        this.addComp(this.getCompOptions({
+        this.addComp(new CompCtrl({
+          konvaContext: this.konvaObjs,
           x: 100,
           y: 100,
           width: 100,
@@ -402,7 +351,8 @@
         }))
       },
       addIcon2() {
-        this.addComp(this.getCompOptions({
+        this.addComp(new CompCtrl({
+          konvaContext: this.konvaObjs,
           x: 300,
           y: 300,
           width: 200,
@@ -418,52 +368,14 @@
         }))
       },
       addAll() {
-        this.addRect()
+        this.addLabel()
         this.addIcon()
+        this.addRect()
         this.addIcon2()
-      },
-      updateLayout(comp) {
-        comp.x = comp.konvaRect.getAbsolutePosition().x
-        comp.y = comp.konvaRect.getAbsolutePosition().y
-        comp.scaleX = comp.konvaRect.getAbsoluteScale().x
-        comp.scaleY = comp.konvaRect.getAbsoluteScale().y
-        comp.rotation = comp.konvaRect.rotation()
-      },
-      addTransformer(node) {
-        // if (!node.hasName('rect')) {
-        //   return;
-        // }
-        // remove old transformers
-        // TODO: we can skip it if current rect is already selected
-        // this.konvaObjs.stage.find('Transformer').destroy()
-        //
-        // // create new transformer
-        // const tr = new Konva.Transformer({
-        //   keepRatio: false,
-        //   anchorSize: 8,
-        //   rotationSnaps: [0, 90, 180, 270]
-        // })
-        this.konvaObjs.layers[0].add(this.konvaObjs.transformer)
-        this.konvaObjs.transformer.attachTo(node)
-        this.konvaObjs.layers[0].draw()
-      },
-      removeCompfromGroupSel(comp) {
-        if (comp.tempTr) {
-          comp.tempTr.destroy()
-          comp.tempTr = null
-        }
-        const compPosition = comp.konvaRect.getAbsolutePosition()
-        comp.konvaRect.moveTo(this.konvaObjs.layers[0])
-        comp.konvaRect.setAbsolutePosition(compPosition)
-        comp.konvaRect.scale({
-          x: comp.konvaRect.getAbsoluteScale().x,
-          y: comp.konvaRect.getAbsoluteScale().y
-        })
-        comp.konvaRect.draggable(true)
       },
       unGroupSelAll() {
         this.curSelComps.forEach((comp) => {
-          this.removeCompfromGroupSel(comp)
+          comp.removeCompfromGroupSel()
         })
         this.curSelComps = []
       },
@@ -507,7 +419,7 @@
       },
       syncGroupSel() {
         this.curSelComps.forEach((comp) => {
-          this.removeCompfromGroupSel(comp)
+          comp.removeCompfromGroupSel()
         })
         this.cancelSelGroup()
         this.addToGroup()
@@ -557,13 +469,8 @@
         this.curSelComps.forEach((selComp) => {
           const i = _.findIndex(this.comps, selComp)
           if (i >= 0) {
-            if (selComp.tempTr) {
-              selComp.tempTr.destroy()
-              selComp.tempTr = null
-            }
-            selComp.konvaRect.destroy()
+            selComp.delete()
             this.comps.splice(i, 1)
-            // this.comps.unshift(selComp)
           }
         })
         this.curSelComps = []
@@ -603,8 +510,8 @@
         console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
-            this.removeCompfromGroupSel(this.curSelComps[0])
-            this.addTransformer(this.curSelComps[0].konvaRect)
+            // this.curSelComps[0].removeCompfromGroupSel()
+            this.curSelComps[0].addTransformer()
             this.cancelSelGroup()
           } else {
             this.addToGroup()
