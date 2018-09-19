@@ -34,16 +34,25 @@
                   rotation: item.rotation,
                  }"/>
     </svg>
-    <div id="workarea" style="height: 100vh; user-select: none"></div>
+    <div id="workarea"></div>
     <div class="toolbar" style="position: fixed;top: 0;left: 0;">
       <!--<button @click="btnClicked">add</button>-->
       <!--<button @click="btnZoomInClicked">zoom+</button>-->
       <!--<button @click="btnZoomOutClicked">zoom-</button>-->
       <!--<button @click="btnClicked1">log</button>-->
+      <button @click="addLabel">label</button>
       <button @click="addRect">rect</button>
       <button @click="addIcon">twitter</button>
       <button @click="addIcon2">google</button>
       <button @click="addAll">add all</button>
+      <span style="display: inline-block; width: 20px"/>
+      <button @click="showNodeZIndex">z index</button>
+      <span style="display: inline-block; width: 20px"/>
+      <button @click="compsMoveTop">to top</button>
+      <button @click="compsMoveBottom">to bottom</button>
+      <button @click="compsDelete">delete</button>
+      <span style="display: inline-block; width: 20px"/>
+      <button @click="classTest">test</button>
       <!--<button @click="unGroupSelAll">ungroup</button>-->
     </div>
   </section>
@@ -51,19 +60,23 @@
 </template>
 
 <script>
+  import CompCtrl from './class/CompCtrl'
+
   import Guid from './utils/guid'
   import Konva from 'konva'
-  import ScadaImage from './components/image'
-  import ScadaRect from './components/rect'
   import _ from 'lodash'
+  import hotkeys from 'hotkeys-js'
+
+  import ScadaImage from './components/image'
+  import ScadaRect from './components/rect1'
+  import ScadaLabel from './components/label'
+
 
   const WIDTH = window.innerWidth
   const HEIGHT = window.innerHeight
 
-  import hotkeys from 'hotkeys-js'
-
   export default {
-    components: { ScadaImage, ScadaRect },
+    components: { ScadaImage, ScadaRect, ScadaLabel },
     name: 'Editor',
     data() {
       return {
@@ -119,7 +132,7 @@
 
       this.konvaObjs.groupTransformer.on('transformend', () => {
         console.log('transformend ')
-        // this.refreashGroupSel()
+        // this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // console.log(compScale)
           this.updateLayout(comp)
@@ -127,7 +140,7 @@
           //   comp.tempTr.forceUpdate()
           // }
         })
-        this.refreashGroupSel()
+        this.syncGroupSel()
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
       })
@@ -174,7 +187,7 @@
       this.konvaObjs.selCompsGroup.on('dragend ', () => {
         // console.log('dragend ')
         this.konvaObjs.groupTransformer.resizeEnabled(true)
-        this.refreashGroupSel()
+        this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // const compPosition = comp.konvaRect.getAbsolutePosition()
           // console.log(compPosition)
@@ -343,6 +356,22 @@
         this.konvaObjs.layers[0].add(comp.konvaRect)
         this.konvaObjs.layers[0].draw()
       },
+      addLabel() {
+        this.addComp(this.getCompOptions({
+          x: 400,
+          y: 400,
+          width: 200,
+          height: 68,
+          offsetX: -100,
+          offsetY: -34,
+          comp: {
+            type: 'ScadaLabel',
+            options: {
+              fontSize: 20
+            }
+          },
+        }))
+      },
       addRect() {
         this.addComp(this.getCompOptions({
           x: 200,
@@ -476,7 +505,7 @@
       isInSelGroup(comp) {
         return _.findIndex(this.curSelComps, comp) >= 0
       },
-      refreashGroupSel() {
+      syncGroupSel() {
         this.curSelComps.forEach((comp) => {
           this.removeCompfromGroupSel(comp)
         })
@@ -499,12 +528,68 @@
           r1.y <= r2.y &&
           r1.y + r1.height >= r2.y + r2.height
         )
+      },
+      syncKonvaZIndex() {
+        this.comps.forEach((comp, index) => {
+          comp.konvaRect.setZIndex(index)
+        })
+        this.konvaObjs.layers[0].draw()
+      },
+      compsMoveTop() {
+        this.curSelComps.forEach((selComp) => {
+          const i = _.findIndex(this.comps, selComp)
+          if (i >= 0) {
+            this.comps.splice(i, 1)
+            this.comps.push(selComp)
+          }
+        })
+      },
+      compsMoveBottom() {
+        this.curSelComps.forEach((selComp) => {
+          const i = _.findIndex(this.comps, selComp)
+          if (i >= 0) {
+            this.comps.splice(i, 1)
+            this.comps.unshift(selComp)
+          }
+        })
+      },
+      compsDelete() {
+        this.curSelComps.forEach((selComp) => {
+          const i = _.findIndex(this.comps, selComp)
+          if (i >= 0) {
+            if (selComp.tempTr) {
+              selComp.tempTr.destroy()
+              selComp.tempTr = null
+            }
+            selComp.konvaRect.destroy()
+            this.comps.splice(i, 1)
+            // this.comps.unshift(selComp)
+          }
+        })
+        this.curSelComps = []
+      },
+      showNodeZIndex() {
+        this.comps.forEach((comp, index) => {
+          console.log(`${index} : ${comp.konvaRect.name()} ${comp.konvaRect.getZIndex()}`)
+        })
+      },
+      classTest() {
+        const comp = new CompCtrl({
+          x: 200,
+          y: 200,
+          width: 120,
+          height: 100,
+          offsetX: -60,
+          offsetY: -50,
+          comp: {
+            type: 'ScadaRect'
+          }
+        })
+        console.log(JSON.stringify(comp))
+        this.comps.push(comp)
       }
     },
     computed: {
-      // curSelComps() {
-      //
-      // },
       svgViewbox() {
         const x = (-this.canvasLayout.x / this.canvasLayout.scale).toFixed(2)
         const y = (-this.canvasLayout.y / this.canvasLayout.scale).toFixed(2)
@@ -526,8 +611,14 @@
           }
         } else {
           // console.log('ungroup')
+          this.konvaObjs.transformer.detach()
           this.cancelSelGroup()
         }
+        this.syncKonvaZIndex()
+      },
+      comps() {
+        console.log('comp changed')
+        this.syncKonvaZIndex()
       }
     }
   }
@@ -535,14 +626,19 @@
 </script>
 <style lang="scss">
   body {
+    width: 100vw;
+    height: 100vh;
     margin: 0;
     padding: 0;
     background: #2B2B2B;
+    overflow: hidden;
   }
 
   #workarea {
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     user-select: none;
+
   }
 
   .toolbar {
