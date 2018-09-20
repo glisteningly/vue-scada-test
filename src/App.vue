@@ -18,11 +18,11 @@
       <!--<component :is="item.comp.type"/>-->
       <!--</g>-->
 
-      <component v-for="item in comps"
-                 :key="item.name"
-                 :is="item.comp.type"
-                 :options="item.comp.options"
-                 :layout="item.layout()"/>
+      <component v-for="comp in comps"
+                 :key="comp.name"
+                 :is="comp.type"
+                 :comp="comp"
+                 :options="comp.options"/>
     </svg>
     <div id="workarea"></div>
     <div class="toolbar" style="position: fixed;top: 0;left: 0;">
@@ -42,7 +42,16 @@
       <button @click="compsMoveBottom">to bottom</button>
       <button @click="compsDelete">delete</button>
       <span style="display: inline-block; width: 20px"/>
+      <button @click="testImport">import</button>
       <button @click="classTest">test</button>
+      <span style="display: inline-block; width: 20px"/>
+      <div style="display: inline-block" v-if="curSelCompLayout">
+        <span>x </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutX">
+        <span>y </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutY">
+        <span>w </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutW">
+        <span>h </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutH">
+        <span>r </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutR" disabled>
+      </div>
       <!--<button @click="unGroupSelAll">ungroup</button>-->
     </div>
   </section>
@@ -52,7 +61,6 @@
 <script>
   import CompCtrl from './class/CompCtrl'
 
-  import Guid from './utils/guid'
   import Konva from 'konva'
   import _ from 'lodash'
   import hotkeys from 'hotkeys-js'
@@ -64,6 +72,8 @@
 
   const WIDTH = window.innerWidth
   const HEIGHT = window.innerHeight
+
+  import CompConfig from './temp/compConfig1'
 
   export default {
     components: { ScadaImage, ScadaRect, ScadaLabel },
@@ -88,7 +98,8 @@
         },
         curSelComps: [],
         groupLastPos: { x: 0, y: 0 },
-        isDragSelecting: false
+        isDragSelecting: false,
+        testData: 2
       }
     },
     mounted() {
@@ -125,7 +136,7 @@
         // this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // console.log(compScale)
-          comp.updateLayout()
+          comp.syncCompLayout()
           // if (comp.tempTr) {
           //   comp.tempTr.forceUpdate()
           // }
@@ -162,32 +173,41 @@
       this.konvaObjs.selCompsGroup = new Konva.Group({
         draggable: true,
         // dragBoundFunc: function (pos) {
-        //   return {
-        //     x: pos.x,
-        //     y: this.getAbsolutePosition().y
+        //   if (hotkeys.shift) {
+        //     return {
+        //       x: pos.x,
+        //       y: this.getAbsolutePosition().y
+        //     }
+        //   } else {
+        //     return {
+        //       x: pos.x,
+        //       y: pos.y,
+        //     }
         //   }
         // }
       })
 
       this.konvaObjs.selCompsGroup.on('dragstart ', () => {
         this.konvaObjs.groupTransformer.resizeEnabled(false)
+        this.konvaObjs.groupTransformer.borderEnabled(false)
         this.konvaObjs.layers[0].draw()
       })
 
       this.konvaObjs.selCompsGroup.on('dragend ', () => {
         // console.log('dragend ')
         this.konvaObjs.groupTransformer.resizeEnabled(true)
+        this.konvaObjs.groupTransformer.borderEnabled(true)
+        this.konvaObjs.layers[0].draw()
         this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // const compPosition = comp.konvaRect.getAbsolutePosition()
           // console.log(compPosition)
-          comp.updateLayout()
+          comp.syncCompLayout()
         })
       })
 
       //click
       this.konvaObjs.stage.on('mousedown', (e) => {
-        // if click on empty area - remove all transformers
         if (e.target === this.konvaObjs.stage) {
           console.log('stage mousedown')
           // this.konvaObjs.transformer.detach()
@@ -219,7 +239,7 @@
       })
 
       this.konvaObjs.stage.on('mouseup', (e) => {
-        console.log('mouseup')
+        console.log('state mouseup')
 
         // if (e.target === this.konvaObjs.stage) {
         //   console.log('stage mouseup')
@@ -267,9 +287,9 @@
     },
     methods: {
       addComp(comp) {
-        comp.setContext(this.konvaObjs)
+        // comp.setContext(this.konvaObjs)
         comp.konvaRect.on('click', () => {
-          if (comp.isInSelGroup()) {
+          if (!this.isInSelGroup(comp)) {
             // 不在多选组内
             if (!hotkeys.shift) {
               this.unGroupSelAll()
@@ -292,7 +312,7 @@
 
         comp.konvaRect.on('dragstart', () => {
           console.log('dragstart')
-          if (comp.isInSelGroup()) {
+          if (!this.isInSelGroup(comp)) {
             this.unGroupSelAll()
             this.curSelComps.push(comp)
           }
@@ -303,69 +323,64 @@
         // this.konvaObjs.layers[0].draw()
       },
       addLabel() {
-        this.addComp(new CompCtrl({
-          konvaContext: this.konvaObjs,
-          x: 400,
-          y: 400,
-          width: 200,
-          height: 68,
-          offsetX: -100,
-          offsetY: -34,
-          comp: {
-            type: 'ScadaLabel',
-            options: {
+        this.addCompToCanvas({
+          type: 'ScadaLabel',
+          layout: {
+            x: 400,
+            y: 400,
+            width: 200,
+            height: 68
+          },
+          options: {
+            style: {
               fontSize: 20
             }
           },
-        }))
+        })
       },
       addRect() {
-        this.addComp(new CompCtrl({
-          konvaContext: this.konvaObjs,
-          x: 200,
-          y: 200,
-          width: 120,
-          height: 100,
-          offsetX: -60,
-          offsetY: -50,
-          comp: {
-            type: 'ScadaRect'
+        this.addCompToCanvas({
+          type: 'ScadaRect',
+          layout: {
+            x: 0,
+            y: 0,
+            width: 120,
+            height: 100
+          },
+          options: {
+            style: {
+              strokeWidth: 2
+            }
           }
-        }))
+        })
       },
       addIcon() {
-        this.addComp(new CompCtrl({
-          konvaContext: this.konvaObjs,
-          x: 100,
-          y: 100,
-          width: 100,
-          height: 100,
-          offsetX: -50,
-          offsetY: -50,
-          comp: {
-            type: 'ScadaImage',
-            options: {
-              url: '/images/twitter.svg'
-            }
+        this.addCompToCanvas({
+          type: 'ScadaImage',
+          layout: {
+            x: 100,
+            y: 100,
+            width: 100,
+            height: 100
           },
-        }))
+          options: {
+            url: '/images/twitter.svg'
+          }
+        })
       },
       addIcon2() {
-        this.addComp(new CompCtrl({
-          konvaContext: this.konvaObjs,
-          x: 300,
-          y: 300,
-          width: 200,
-          height: 68,
-          offsetX: -100,
-          offsetY: -34,
-          comp: {
-            type: 'ScadaImage',
-            options: {
-              url: '/images/google.png'
-            }
+        this.addCompToCanvas({
+          type: 'ScadaImage',
+          layout: {
+            x: 300,
+            y: 300,
+            width: 200,
+            height: 68
           },
-        }))
+          options: {
+            url: '/images/google.png'
+          }
+        })
       },
       addAll() {
         this.addLabel()
@@ -411,7 +426,12 @@
         this.konvaObjs.layers[0].draw()
       },
       initHotkeyBinding() {
-        hotkeys('*', (e) => {
+        hotkeys('delete ', (e, handler) => {
+          switch (handler.key) {
+            case "delete":
+              this.compsDelete()
+              break;
+          }
         })
       },
       isInSelGroup(comp) {
@@ -480,20 +500,34 @@
           console.log(`${index} : ${comp.konvaRect.name()} ${comp.konvaRect.getZIndex()}`)
         })
       },
-      classTest() {
-        const comp = new CompCtrl({
-          x: 200,
-          y: 200,
-          width: 120,
-          height: 100,
-          offsetX: -60,
-          offsetY: -50,
-          comp: {
-            type: 'ScadaRect'
-          }
+      addCompToCanvas(comp) {
+        Object.assign(comp, { konvaContext: this.konvaObjs })
+        const c = new CompCtrl(comp)
+        this.addComp(c)
+      },
+      testImport() {
+        CompConfig.comps.forEach((comp) => {
+          this.addCompToCanvas(comp)
         })
-        console.log(JSON.stringify(comp))
-        this.comps.push(comp)
+      },
+      classTest() {
+        // CompConfig.comps.forEach((comp) => {
+        //   this.addCompToCanvas(comp)
+        // })
+        // this.comps[0].options.style.strokeWidth = 5
+        // this.comps[0].x = this.comps[0].x + 10
+        // this.comps[0].y = this.comps[0].y + 10
+        // this.comps[0].x = this.comps[0].x / 1.1
+        // this.comps[0].y = this.comps[0].y / 1.1
+        this.comps[0].scaleX = this.comps[0].scaleX * 1.1
+        this.comps[0].scaleY = this.comps[0].scaleY * 1.1
+        // this.comps[0].scaleY = 1.5
+        // this.comps[0].scaleX = 2
+        // this.comps[0].rotation = 30
+        // this.comps[0].syncKonva()
+      },
+      getRoundNum(num) {
+        return Math.round(num * 100) / 100
       }
     },
     computed: {
@@ -503,6 +537,96 @@
         const w = (this.canvasLayout.width / this.canvasLayout.scale).toFixed(2)
         const h = (this.canvasLayout.height / this.canvasLayout.scale).toFixed(2)
         return `${x} ${y} ${w} ${h}`
+      },
+      curSelCompLayoutX: {
+        get() {
+          if (this.curSelComp) {
+            return this.getRoundNum(this.curSelComp.x)
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          this.curSelComp.x = v
+        }
+      },
+      curSelCompLayoutY: {
+        get() {
+          if (this.curSelComp) {
+            return this.getRoundNum(this.curSelComp.y)
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          this.curSelComp.y = v
+        }
+      },
+      curSelCompLayoutW: {
+        get() {
+          if (this.curSelComp) {
+            return this.getRoundNum(this.curSelComp.width * this.curSelComp.scaleX)
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          this.curSelComp.scaleX = v / this.curSelComp.width
+        }
+      },
+      curSelCompLayoutH: {
+        get() {
+          if (this.curSelComp) {
+            return this.getRoundNum(this.curSelComp.height * this.curSelComp.scaleY)
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          this.curSelComp.scaleY = v / this.curSelComp.height
+        }
+      },
+      curSelCompLayoutR: {
+        get() {
+          if (this.curSelComp) {
+            return this.getRoundNum(this.curSelComp.rotation)
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          this.curSelComp.rotation = v
+        }
+      },
+      curSelCompLayout: {
+        get() {
+          if (this.curSelComp) {
+            return {
+              x: this.getRoundNum(this.curSelComp.x),
+              y: this.getRoundNum(this.curSelComp.y),
+              scaleX: this.curSelComp.scaleX,
+              scaleY: this.curSelComp.scaleY,
+              rotation: this.getRoundNum(this.curSelComp.rotation),
+              width: this.getRoundNum(this.curSelComp.width * this.curSelComp.scaleX),
+              height: this.getRoundNum(this.curSelComp.height * this.curSelComp.scaleY),
+            }
+          } else {
+            return null
+          }
+        },
+        set(v) {
+          console.log('vvv')
+          if (this.curSelComp) {
+            this.curSelComp.x = v.x
+          }
+        }
+      },
+      curSelComp() {
+        if (this.curSelComps.length === 1) {
+          return this.curSelComps[0]
+        } else {
+          return null
+        }
       }
     },
     watch: {
@@ -523,10 +647,22 @@
         }
         this.syncKonvaZIndex()
       },
-      comps() {
-        console.log('comp changed')
-        this.syncKonvaZIndex()
-      }
+      curSelCompLayout: {
+        handler: function () {
+          console.log('comp layout changed')
+          if (this.curSelComp) {
+            this.curSelComp.syncKonva()
+          }
+        },
+        // deep: true
+      },
+      // curSelComp: {
+      //   handler: function () {
+      //     console.log('comp layout changed')
+      //     this.curSelComps[0].syncKonva()
+      //   },
+      //   // deep: true
+      // }
     }
   }
 
@@ -553,5 +689,15 @@
     button {
       margin-right: 5px;
     }
+    span {
+      color: #DDD;
+    }
+    .layout-input {
+      width: 60px;
+      margin-right: 8px;
+      text-align: right;
+      padding: 0 3px;
+    }
   }
+
 </style>

@@ -1,10 +1,10 @@
 <template>
   <g>
     <text fill="#FFF"
-          :x="layout.width * layout.scaleX / 2"
-          :y="layout.height * layout.scaleY / 2"
+          :x="comp.width * comp.scaleX / 2"
+          :y="comp.height * comp.scaleY / 2"
           :transform="rectTransformStr"
-          :font-size="options.fontSize"
+          :font-size="options.style.fontSize || 16"
           alignment-baseline="middle"
           text-anchor="middle">
       全应科技

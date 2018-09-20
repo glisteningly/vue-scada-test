@@ -1,18 +1,19 @@
 <template>
-  <rect fill="#08334C" stroke="#20A0FF" stroke-width="2"
+  <rect fill="#08334C" stroke="#20A0FF" :stroke-width="options.style.strokeWidth || 0"
         :transform="rectTransformStr"
-        :width="layout.width * layout.scaleX"
-        :height="layout.height * layout.scaleY"/>
+        :width="comp.width * comp.scaleX"
+        :height="comp.height * comp.scaleY"/>
 </template>
 
 <script>
   import BaseComp from './BaseComp'
+
   export default {
     extends: BaseComp,
     name: 'scadaRect',
-    props: {
-      layout: Object
-    }
+    // props: {
+    //   layout: Object
+    // }
   }
 </script>
 

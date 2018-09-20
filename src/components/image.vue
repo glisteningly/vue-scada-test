@@ -1,6 +1,6 @@
 <template>
-  <CompWrapper :layout="layout">
-    <image :xlink:href="options.url" :width="layout.width" :height="layout.height"/>
+  <CompWrapper :layout="comp">
+    <image :xlink:href="options.url" :width="comp.width" :height="comp.height"/>
   </CompWrapper>
 </template>
 
