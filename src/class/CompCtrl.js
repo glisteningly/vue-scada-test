@@ -11,16 +11,21 @@ class CompCtrl {
     this.options = options.options
 
     this.name = guid
-    this.x = options.layout.x || 0
-    this.y = options.layout.y || 0
+
+    // this.offsetX = options.layout.offsetX || (options.layout.width / 2)
+    // this.offsetY = options.layout.offsetY || (options.layout.height / 2)
+    this.offsetX = 0
+    this.offsetY = 0
+
+    this.x = options.layout.x + this.offsetX || 0
+    this.y = options.layout.y + this.offsetY || 0
     this.width = options.layout.width
     this.height = options.layout.height
     this.scaleX = options.layout.scaleX || 1
     this.scaleY = options.layout.scaleY || 1
-    // this.offsetX = options.layout.offsetX || -(options.layout.width / 2)
-    // this.offsetY = options.layout.offsetY || -(options.layout.height / 2)
-    this.offsetX = 0
-    this.offsetY = 0
+
+    // this.offsetX = 0
+    // this.offsetY = 0
     this.rotation = options.layout.rotation || 0
     // this.strokeWidth = 1
     // this.stroke= '#F00'

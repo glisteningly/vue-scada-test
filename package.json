@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "hotkeys-js": "^3.3.8",
-    "konva": "^2.3.0",
+    "konva": "^2.4.0",
     "lodash": "^4.17.11",
     "vue": "^2.5.16",
     "vue-konva": "^1.0.6",

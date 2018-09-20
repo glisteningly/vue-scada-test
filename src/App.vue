@@ -541,25 +541,25 @@
       curSelCompLayoutX: {
         get() {
           if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.x)
+            return this.getRoundNum(this.curSelComp.x - this.curSelComp.offsetX)
           } else {
             return null
           }
         },
         set(v) {
-          this.curSelComp.x = v
+          this.curSelComp.x = v + this.curSelComp.offsetX
         }
       },
       curSelCompLayoutY: {
         get() {
           if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.y)
+            return this.getRoundNum(this.curSelComp.y - this.curSelComp.offsetY)
           } else {
             return null
           }
         },
         set(v) {
-          this.curSelComp.y = v
+          this.curSelComp.y = v + this.curSelComp.offsetY
         }
       },
       curSelCompLayoutW: {
@@ -596,6 +596,8 @@
         },
         set(v) {
           this.curSelComp.rotation = v
+          // this.curSelComp.x = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.cos(v * Math.PI / 180) + (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.sin(v * Math.PI / 180) + this.curSelComp.x + this.curSelComp.width * this.curSelComp.scaleX / 2
+          // this.curSelComp.y = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.sin(v * Math.PI / 180) - (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.cos(v * Math.PI / 180) + this.curSelComp.y + this.curSelComp.height * this.curSelComp.scaleY / 2
         }
       },
       curSelCompLayout: {
