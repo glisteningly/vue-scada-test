@@ -12,10 +12,10 @@ class CompCtrl {
 
     this.name = guid
 
-    // this.offsetX = options.layout.offsetX || (options.layout.width / 2)
-    // this.offsetY = options.layout.offsetY || (options.layout.height / 2)
-    this.offsetX = 0
-    this.offsetY = 0
+    this.offsetX = options.layout.offsetX || (options.layout.width / 2)
+    this.offsetY = options.layout.offsetY || (options.layout.height / 2)
+    // this.offsetX = 0
+    // this.offsetY = 0
 
     this.x = options.layout.x + this.offsetX || 0
     this.y = options.layout.y + this.offsetY || 0

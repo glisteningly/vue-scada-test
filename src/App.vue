@@ -50,7 +50,7 @@
         <span>y </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutY">
         <span>w </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutW">
         <span>h </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutH">
-        <span>r </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutR" disabled>
+        <span>r </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutR">
       </div>
       <!--<button @click="unGroupSelAll">ungroup</button>-->
     </div>
@@ -344,7 +344,7 @@
           layout: {
             x: 0,
             y: 0,
-            width: 120,
+            width: 100,
             height: 100
           },
           options: {
@@ -541,25 +541,25 @@
       curSelCompLayoutX: {
         get() {
           if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.x - this.curSelComp.offsetX)
+            return this.getRoundNum(this.curSelComp.x - this.curSelComp.offsetX * this.curSelComp.scaleX)
           } else {
             return null
           }
         },
         set(v) {
-          this.curSelComp.x = v + this.curSelComp.offsetX
+          this.curSelComp.x = v + this.curSelComp.offsetX * this.curSelComp.scaleX
         }
       },
       curSelCompLayoutY: {
         get() {
           if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.y - this.curSelComp.offsetY)
+            return this.getRoundNum(this.curSelComp.y - this.curSelComp.offsetY * this.curSelComp.scaleY)
           } else {
             return null
           }
         },
         set(v) {
-          this.curSelComp.y = v + this.curSelComp.offsetY
+          this.curSelComp.y = v + this.curSelComp.offsetY * this.curSelComp.scaleY
         }
       },
       curSelCompLayoutW: {
@@ -571,6 +571,7 @@
           }
         },
         set(v) {
+          this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
           this.curSelComp.scaleX = v / this.curSelComp.width
         }
       },
@@ -583,6 +584,7 @@
           }
         },
         set(v) {
+          this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
           this.curSelComp.scaleY = v / this.curSelComp.height
         }
       },
