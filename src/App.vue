@@ -129,7 +129,7 @@
         keepRatio: true,
         anchorSize: 6,
         // resizeEnabled: false,
-        rotateEnabled: false,
+        // rotateEnabled: false,
         // rotationSnaps: [],
         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
       })
@@ -144,7 +144,7 @@
           //   comp.tempTr.forceUpdate()
           // }
         })
-        this.syncGroupSel()
+        // this.syncGroupSel()
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
       })
@@ -192,6 +192,7 @@
 
       this.konvaObjs.selCompsGroup.on('dragstart ', () => {
         this.konvaObjs.groupTransformer.resizeEnabled(false)
+        this.konvaObjs.groupTransformer.rotateEnabled(false)
         this.konvaObjs.groupTransformer.borderEnabled(false)
         this.konvaObjs.layers[0].draw()
       })
@@ -199,9 +200,10 @@
       this.konvaObjs.selCompsGroup.on('dragend ', () => {
         // console.log('dragend ')
         this.konvaObjs.groupTransformer.resizeEnabled(true)
+        this.konvaObjs.groupTransformer.rotateEnabled(true)
         this.konvaObjs.groupTransformer.borderEnabled(true)
         this.konvaObjs.layers[0].draw()
-        this.syncGroupSel()
+        // this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // const compPosition = comp.konvaRect.getAbsolutePosition()
           // console.log(compPosition)
@@ -274,7 +276,6 @@
             // this.unGroupSelAll()
             this.curSelComps = newSels
           } else {
-
             this.konvaObjs.layers[0].draw()
           }
 
@@ -438,6 +439,7 @@
         this.konvaObjs.selCompsGroup.y(0)
         this.konvaObjs.selCompsGroup.scaleX(1)
         this.konvaObjs.selCompsGroup.scaleY(1)
+        this.konvaObjs.selCompsGroup.rotation(0)
         this.konvaObjs.layers[0].draw()
       },
       initHotkeyBinding() {

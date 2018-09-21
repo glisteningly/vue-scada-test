@@ -120,7 +120,7 @@ class CompCtrl {
     this.y = this.konvaRect.getAbsolutePosition().y
     this.scaleX = this.konvaRect.getAbsoluteScale().x
     this.scaleY = this.konvaRect.getAbsoluteScale().y
-    this.rotation = this.konvaRect.rotation()
+    this.rotation = this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation()
   }
 
   syncChildrenCompLayout() {
@@ -166,6 +166,7 @@ class CompCtrl {
       x: this.konvaRect.getAbsoluteScale().x,
       y: this.konvaRect.getAbsoluteScale().y
     })
+    this.konvaRect.rotation(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
     this.konvaRect.draggable(true)
   }
 
