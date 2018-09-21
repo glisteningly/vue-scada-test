@@ -32,9 +32,10 @@
       <!--<button @click="btnClicked1">log</button>-->
       <button @click="addLabel">label</button>
       <button @click="addRect">rect</button>
-      <button @click="addIcon">twitter</button>
-      <button @click="addIcon2">google</button>
+      <!--<button @click="addIcon">twitter</button>-->
+      <!--<button @click="addIcon2">google</button>-->
       <button @click="addAll">add all</button>
+      <button @click="addCompGroup">add group</button>
       <span style="display: inline-block; width: 20px"/>
       <button @click="showNodeZIndex">z index</button>
       <span style="display: inline-block; width: 20px"/>
@@ -68,15 +69,17 @@
   import ScadaImage from './components/image'
   import ScadaRect from './components/rect1'
   import ScadaLabel from './components/label'
+  import ScadaGroup from './components/compGroup'
 
 
   const WIDTH = window.innerWidth
   const HEIGHT = window.innerHeight
 
   import CompConfig from './temp/compConfig1'
+  import CompGroup1 from './temp/compGroup1'
 
   export default {
-    components: { ScadaImage, ScadaRect, ScadaLabel },
+    components: { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup },
     name: 'Editor',
     data() {
       return {
@@ -387,6 +390,18 @@
         this.addIcon()
         this.addRect()
         this.addIcon2()
+      },
+      addCompGroup() {
+        const children = []
+        CompGroup1.children.forEach((comp) => {
+          children.push(new CompCtrl(comp))
+        })
+
+        Object.assign(CompGroup1, { konvaContext: this.konvaObjs })
+        const c = new CompCtrl(CompGroup1)
+        c.children = children
+        c.syncChildrenCompLayout()
+        this.addComp(c)
       },
       unGroupSelAll() {
         this.curSelComps.forEach((comp) => {

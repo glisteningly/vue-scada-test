@@ -7,6 +7,7 @@ class CompCtrl {
     const guid = Guid()
     // this.id = guid
 
+
     this.type = options.type
     this.options = options.options
 
@@ -24,20 +25,21 @@ class CompCtrl {
     this.scaleX = options.layout.scaleX || 1
     this.scaleY = options.layout.scaleY || 1
 
-    // this.offsetX = 0
-    // this.offsetY = 0
     this.rotation = options.layout.rotation || 0
-    // this.strokeWidth = 1
-    // this.stroke= '#F00'
-    this.draggable = true
 
+    this.initLayout = {
+      x: options.layout.x + this.offsetX || 0,
+      y: options.layout.y + this.offsetY || 0,
+      scaleX: options.layout.scaleX || 1,
+      scaleY: options.layout.scaleY || 1,
+      offsetX: options.layout.offsetX || (options.layout.width / 2),
+      offsetY: options.layout.offsetY || (options.layout.height / 2)
+    }
 
-    this.konvaRect = new Konva.Rect(this)
-    this.tempTr = null
-
-    this.konvaContext = options.konvaContext
-
-    this.initKonva()
+    if (options.konvaContext) {
+      this.konvaContext = options.konvaContext
+      this.initKonva()
+    }
   }
 
   // get x() {
@@ -50,6 +52,11 @@ class CompCtrl {
   // }
 
   initKonva() {
+    this.draggable = true
+    this.konvaRect = new Konva.Rect(this)
+    this.tempTr = null
+
+    // this.konvaContext = options.konvaContext
     // 拖拽移动时即时变化
     // this.konvaRect.on('dragmove', () => {
     //   this.updateLayout()
@@ -73,8 +80,12 @@ class CompCtrl {
     })
 
     this.konvaRect.on('dragend transformend', () => {
+      console.log(this.children)
       this.syncCompLayout()
-      this.konvaContext.transformer.rotateEnabled(true)
+      this.syncChildrenCompLayout()
+      if (this.type !== 'ScadaGroup') {
+        this.konvaContext.transformer.rotateEnabled(true)
+      }
       this.konvaContext.transformer.resizeEnabled(true)
       this.konvaContext.transformer.forceUpdate()
       this.konvaRect.getLayer().draw()
@@ -82,6 +93,8 @@ class CompCtrl {
 
     this.konvaContext.layers[0].add(this.konvaRect)
     this.konvaRect.getLayer().draw()
+
+    // this.syncChildrenCompLayout()
   }
 
   setContext(konvaContext) {
@@ -108,6 +121,19 @@ class CompCtrl {
     this.scaleX = this.konvaRect.getAbsoluteScale().x
     this.scaleY = this.konvaRect.getAbsoluteScale().y
     this.rotation = this.konvaRect.rotation()
+  }
+
+  syncChildrenCompLayout() {
+    console.log(this.children)
+    if (this.children && this.children.length > 0) {
+      this.children.forEach((comp) => {
+        console.log(comp.initLayout)
+        comp.scaleX = comp.initLayout.scaleX * this.scaleX
+        comp.scaleY = comp.initLayout.scaleY * this.scaleY
+        comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX-1) * this.konvaRect.getAbsolutePosition().x
+        comp.y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY-1) * this.konvaRect.getAbsolutePosition().y
+      })
+    }
   }
 
   syncKonva() {
@@ -151,6 +177,17 @@ class CompCtrl {
   addTransformer() {
     this.removeCompfromGroupSel()
     this.konvaRect.getLayer().add(this.konvaContext.transformer)
+    //判断是否是添加到组上
+    if (this.type === 'ScadaGroup') {
+      this.konvaContext.transformer.rotateEnabled(false)
+      this.konvaContext.transformer.keepRatio(true)
+      this.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
+    } else {
+      this.konvaContext.transformer.rotateEnabled(true)
+      this.konvaContext.transformer.keepRatio(false)
+      this.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
+    }
+
     this.konvaContext.transformer.attachTo(this.konvaRect)
     this.setDragBound(true)
     this.konvaRect.getLayer().draw()
