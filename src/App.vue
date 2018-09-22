@@ -393,16 +393,7 @@
         this.addIcon2()
       },
       addCompGroup() {
-        const children = []
-        CompGroup1.children.forEach((comp) => {
-          children.push(new CompCtrl(comp))
-        })
-
-        Object.assign(CompGroup1, { konvaContext: this.konvaObjs })
-        const c = new CompCtrl(CompGroup1)
-        c.children = children
-        c.syncChildrenCompLayout()
-        this.addComp(c)
+        this.addCompToCanvas(CompGroup1)
       },
       unGroupSelAll() {
         this.curSelComps.forEach((comp) => {
@@ -536,8 +527,8 @@
         // this.comps[0].y = this.comps[0].y + 10
         // this.comps[0].x = this.comps[0].x / 1.1
         // this.comps[0].y = this.comps[0].y / 1.1
-        this.comps[0].scaleX = this.comps[0].scaleX * 1.1
-        this.comps[0].scaleY = this.comps[0].scaleY * 1.1
+        // this.comps[0].scaleX = this.comps[0].scaleX * 1.1
+        // this.comps[0].scaleY = this.comps[0].scaleY * 1.1
         // this.comps[0].scaleY = 1.5
         // this.comps[0].scaleX = 2
         // this.comps[0].rotation = 30

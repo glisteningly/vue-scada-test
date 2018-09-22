@@ -37,6 +37,18 @@ class CompCtrl {
       rotation: this.rotation
     }
 
+    if (options.children && options.children.length > 0) {
+      const children = []
+      options.children.forEach((comp) => {
+        children.push(new CompCtrl(comp))
+      })
+
+      // Object.assign(CompGroup1, { konvaContext: this.konvaObjs })
+      // const c = new CompCtrl(CompGroup1)
+      this.children = children
+      // this.syncChildrenCompLayout()
+    }
+
     if (options.konvaContext) {
       this.konvaContext = options.konvaContext
       this.initKonva()
@@ -50,6 +62,13 @@ class CompCtrl {
   // set x(value) {
   //   this.x = value
   //   console.log('setter: ' + value)
+  // }
+  // getRoundNum(num) {
+  //   return Math.round(num * 100) / 100
+  // }
+
+  // getRoundNum(num, precision = 12) {
+  //   return +parseFloat(num.toPrecision(precision));
   // }
 
   initKonva() {
@@ -83,10 +102,7 @@ class CompCtrl {
     this.konvaRect.on('dragend transformend', () => {
       console.log(this.children)
       this.syncCompLayout()
-      // this.syncChildrenCompLayout()
-      // if (this.type !== 'ScadaGroup') {
       this.konvaContext.transformer.rotateEnabled(true)
-      // }
       this.konvaContext.transformer.resizeEnabled(true)
       this.konvaContext.transformer.forceUpdate()
       this.konvaRect.getLayer().draw()
@@ -95,7 +111,9 @@ class CompCtrl {
     this.konvaContext.layers[0].add(this.konvaRect)
     this.konvaRect.getLayer().draw()
 
-    // this.syncChildrenCompLayout()
+    if (this.children && this.children.length > 0) {
+      this.syncChildrenCompLayout()
+    }
   }
 
   setContext(konvaContext) {
@@ -124,6 +142,15 @@ class CompCtrl {
     this.rotation = this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation()
     this.syncChildrenCompLayout()
   }
+
+  // syncCompLayout() {
+  //   this.x = this.getRoundNum(this.konvaRect.getAbsolutePosition().x)
+  //   this.y = this.getRoundNum(this.konvaRect.getAbsolutePosition().y)
+  //   this.scaleX = this.getRoundNum(this.konvaRect.getAbsoluteScale().x)
+  //   this.scaleY = this.getRoundNum(this.konvaRect.getAbsoluteScale().y)
+  //   this.rotation = this.getRoundNum(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
+  //   this.syncChildrenCompLayout()
+  // }
 
   syncChildrenCompLayout() {
     // console.log(this.children)
