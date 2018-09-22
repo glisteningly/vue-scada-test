@@ -28,12 +28,13 @@ class CompCtrl {
     this.rotation = options.layout.rotation || 0
 
     this.initLayout = {
-      x: options.layout.x + this.offsetX || 0,
-      y: options.layout.y + this.offsetY || 0,
-      scaleX: options.layout.scaleX || 1,
-      scaleY: options.layout.scaleY || 1,
-      offsetX: options.layout.offsetX || (options.layout.width / 2),
-      offsetY: options.layout.offsetY || (options.layout.height / 2)
+      x: this.x,
+      y: this.y,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      rotation: this.rotation
     }
 
     if (options.konvaContext) {
@@ -82,10 +83,10 @@ class CompCtrl {
     this.konvaRect.on('dragend transformend', () => {
       console.log(this.children)
       this.syncCompLayout()
-      this.syncChildrenCompLayout()
-      if (this.type !== 'ScadaGroup') {
-        this.konvaContext.transformer.rotateEnabled(true)
-      }
+      // this.syncChildrenCompLayout()
+      // if (this.type !== 'ScadaGroup') {
+      this.konvaContext.transformer.rotateEnabled(true)
+      // }
       this.konvaContext.transformer.resizeEnabled(true)
       this.konvaContext.transformer.forceUpdate()
       this.konvaRect.getLayer().draw()
@@ -121,17 +122,25 @@ class CompCtrl {
     this.scaleX = this.konvaRect.getAbsoluteScale().x
     this.scaleY = this.konvaRect.getAbsoluteScale().y
     this.rotation = this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation()
+    this.syncChildrenCompLayout()
   }
 
   syncChildrenCompLayout() {
-    console.log(this.children)
+    // console.log(this.children)
     if (this.children && this.children.length > 0) {
       this.children.forEach((comp) => {
         console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
-        comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX-1) * this.konvaRect.getAbsolutePosition().x
-        comp.y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY-1) * this.konvaRect.getAbsolutePosition().y
+        // comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
+        // comp.y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
+        const x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
+        const y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
+        const rx0 = this.konvaRect.getAbsolutePosition().x
+        const ry0 = this.konvaRect.getAbsolutePosition().y
+        comp.x = (x - rx0) * Math.cos(this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(this.rotation * Math.PI / 180) + rx0
+        comp.y = (x - rx0) * Math.sin(this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(this.rotation * Math.PI / 180) + ry0
+        comp.rotation = comp.initLayout.rotation + this.rotation
       })
     }
   }
@@ -147,6 +156,7 @@ class CompCtrl {
     })
     this.konvaRect.rotation(this.rotation)
     this.konvaRect.getLayer().draw()
+    this.syncChildrenCompLayout()
   }
 
   removeTempTransformer() {
@@ -180,11 +190,11 @@ class CompCtrl {
     this.konvaRect.getLayer().add(this.konvaContext.transformer)
     //判断是否是添加到组上
     if (this.type === 'ScadaGroup') {
-      this.konvaContext.transformer.rotateEnabled(false)
+      // this.konvaContext.transformer.rotateEnabled(false)
       this.konvaContext.transformer.keepRatio(true)
       this.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
     } else {
-      this.konvaContext.transformer.rotateEnabled(true)
+      // this.konvaContext.transformer.rotateEnabled(true)
       this.konvaContext.transformer.keepRatio(false)
       this.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
     }
