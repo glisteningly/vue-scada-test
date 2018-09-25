@@ -100,7 +100,7 @@ class CompCtrl {
     })
 
     this.konvaRect.on('dragend transformend', () => {
-      console.log(this.children)
+      // console.log(this.children)
       this.syncCompLayout()
       this.konvaContext.transformer.rotateEnabled(true)
       this.konvaContext.transformer.resizeEnabled(true)
@@ -156,7 +156,7 @@ class CompCtrl {
     // console.log(this.children)
     if (this.children && this.children.length > 0) {
       this.children.forEach((comp) => {
-        console.log(comp.initLayout)
+        // console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
         // comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x

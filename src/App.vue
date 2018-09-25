@@ -36,6 +36,8 @@
       <!--<button @click="addIcon2">google</button>-->
       <button @click="addAll">add all</button>
       <button @click="addCompGroup">add group</button>
+      <button @click="unGroupToComps">ungroup</button>
+      <button @click="jointCompsToGroup">to group</button>
       <span style="display: inline-block; width: 20px"/>
       <button @click="showNodeZIndex">z index</button>
       <span style="display: inline-block; width: 20px"/>
@@ -144,7 +146,7 @@
           //   comp.tempTr.forceUpdate()
           // }
         })
-        // this.syncGroupSel()
+        this.syncGroupSel()
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
       })
@@ -290,39 +292,39 @@
       this.konvaObjs.layers[0].draw()
     },
     methods: {
-      addComp(comp) {
+      addComp(compCtrl) {
         // comp.setContext(this.konvaObjs)
-        comp.konvaRect.on('click', () => {
-          if (!this.isInSelGroup(comp)) {
+        compCtrl.konvaRect.on('click', () => {
+          if (!this.isInSelGroup(compCtrl)) {
             // 不在多选组内
             if (!hotkeys.shift) {
               this.unGroupSelAll()
-              this.curSelComps.push(comp)
+              this.curSelComps.push(compCtrl)
             } else {
-              if (!this.isInSelGroup(comp)) {
-                this.curSelComps.push(comp)
+              if (!this.isInSelGroup(compCtrl)) {
+                this.curSelComps.push(compCtrl)
               }
             }
           } else {
             // 在多选组内
             if (hotkeys.shift) {
-              if (this.isInSelGroup(comp)) {
-                comp.removeCompfromGroupSel()
-                this.curSelComps.splice(_.findIndex(this.curSelComps, comp), 1)
+              if (this.isInSelGroup(compCtrl)) {
+                compCtrl.removeCompfromGroupSel()
+                this.curSelComps.splice(_.findIndex(this.curSelComps, compCtrl), 1)
               }
             }
           }
         })
 
-        comp.konvaRect.on('dragstart', () => {
+        compCtrl.konvaRect.on('dragstart', () => {
           console.log('dragstart')
-          if (!this.isInSelGroup(comp)) {
+          if (!this.isInSelGroup(compCtrl)) {
             this.unGroupSelAll()
-            this.curSelComps.push(comp)
+            this.curSelComps.push(compCtrl)
           }
         })
 
-        this.comps.push(comp)
+        this.comps.push(compCtrl)
         // this.konvaObjs.layers[0].add(comp.konvaRect)
         // this.konvaObjs.layers[0].draw()
       },
@@ -394,6 +396,92 @@
       },
       addCompGroup() {
         this.addCompToCanvas(CompGroup1)
+      },
+      unGroupToComps() {
+        if (this.curSelComp && this.curSelComp.type === 'ScadaGroup') {
+          const childComps = []
+          if (this.curSelComp.children) {
+            this.curSelComp.children.forEach((childrenComp) => {
+              childrenComp.setContext(this.konvaObjs)
+              childrenComp.initKonva()
+              this.addComp(childrenComp)
+              childComps.push(childrenComp)
+            })
+          }
+          this.compsDelete()
+          this.curSelComps = childComps
+        }
+      },
+      jointCompsToGroup() {
+        // console.log(this.konvaObjs.selCompsGroup.getClientRect())
+        console.log(this.konvaObjs.selCompsGroup.getAbsoluteScale())
+        if (this.curSelComps.length > 0) {
+          const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
+          const g = {
+            type: 'ScadaGroup',
+            layout: {
+              x: groupRect.x + 1,
+              y: groupRect.y + 1,
+              width: groupRect.width - 2,
+              height: groupRect.height - 2
+            },
+            konvaContext: this.konvaObjs
+          }
+          // const c = new CompCtrl(g)
+          const children = []
+
+
+          this.curSelComps.forEach((comp) => {
+            // comp.initLayout.x = (comp.initLayout.x - g.layout.x) * comp.scaleX
+            // comp.initLayout.y = (comp.initLayout.y - g.layout.y) * comp.scaleX
+            // comp.initLayout.scaleX = comp.scaleX
+            // comp.initLayout.scaleY = comp.scaleY
+            // // comp.initLayout = {
+            // //   x: comp.x - g.layout.x,
+            // //   y: comp.y - g.layout.y,
+            // //   scaleX: this.scaleX,
+            // //   scaleY: this.scaleY,
+            // //   offsetX: this.offsetX,
+            // //   offsetY: this.offsetY,
+            // //   rotation: this.rotation
+            // // }
+            // children.push(comp)
+            const cOptions = Object.assign({}, comp, {
+              layout: {
+                x: comp.x - comp.offsetX - g.layout.x,
+                y: comp.y - comp.offsetY - g.layout.y,
+                width: comp.width,
+                height: comp.height,
+                scaleX: comp.scaleX,
+                scaleY: comp.scaleY,
+                // offsetX: comp.offsetX,
+                // offsetY: comp.offsetY,
+                rotation: comp.rotation
+              },
+              konvaContext: null
+            })
+            children.push(cOptions)
+          })
+
+          g.children = children
+          this.compsDelete()
+          const c = new CompCtrl(g)
+          this.addComp(c)
+          // c.children = children
+          // c.syncChildrenCompLayout()
+          // this.compsDelete()
+          // this.addComp(c)
+          // this.konvaObjs.layers[0].add(new Konva.Rect({
+          //   x: groupRect.x + 1,
+          //   y: groupRect.y + 1,
+          //   width: groupRect.width - 2,
+          //   height: groupRect.height - 2,
+          //   fill: 'red'
+          // }))
+          // this.konvaObjs.layers[0].draw()
+          // console.log(g)
+        }
+
       },
       unGroupSelAll() {
         this.curSelComps.forEach((comp) => {
