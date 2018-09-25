@@ -78,7 +78,7 @@
   const HEIGHT = window.innerHeight
 
   import CompConfig from './temp/compConfig1'
-  import CompGroup1 from './temp/compGroup1'
+  import CompGroup1 from './temp/compGroup2'
 
   export default {
     components: { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup },
@@ -205,7 +205,7 @@
         this.konvaObjs.groupTransformer.rotateEnabled(true)
         this.konvaObjs.groupTransformer.borderEnabled(true)
         this.konvaObjs.layers[0].draw()
-        // this.syncGroupSel()
+        this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // const compPosition = comp.konvaRect.getAbsolutePosition()
           // console.log(compPosition)
@@ -427,29 +427,12 @@
             },
             konvaContext: this.konvaObjs
           }
-          // const c = new CompCtrl(g)
           const children = []
-
-
           this.curSelComps.forEach((comp) => {
-            // comp.initLayout.x = (comp.initLayout.x - g.layout.x) * comp.scaleX
-            // comp.initLayout.y = (comp.initLayout.y - g.layout.y) * comp.scaleX
-            // comp.initLayout.scaleX = comp.scaleX
-            // comp.initLayout.scaleY = comp.scaleY
-            // // comp.initLayout = {
-            // //   x: comp.x - g.layout.x,
-            // //   y: comp.y - g.layout.y,
-            // //   scaleX: this.scaleX,
-            // //   scaleY: this.scaleY,
-            // //   offsetX: this.offsetX,
-            // //   offsetY: this.offsetY,
-            // //   rotation: this.rotation
-            // // }
-            // children.push(comp)
             const cOptions = Object.assign({}, comp, {
               layout: {
-                x: comp.x - comp.offsetX - g.layout.x,
-                y: comp.y - comp.offsetY - g.layout.y,
+                x: comp.x - comp.offsetX * comp.scaleX - g.layout.x,
+                y: comp.y - comp.offsetY * comp.scaleY - g.layout.y,
                 width: comp.width,
                 height: comp.height,
                 scaleX: comp.scaleX,
@@ -467,21 +450,8 @@
           this.compsDelete()
           const c = new CompCtrl(g)
           this.addComp(c)
-          // c.children = children
-          // c.syncChildrenCompLayout()
-          // this.compsDelete()
-          // this.addComp(c)
-          // this.konvaObjs.layers[0].add(new Konva.Rect({
-          //   x: groupRect.x + 1,
-          //   y: groupRect.y + 1,
-          //   width: groupRect.width - 2,
-          //   height: groupRect.height - 2,
-          //   fill: 'red'
-          // }))
-          // this.konvaObjs.layers[0].draw()
-          // console.log(g)
+          this.curSelComps.push(c)
         }
-
       },
       unGroupSelAll() {
         this.curSelComps.forEach((comp) => {

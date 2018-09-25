@@ -18,12 +18,13 @@ class CompCtrl {
     // this.offsetX = 0
     // this.offsetY = 0
 
-    this.x = options.layout.x + this.offsetX || 0
-    this.y = options.layout.y + this.offsetY || 0
+
     this.width = options.layout.width
     this.height = options.layout.height
     this.scaleX = options.layout.scaleX || 1
     this.scaleY = options.layout.scaleY || 1
+    this.x = options.layout.x + this.offsetX * this.scaleX || 0
+    this.y = options.layout.y + this.offsetY * this.scaleY || 0
 
     this.rotation = options.layout.rotation || 0
 
@@ -50,6 +51,7 @@ class CompCtrl {
     }
 
     if (options.konvaContext) {
+      console.log('-----------')
       this.konvaContext = options.konvaContext
       this.initKonva()
     }
@@ -161,8 +163,10 @@ class CompCtrl {
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
         // comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
         // comp.y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
-        const x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
-        const y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
+        // const x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * comp.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
+        // const y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * comp.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
+        const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.konvaRect.getAbsolutePosition().x
+        const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.konvaRect.getAbsolutePosition().y
         const rx0 = this.konvaRect.getAbsolutePosition().x
         const ry0 = this.konvaRect.getAbsolutePosition().y
         comp.x = (x - rx0) * Math.cos(this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(this.rotation * Math.PI / 180) + rx0
