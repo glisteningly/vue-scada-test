@@ -161,10 +161,6 @@ class CompCtrl {
         // console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
-        // comp.x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * this.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
-        // comp.y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * this.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
-        // const x = (comp.initLayout.x + this.konvaRect.getAbsolutePosition().x - this.offsetX) * comp.scaleX - (comp.scaleX - 1) * this.konvaRect.getAbsolutePosition().x
-        // const y = (comp.initLayout.y + this.konvaRect.getAbsolutePosition().y - this.offsetY) * comp.scaleY - (comp.scaleY - 1) * this.konvaRect.getAbsolutePosition().y
         const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.konvaRect.getAbsolutePosition().x
         const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.konvaRect.getAbsolutePosition().y
         const rx0 = this.konvaRect.getAbsolutePosition().x
