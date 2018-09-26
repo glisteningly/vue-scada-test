@@ -17,7 +17,7 @@
   import ScadaGroup from './compGroup'
 
   export default {
-    name: 'scadaGroup',
+    name: 'ScadaGroup',
     components: { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup },
     props: {
       options: Object

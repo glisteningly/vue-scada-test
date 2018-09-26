@@ -415,7 +415,7 @@
       jointCompsToGroup() {
         // console.log(this.konvaObjs.selCompsGroup.getClientRect())
         console.log(this.konvaObjs.selCompsGroup.getAbsoluteScale())
-        if (this.curSelComps.length > 0) {
+        if (this.curSelComps.length > 1) {
           const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
           const g = {
             type: 'ScadaGroup',
@@ -427,30 +427,41 @@
             },
             konvaContext: this.konvaObjs
           }
+          // const children = []
+          // this.curSelComps.forEach((comp) => {
+          //   const cOptions = Object.assign({}, comp, {
+          //     layout: {
+          //       x: comp.x - comp.offsetX * comp.scaleX - g.layout.x,
+          //       y: comp.y - comp.offsetY * comp.scaleY - g.layout.y,
+          //       width: comp.width,
+          //       height: comp.height,
+          //       scaleX: comp.scaleX,
+          //       scaleY: comp.scaleY,
+          //       // offsetX: comp.offsetX,
+          //       // offsetY: comp.offsetY,
+          //       rotation: comp.rotation
+          //     },
+          //     konvaContext: null
+          //   })
+          //   children.push(cOptions)
+          // })
+          //
+          // g.children = children
+          // this.compsDelete()
+          // const c = new CompCtrl(g)
+          // this.addComp(c)
+          // this.curSelComps.push(c)
           const children = []
           this.curSelComps.forEach((comp) => {
-            const cOptions = Object.assign({}, comp, {
-              layout: {
-                x: comp.x - comp.offsetX * comp.scaleX - g.layout.x,
-                y: comp.y - comp.offsetY * comp.scaleY - g.layout.y,
-                width: comp.width,
-                height: comp.height,
-                scaleX: comp.scaleX,
-                scaleY: comp.scaleY,
-                // offsetX: comp.offsetX,
-                // offsetY: comp.offsetY,
-                rotation: comp.rotation
-              },
-              konvaContext: null
-            })
-            children.push(cOptions)
+            // comp.x = comp.x - g.layout.x
+            // comp.y = comp.y - g.layout.y
+            comp.removeCompfromGroupSel()
+            children.push(comp)
           })
-
-          g.children = children
-          this.compsDelete()
           const c = new CompCtrl(g)
+          c.children = children
           this.addComp(c)
-          this.curSelComps.push(c)
+          // this.curSelComps.push(c)
         }
       },
       unGroupSelAll() {

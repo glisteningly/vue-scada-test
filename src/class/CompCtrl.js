@@ -161,13 +161,18 @@ class CompCtrl {
         // console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
-        const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.konvaRect.getAbsolutePosition().x
-        const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.konvaRect.getAbsolutePosition().y
-        const rx0 = this.konvaRect.getAbsolutePosition().x
-        const ry0 = this.konvaRect.getAbsolutePosition().y
+        // const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.konvaRect.getAbsolutePosition().x
+        // const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.konvaRect.getAbsolutePosition().y
+        // const rx0 = this.konvaRect.getAbsolutePosition().x
+        // const ry0 = this.konvaRect.getAbsolutePosition().y
+        const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.x
+        const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.y
+        const rx0 = this.x
+        const ry0 = this.y
         comp.x = (x - rx0) * Math.cos(this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(this.rotation * Math.PI / 180) + rx0
         comp.y = (x - rx0) * Math.sin(this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(this.rotation * Math.PI / 180) + ry0
         comp.rotation = comp.initLayout.rotation + this.rotation
+        comp.syncChildrenCompLayout()
       })
     }
   }
