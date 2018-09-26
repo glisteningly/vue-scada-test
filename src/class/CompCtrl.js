@@ -28,15 +28,17 @@ class CompCtrl {
 
     this.rotation = options.layout.rotation || 0
 
-    this.initLayout = {
-      x: this.x,
-      y: this.y,
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
-      rotation: this.rotation
-    }
+    // this.initLayout = {
+    //   x: this.x,
+    //   y: this.y,
+    //   scaleX: this.scaleX,
+    //   scaleY: this.scaleY,
+    //   offsetX: this.offsetX,
+    //   offsetY: this.offsetY,
+    //   rotation: this.rotation
+    // }
+
+    this.initBaseLayout()
 
     if (options.children && options.children.length > 0) {
       const children = []
@@ -72,6 +74,10 @@ class CompCtrl {
   // getRoundNum(num, precision = 12) {
   //   return +parseFloat(num.toPrecision(precision));
   // }
+
+  initBaseLayout() {
+    this.initLayout = this.layout()
+  }
 
   initKonva() {
     this.draggable = true
@@ -201,20 +207,23 @@ class CompCtrl {
   removeCompfromGroupSel() {
     this.removeTempTransformer()
 
-    const compPosition = this.konvaRect.getAbsolutePosition()
-    this.konvaRect.moveTo(this.konvaRect.getLayer())
-    this.konvaRect.setAbsolutePosition(compPosition)
-    this.konvaRect.scale({
-      x: this.konvaRect.getAbsoluteScale().x,
-      y: this.konvaRect.getAbsoluteScale().y
-    })
-    this.konvaRect.rotation(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
-    this.konvaRect.draggable(true)
+    if (this.konvaRect) {
+      const compPosition = this.konvaRect.getAbsolutePosition()
+      this.konvaRect.moveTo(this.konvaRect.getLayer())
+      this.konvaRect.setAbsolutePosition(compPosition)
+      this.konvaRect.scale({
+        x: this.konvaRect.getAbsoluteScale().x,
+        y: this.konvaRect.getAbsoluteScale().y
+      })
+      this.konvaRect.rotation(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
+      this.konvaRect.draggable(true)
+    }
   }
 
   delete() {
     this.removeTempTransformer()
     this.konvaRect.destroy()
+    this.konvaRect = null
   }
 
   addTransformer() {
