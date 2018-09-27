@@ -276,7 +276,7 @@ class CompCtrl {
       this.children.forEach((comp) => {
         const childConfig = comp.toConfig()
 
-        comp.x = ((comp.initLayout.x - this.offsetX) * this.scaleX) + this.x
+        // comp.x = ((comp.initLayout.x - this.offsetX) * this.scaleX) + this.x
 
         console.log(childConfig.layout)
         console.log('------')
@@ -289,8 +289,8 @@ class CompCtrl {
         const y = (childConfig.layout.y - (this.y - this.offsetY * this.scaleY)) / this.scaleY
         const rx0 = this.x
         const ry0 = this.y
-        childConfig.layout.x = (x - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
-        childConfig.layout.y = (x - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
+        childConfig.layout.x = (x - rx0) * Math.cos(this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(this.rotation * Math.PI / 180) + rx0
+        childConfig.layout.y = (x - rx0) * Math.sin(this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(this.rotation * Math.PI / 180) + ry0
         childConfig.layout.rotation = childConfig.layout.rotation - this.rotation
 
 
