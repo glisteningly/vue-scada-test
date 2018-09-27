@@ -4,7 +4,7 @@ export default {
     x: 200,
     y: 200,
     width: 320,
-    height: 110
+    height: 165
   },
   options: {},
   children: [{

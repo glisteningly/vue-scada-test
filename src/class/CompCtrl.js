@@ -132,6 +132,21 @@ class CompCtrl {
     return {
       x: this.x,
       y: this.y,
+
+      width: this.width,
+      height: this.height,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      rotation: this.rotation,
+    }
+  }
+
+  optionLayout() {
+    return {
+      x: this.x - this.offsetX * this.scaleX,
+      y: this.y - this.offsetY * this.scaleY,
       width: this.width,
       height: this.height,
       scaleX: this.scaleX,
@@ -173,10 +188,8 @@ class CompCtrl {
         // const ry0 = this.konvaRect.getAbsolutePosition().y
         const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.x
         const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.y
-        const rx0 = this.x
-        const ry0 = this.y
-        comp.x = (x - rx0) * Math.cos(this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(this.rotation * Math.PI / 180) + rx0
-        comp.y = (x - rx0) * Math.sin(this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(this.rotation * Math.PI / 180) + ry0
+        comp.x = (x - this.x) * Math.cos(this.rotation * Math.PI / 180) - (y - this.y) * Math.sin(this.rotation * Math.PI / 180) + this.x
+        comp.y = (x - this.x) * Math.sin(this.rotation * Math.PI / 180) + (y - this.y) * Math.cos(this.rotation * Math.PI / 180) + this.y
         comp.rotation = comp.initLayout.rotation + this.rotation
         comp.syncChildrenCompLayout()
       })
@@ -247,6 +260,45 @@ class CompCtrl {
 
   toString() {
     return '()'
+  }
+
+
+  toConfig() {
+    const compConfig = {
+      layout: this.optionLayout(),
+      type: this.type,
+      options: this.options
+    }
+    if (this.children && this.children.length > 0) {
+      console.log(this.layout())
+      console.log('------')
+      const children = []
+      this.children.forEach((comp) => {
+        const childConfig = comp.toConfig()
+
+        comp.x = ((comp.initLayout.x - this.offsetX) * this.scaleX) + this.x
+
+        console.log(childConfig.layout)
+        console.log('------')
+
+        childConfig.layout.scaleX = childConfig.layout.scaleX / this.scaleX
+        childConfig.layout.scaleY = childConfig.layout.scaleY / this.scaleY
+        // childConfig.layout.x = (childConfig.layout.x - (this.x - this.offsetX * this.scaleX)) / this.scaleX
+        // childConfig.layout.y = (childConfig.layout.y - (this.y - this.offsetY * this.scaleY)) / this.scaleY
+        const x = (childConfig.layout.x - (this.x - this.offsetX * this.scaleX)) / this.scaleX
+        const y = (childConfig.layout.y - (this.y - this.offsetY * this.scaleY)) / this.scaleY
+        const rx0 = this.x
+        const ry0 = this.y
+        childConfig.layout.x = (x - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
+        childConfig.layout.y = (x - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
+        childConfig.layout.rotation = childConfig.layout.rotation - this.rotation
+
+
+        children.push(childConfig)
+      })
+      compConfig.children = children
+    }
+    return compConfig
   }
 
   setDragBound(flag) {
