@@ -782,20 +782,27 @@
 
   #context-menu {
     user-select: none;
-    li {
-
-      padding: 4px 10px;
-      &:hover {
-        background: rgba(39, 176, 255, 0.4);
-      }
-      button {
-        letter-spacing: 1px;
-        font-size: 15px;
-        color: #333;
-        text-align: left;
-        width: 100%;
-        background: none;
-        border: none;
+    &.ctx-menu-container {
+      border: none;
+      ul {
+        border-radius: 0;
+        background-color: #EEE;
+        li {
+          padding: 4px 10px;
+          &:hover {
+            /*background: rgba(39, 176, 255, 0.4);*/
+            background: #D3D3D3;
+          }
+          button {
+            letter-spacing: 1px;
+            font-size: 15px;
+            color: #333;
+            text-align: left;
+            width: 100%;
+            background: none;
+            border: none;
+          }
+        }
       }
     }
   }
