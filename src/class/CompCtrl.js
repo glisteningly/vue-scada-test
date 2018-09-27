@@ -53,7 +53,6 @@ class CompCtrl {
     }
 
     if (options.konvaContext) {
-      console.log('-----------')
       this.konvaContext = options.konvaContext
       this.initKonva()
     }
@@ -143,19 +142,6 @@ class CompCtrl {
     }
   }
 
-  optionLayout() {
-    return {
-      x: this.x - this.offsetX * this.scaleX,
-      y: this.y - this.offsetY * this.scaleY,
-      width: this.width,
-      height: this.height,
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
-      rotation: this.rotation,
-    }
-  }
 
   syncCompLayout() {
     this.x = this.konvaRect.getAbsolutePosition().x
@@ -182,10 +168,6 @@ class CompCtrl {
         // console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
-        // const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.konvaRect.getAbsolutePosition().x
-        // const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.konvaRect.getAbsolutePosition().y
-        // const rx0 = this.konvaRect.getAbsolutePosition().x
-        // const ry0 = this.konvaRect.getAbsolutePosition().y
         const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.x
         const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.y
         comp.x = (x - this.x) * Math.cos(this.rotation * Math.PI / 180) - (y - this.y) * Math.sin(this.rotation * Math.PI / 180) + this.x
@@ -262,9 +244,41 @@ class CompCtrl {
     return '()'
   }
 
+  getCompLayout() {
+    return {
+      x: this.x - this.offsetX * this.scaleX,
+      y: this.y - this.offsetY * this.scaleY,
+      width: this.width,
+      height: this.height,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      offsetX: this.offsetX,
+      offsetY: this.offsetY,
+      rotation: this.rotation,
+    }
+  }
+
+  getChildLayout(comp) {
+    const x1 = comp.x
+    const y1 = comp.y
+    const rx0 = this.x
+    const ry0 = this.y
+    const x = (x1 - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y1 - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
+    const y = (x1 - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y1 - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
+    return {
+      x: (x - this.x) / this.scaleX + this.offsetX - comp.offsetX * comp.scaleX / this.scaleX,
+      y: (y - this.y) / this.scaleY + this.offsetY - comp.offsetY * comp.scaleY / this.scaleY,
+      width: comp.width,
+      height: comp.height,
+      scaleX: comp.scaleX / this.scaleX,
+      scaleY: comp.scaleY / this.scaleY,
+      rotation: comp.rotation - this.rotation
+    }
+  }
+
   toConfig() {
     const compConfig = {
-      layout: this.optionLayout(),
+      layout: this.getCompLayout(),
       type: this.type,
       options: this.options
     }
@@ -272,18 +286,7 @@ class CompCtrl {
       const children = []
       this.children.forEach((comp) => {
         const childConfig = comp.toConfig()
-        const x1 = comp.x
-        const y1 = comp.y
-        const rx0 = this.x
-        const ry0 = this.y
-        const x = (x1 - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y1 - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
-        const y = (x1 - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y1 - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
-        childConfig.layout.x = (x - this.x) / this.scaleX + this.offsetX - comp.offsetX * comp.scaleX / this.scaleX
-        childConfig.layout.y = (y - this.y) / this.scaleY + this.offsetY - comp.offsetY * comp.scaleY / this.scaleY
-        childConfig.layout.scaleX = comp.scaleX / this.scaleX
-        childConfig.layout.scaleY = comp.scaleY / this.scaleY
-        childConfig.layout.rotation = comp.rotation - this.rotation
-
+        childConfig.layout = this.getChildLayout(comp)
         children.push(childConfig)
       })
       compConfig.children = children
