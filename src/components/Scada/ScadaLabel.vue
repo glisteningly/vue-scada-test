@@ -15,10 +15,7 @@
 
   export default {
     extends: BaseComp,
-    name: 'scadaLabel',
-    // props: {
-    //   layout: Object
-    // }
+    name: 'ScadaLabel',
   }
 </script>
 

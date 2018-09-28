@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueKonva from 'vue-konva'
 import store from './store'
-import CompWrapper from './components/compWrapper'
+import ScadaComps from './components/Scada'
 
-Vue.use(VueKonva)
-Vue.component('CompWrapper', CompWrapper)
+Vue.use(ScadaComps)
 
 Vue.config.productionTip = false
 

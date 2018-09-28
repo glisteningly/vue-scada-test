@@ -11,14 +11,8 @@
 <script>
   import BaseComp from './BaseComp'
 
-  import ScadaImage from './image'
-  import ScadaRect from './rect1'
-  import ScadaLabel from './label'
-  import ScadaGroup from './compGroup'
-
   export default {
     name: 'ScadaGroup',
-    components: { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup },
     props: {
       options: Object
     },

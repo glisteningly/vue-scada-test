@@ -108,7 +108,7 @@ export default {
         },
         options: {
           style: {
-            fontSize: 16
+            fontSize: 18
           }
         },
       }]

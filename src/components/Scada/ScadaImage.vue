@@ -12,7 +12,7 @@
       options: Object
     },
     extends: BaseComp,
-    name: 'scadaImage'
+    name: 'ScadaImage'
   }
 </script>
 

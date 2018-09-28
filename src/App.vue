@@ -47,6 +47,8 @@
       <span style="display: inline-block; width: 20px"/>
       <button @click="testImport">import</button>
       <button @click="doTest">test</button>
+      <button @click="loadLocal">load</button>
+      <button @click="initKonvaWorkArea">refreash</button>
       <span style="display: inline-block; width: 20px"/>
       <div style="display: inline-block" v-if="curSelCompLayout">
         <span>x </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutX">
@@ -88,12 +90,6 @@
   import _ from 'lodash'
   import hotkeys from 'hotkeys-js'
 
-  import ScadaImage from './components/image'
-  import ScadaRect from './components/rect1'
-  import ScadaLabel from './components/label'
-  import ScadaGroup from './components/compGroup'
-
-
   const WIDTH = window.innerWidth
   const HEIGHT = window.innerHeight
 
@@ -105,10 +101,11 @@
 
 
   export default {
-    components: { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup, ContextMenu },
+    components: { ContextMenu },
     name: 'Editor',
     data() {
       return {
+        inited: false,
         comps: [],
         canvasLayout: {
           width: WIDTH,
@@ -133,195 +130,212 @@
     },
     mounted() {
       this.initHotkeyBinding()
-      const width = window.innerWidth
-      const height = window.innerHeight
-
-      this.konvaObjs.stage = new Konva.Stage({
-        container: 'workarea',
-        width: width,
-        height: height
-      });
-
-      const layer = new Konva.Layer()
-      this.konvaObjs.layers.push(layer)
-      this.konvaObjs.stage.add(this.konvaObjs.layers[0])
-      this.konvaObjs.transformer = new Konva.Transformer({
-        keepRatio: false,
-        anchorSize: 6,
-        rotationSnaps: [0, 90, 180, 270]
-      })
-
-      this.konvaObjs.groupTransformer = new Konva.Transformer({
-        keepRatio: true,
-        anchorSize: 6,
-        // resizeEnabled: false,
-        // rotateEnabled: false,
-        // rotationSnaps: [],
-        enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
-      })
-
-      this.konvaObjs.groupTransformer.on('transformend', () => {
-        console.log('transformend ')
-        // this.syncGroupSel()
-        this.curSelComps.forEach((comp) => {
-          // console.log(compScale)
-          comp.syncCompLayout()
-          // if (comp.tempTr) {
-          //   comp.tempTr.forceUpdate()
-          // }
-        })
-        this.syncGroupSel()
-        this.konvaObjs.groupTransformer.forceUpdate()
-        this.konvaObjs.layers[0].draw()
-      })
-
-      this.konvaObjs.groupTransformer.on('transform', () => {
-        // console.log('transform')
-        this.curSelComps.forEach((comp) => {
-          // console.log(compScale)
-          // this.updateLayout(comp)
-          if (comp.tempTr) {
-            comp.tempTr.forceUpdate()
-          }
-        })
-        this.konvaObjs.groupTransformer.forceUpdate()
-        this.konvaObjs.layers[0].draw()
-      })
-
-      this.konvaObjs.selCompsRect = new Konva.Rect({
-        draggable: false,
-        x: 0,
-        y: 0,
-        width: 50,
-        height: 50,
-        strokeWidth: 1,
-        stroke: '#AAA',
-        dash: [3, 1]
-      })
-
-      this.konvaObjs.selCompsGroup = new Konva.Group({
-        draggable: true,
-        // dragBoundFunc: function (pos) {
-        //   if (hotkeys.shift) {
-        //     return {
-        //       x: pos.x,
-        //       y: this.getAbsolutePosition().y
-        //     }
-        //   } else {
-        //     return {
-        //       x: pos.x,
-        //       y: pos.y,
-        //     }
-        //   }
-        // }
-      })
-
-      this.konvaObjs.selCompsGroup.on('dragstart ', () => {
-        this.konvaObjs.groupTransformer.resizeEnabled(false)
-        this.konvaObjs.groupTransformer.rotateEnabled(false)
-        this.konvaObjs.groupTransformer.borderEnabled(false)
-        this.konvaObjs.layers[0].draw()
-      })
-
-      this.konvaObjs.selCompsGroup.on('dragend ', () => {
-        // console.log('dragend ')
-        this.konvaObjs.groupTransformer.resizeEnabled(true)
-        this.konvaObjs.groupTransformer.rotateEnabled(true)
-        this.konvaObjs.groupTransformer.borderEnabled(true)
-        this.konvaObjs.layers[0].draw()
-        this.syncGroupSel()
-        this.curSelComps.forEach((comp) => {
-          // const compPosition = comp.konvaRect.getAbsolutePosition()
-          // console.log(compPosition)
-          comp.syncCompLayout()
-        })
-      })
-
-      //click
-      this.konvaObjs.stage.on('mousedown', (e) => {
-        if (e.target === this.konvaObjs.stage && e.evt.button === 0) {
-          // console.log(e)
-          console.log('stage mousedown')
-          // this.konvaObjs.transformer.detach()
-          // this.unGroupSelAll()
-          // this.konvaObjs.layers[0].draw()
-
-          this.isDragSelecting = true
-          const mousePos = this.konvaObjs.stage.getPointerPosition()
-          const x = mousePos.x
-          const y = mousePos.y
-          console.log('x: ' + x + ', y: ' + y)
-          this.konvaObjs.selCompsRect.width(0)
-          this.konvaObjs.selCompsRect.height(0)
-          this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
-          this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
-        }
-      })
-
-      this.konvaObjs.stage.on('mousemove', (e) => {
-        // console.log('mousemove')
-        if (this.isDragSelecting) {
-          const mousePos = this.konvaObjs.stage.getPointerPosition()
-          const x = mousePos.x
-          const y = mousePos.y
-          this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
-          this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
-          this.konvaObjs.layers[0].draw()
-        }
-      })
-
-      this.konvaObjs.stage.on('mouseup', (e) => {
-
-        if (e.evt.button === 0) {
-
-          console.log('state mouseup')
-
-          // if (e.target === this.konvaObjs.stage) {
-          //   console.log('stage mouseup')
-          //   this.konvaObjs.transformer.detach()
-          //   this.unGroupSelAll()
-          //   this.konvaObjs.layers[0].draw()
-          // }
-
-          if (this.isDragSelecting) {
-            const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
-            console.log(l)
-
-            // this.konvaObjs.layers[0].add(new Konva.Rect(Object.assign({
-            //   strokeWidth: 1,
-            //   stroke: '#AAA'
-            // }, l)))
-            // console.log(this.isRectContain(l, this.comps[0].konvaRect))
-
-            const newSels = []
-            for (const comp of this.comps) {
-              if (this.isRectContain(l, comp.konvaRect)) {
-                newSels.push(comp)
-              }
-            }
-
-            this.konvaObjs.transformer.detach()
-            this.unGroupSelAll()
-            if (newSels.length > 0) {
-              // this.unGroupSelAll()
-              this.curSelComps = newSels
-            } else {
-              this.konvaObjs.layers[0].draw()
-            }
-
-            this.konvaObjs.selCompsRect.remove()
-            this.konvaObjs.selCompsRect.width(0)
-            this.konvaObjs.selCompsRect.height(0)
-            this.konvaObjs.layers[0].draw()
-            this.isDragSelecting = false
-          }
-        }
-      })
-
-      this.konvaObjs.layers[0].draw()
+      this.initKonvaWorkArea()
     },
     methods: {
-      addComp(compCtrl) {
+      initKonvaWorkArea() {
+        const width = window.innerWidth
+        const height = window.innerHeight
+
+        if (this.konvaObjs.stage) {
+          this.konvaObjs.stage.destroyChildren()
+          this.konvaObjs.stage.destroy()
+        }
+
+        this.konvaObjs.stage = new Konva.Stage({
+          container: 'workarea',
+          width: width,
+          height: height
+        })
+
+        this.konvaObjs.layers = []
+        const layer = new Konva.Layer()
+        this.konvaObjs.layers.push(layer)
+        this.konvaObjs.stage.add(this.konvaObjs.layers[0])
+        this.konvaObjs.transformer = new Konva.Transformer({
+          keepRatio: false,
+          anchorSize: 6,
+          rotationSnaps: [0, 90, 180, 270]
+        })
+
+        this.konvaObjs.groupTransformer = new Konva.Transformer({
+          keepRatio: true,
+          anchorSize: 6,
+          // resizeEnabled: false,
+          // rotateEnabled: false,
+          // rotationSnaps: [],
+          enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+        })
+
+        this.konvaObjs.groupTransformer.on('transformend', () => {
+          console.log('transformend ')
+          // this.syncGroupSel()
+          this.curSelComps.forEach((comp) => {
+            // console.log(compScale)
+            comp.syncCompLayout()
+            // if (comp.tempTr) {
+            //   comp.tempTr.forceUpdate()
+            // }
+          })
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+
+        this.konvaObjs.groupTransformer.on('transform', () => {
+          // console.log('transform')
+          this.curSelComps.forEach((comp) => {
+            // console.log(compScale)
+            // this.updateLayout(comp)
+            if (comp.tempTr) {
+              comp.tempTr.forceUpdate()
+            }
+          })
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+
+        this.konvaObjs.selCompsRect = new Konva.Rect({
+          draggable: false,
+          x: 0,
+          y: 0,
+          width: 50,
+          height: 50,
+          strokeWidth: 1,
+          stroke: '#AAA',
+          dash: [3, 1]
+        })
+
+        this.konvaObjs.selCompsGroup = new Konva.Group({
+          draggable: true,
+          // dragBoundFunc: function (pos) {
+          //   if (hotkeys.shift) {
+          //     return {
+          //       x: pos.x,
+          //       y: this.getAbsolutePosition().y
+          //     }
+          //   } else {
+          //     return {
+          //       x: pos.x,
+          //       y: pos.y,
+          //     }
+          //   }
+          // }
+        })
+
+        this.konvaObjs.selCompsGroup.on('dragstart ', () => {
+          this.konvaObjs.groupTransformer.resizeEnabled(false)
+          this.konvaObjs.groupTransformer.rotateEnabled(false)
+          this.konvaObjs.groupTransformer.borderEnabled(false)
+          this.konvaObjs.layers[0].draw()
+        })
+
+        this.konvaObjs.selCompsGroup.on('dragend ', () => {
+          // console.log('dragend ')
+          this.konvaObjs.groupTransformer.resizeEnabled(true)
+          this.konvaObjs.groupTransformer.rotateEnabled(true)
+          this.konvaObjs.groupTransformer.borderEnabled(true)
+          this.konvaObjs.layers[0].draw()
+          this.syncGroupSel()
+          this.curSelComps.forEach((comp) => {
+            // const compPosition = comp.konvaRect.getAbsolutePosition()
+            // console.log(compPosition)
+            comp.syncCompLayout()
+          })
+        })
+
+        //click
+        this.konvaObjs.stage.on('mousedown', (e) => {
+          if (e.target === this.konvaObjs.stage && e.evt.button === 0) {
+            // console.log(e)
+            console.log('stage mousedown')
+            // this.konvaObjs.transformer.detach()
+            // this.unGroupSelAll()
+            // this.konvaObjs.layers[0].draw()
+
+            this.isDragSelecting = true
+            const mousePos = this.konvaObjs.stage.getPointerPosition()
+            const x = mousePos.x
+            const y = mousePos.y
+            console.log('x: ' + x + ', y: ' + y)
+            this.konvaObjs.selCompsRect.width(0)
+            this.konvaObjs.selCompsRect.height(0)
+            this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
+            this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
+          }
+        })
+
+        this.konvaObjs.stage.on('mousemove', (e) => {
+          // console.log('mousemove')
+          if (this.isDragSelecting) {
+            const mousePos = this.konvaObjs.stage.getPointerPosition()
+            const x = mousePos.x
+            const y = mousePos.y
+            this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
+            this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
+            this.konvaObjs.layers[0].draw()
+          }
+        })
+
+        this.konvaObjs.stage.on('mouseup', (e) => {
+
+          if (e.evt.button === 0) {
+
+            console.log('state mouseup')
+
+            // if (e.target === this.konvaObjs.stage) {
+            //   console.log('stage mouseup')
+            //   this.konvaObjs.transformer.detach()
+            //   this.unGroupSelAll()
+            //   this.konvaObjs.layers[0].draw()
+            // }
+
+            if (this.isDragSelecting) {
+              const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
+              console.log(l)
+
+              // this.konvaObjs.layers[0].add(new Konva.Rect(Object.assign({
+              //   strokeWidth: 1,
+              //   stroke: '#AAA'
+              // }, l)))
+              // console.log(this.isRectContain(l, this.comps[0].konvaRect))
+
+              const newSels = []
+              for (const comp of this.comps) {
+                if (this.isRectContain(l, comp.konvaRect)) {
+                  newSels.push(comp)
+                }
+              }
+
+              this.konvaObjs.transformer.detach()
+              this.unGroupSelAll()
+              if (newSels.length > 0) {
+                // this.unGroupSelAll()
+                this.curSelComps = newSels
+              } else {
+                this.konvaObjs.layers[0].draw()
+              }
+
+              this.konvaObjs.selCompsRect.remove()
+              this.konvaObjs.selCompsRect.width(0)
+              this.konvaObjs.selCompsRect.height(0)
+              this.konvaObjs.layers[0].draw()
+              this.isDragSelecting = false
+            }
+          }
+        })
+
+        this.comps.forEach((comp) => {
+          comp.konvaContext = this.konvaObjs
+          comp.initKonva()
+          this.addCompEvent(comp)
+        })
+
+        // this.konvaObjs.layers[0].draw()
+        this.konvaObjs.stage.draw()
+      },
+
+      addCompEvent(compCtrl) {
         // comp.setContext(this.konvaObjs)
         compCtrl.konvaRect.on('click', (e) => {
           if (e.evt.button === 0) {
@@ -355,7 +369,10 @@
             this.curSelComps.push(compCtrl)
           }
         })
+      },
 
+      addComp(compCtrl) {
+        this.addCompEvent(compCtrl)
         this.comps.push(compCtrl)
         // this.konvaObjs.layers[0].add(comp.konvaRect)
         // this.konvaObjs.layers[0].draw()
@@ -607,10 +624,21 @@
       },
       doTest() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))
-        this.addCompToCanvas(this.curSelComp.toConfig())
+        // this.addCompToCanvas(this.curSelComp.toConfig())
+        const compConfig = []
+        this.comps.forEach((comp) => {
+          compConfig.push(comp.toConfig())
+        })
+        localStorage.setItem('comps', JSON.stringify(compConfig))
+      },
+      loadLocal() {
+        const compConfig = JSON.parse(localStorage.getItem('comps'))
+        compConfig.forEach((comp => {
+          this.addCompToCanvas(comp)
+        }))
       },
       getRoundNum(num) {
-        return Math.round(num * 100) / 100
+        return _.round(num, 2)
       }
     },
     computed: {

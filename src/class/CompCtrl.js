@@ -1,6 +1,7 @@
 import Guid from '../utils/guid'
 import Konva from 'konva'
 import hotkeys from 'hotkeys-js'
+import _ from 'lodash'
 
 class CompCtrl {
   constructor(options) {
@@ -244,17 +245,21 @@ class CompCtrl {
     return '()'
   }
 
+  _roundNum(num) {
+    return _.round(num, 3)
+  }
+
   getCompLayout() {
     return {
-      x: this.x - this.offsetX * this.scaleX,
-      y: this.y - this.offsetY * this.scaleY,
-      width: this.width,
-      height: this.height,
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      offsetX: this.offsetX,
-      offsetY: this.offsetY,
-      rotation: this.rotation,
+      x: this._roundNum(this.x - this.offsetX * this.scaleX),
+      y: this._roundNum(this.y - this.offsetY * this.scaleY),
+      width: this._roundNum(this.width),
+      height: this._roundNum(this.height),
+      scaleX: this._roundNum(this.scaleX),
+      scaleY: this._roundNum(this.scaleY),
+      offsetX: this._roundNum(this.offsetX),
+      offsetY: this._roundNum(this.offsetY),
+      rotation: this._roundNum(this.rotation)
     }
   }
 
@@ -266,13 +271,13 @@ class CompCtrl {
     const x = (x1 - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y1 - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
     const y = (x1 - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y1 - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
     return {
-      x: (x - this.x) / this.scaleX + this.offsetX - comp.offsetX * comp.scaleX / this.scaleX,
-      y: (y - this.y) / this.scaleY + this.offsetY - comp.offsetY * comp.scaleY / this.scaleY,
-      width: comp.width,
-      height: comp.height,
-      scaleX: comp.scaleX / this.scaleX,
-      scaleY: comp.scaleY / this.scaleY,
-      rotation: comp.rotation - this.rotation
+      x: this._roundNum((x - this.x) / this.scaleX + this.offsetX - comp.offsetX * comp.scaleX / this.scaleX),
+      y: this._roundNum((y - this.y) / this.scaleY + this.offsetY - comp.offsetY * comp.scaleY / this.scaleY),
+      width: this._roundNum(comp.width),
+      height: this._roundNum(comp.height),
+      scaleX: this._roundNum(comp.scaleX / this.scaleX),
+      scaleY: this._roundNum(comp.scaleY / this.scaleY),
+      rotation: this._roundNum(comp.rotation - this.rotation)
     }
   }
 

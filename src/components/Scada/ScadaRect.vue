@@ -10,7 +10,7 @@
 
   export default {
     extends: BaseComp,
-    name: 'scadaRect',
+    name: 'ScadaRect',
     // props: {
     //   layout: Object
     // }
