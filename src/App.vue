@@ -134,6 +134,7 @@
     },
     methods: {
       initKonvaWorkArea() {
+        this.curSelComps = []
         const width = window.innerWidth
         const height = window.innerHeight
 
@@ -238,8 +239,6 @@
           this.konvaObjs.layers[0].draw()
           this.syncGroupSel()
           this.curSelComps.forEach((comp) => {
-            // const compPosition = comp.konvaRect.getAbsolutePosition()
-            // console.log(compPosition)
             comp.syncCompLayout()
           })
         })
@@ -249,9 +248,6 @@
           if (e.target === this.konvaObjs.stage && e.evt.button === 0) {
             // console.log(e)
             console.log('stage mousedown')
-            // this.konvaObjs.transformer.detach()
-            // this.unGroupSelAll()
-            // this.konvaObjs.layers[0].draw()
 
             this.isDragSelecting = true
             const mousePos = this.konvaObjs.stage.getPointerPosition()
@@ -283,26 +279,13 @@
 
             console.log('state mouseup')
 
-            // if (e.target === this.konvaObjs.stage) {
-            //   console.log('stage mouseup')
-            //   this.konvaObjs.transformer.detach()
-            //   this.unGroupSelAll()
-            //   this.konvaObjs.layers[0].draw()
-            // }
-
             if (this.isDragSelecting) {
               const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
               console.log(l)
 
-              // this.konvaObjs.layers[0].add(new Konva.Rect(Object.assign({
-              //   strokeWidth: 1,
-              //   stroke: '#AAA'
-              // }, l)))
-              // console.log(this.isRectContain(l, this.comps[0].konvaRect))
-
               const newSels = []
               for (const comp of this.comps) {
-                if (this.isRectContain(l, comp.konvaRect)) {
+                if (this.isRectContain(l, comp.konvaRect())) {
                   newSels.push(comp)
                 }
               }
@@ -325,19 +308,23 @@
           }
         })
 
+        CompCtrl.konvaContext = this.konvaObjs
+
         this.comps.forEach((comp) => {
-          comp.konvaContext = this.konvaObjs
+          // comp.konvaContext = this.konvaObjs
           comp.initKonva()
           this.addCompEvent(comp)
         })
 
         // this.konvaObjs.layers[0].draw()
         this.konvaObjs.stage.draw()
+
+        // CompCtrl.konvaContext = this.konvaObjs
       },
 
       addCompEvent(compCtrl) {
         // comp.setContext(this.konvaObjs)
-        compCtrl.konvaRect.on('click', (e) => {
+        compCtrl.konvaRect().on('click', (e) => {
           if (e.evt.button === 0) {
             if (!this.isInSelGroup(compCtrl)) {
               // 不在多选组内
@@ -361,8 +348,7 @@
           }
         })
 
-
-        compCtrl.konvaRect.on('dragstart', () => {
+        compCtrl.konvaRect().on('dragstart', () => {
           console.log('dragstart')
           if (!this.isInSelGroup(compCtrl)) {
             this.unGroupSelAll()
@@ -374,8 +360,6 @@
       addComp(compCtrl) {
         this.addCompEvent(compCtrl)
         this.comps.push(compCtrl)
-        // this.konvaObjs.layers[0].add(comp.konvaRect)
-        // this.konvaObjs.layers[0].draw()
       },
       addLabel() {
         this.addCompToCanvas({
@@ -482,7 +466,7 @@
             comp.y = comp.y - g.layout.y
             comp.initBaseLayout()
             comp.syncCompLayout()
-            // comp.konvaRect.destroy()
+            // comp.konvaRect().destroy()
             children.push(comp)
           })
           this.compsDelete()
@@ -501,11 +485,11 @@
       addToGroup() {
         this.konvaObjs.transformer.detach()
         this.curSelComps.forEach((comp) => {
-          this.konvaObjs.selCompsGroup.add(comp.konvaRect)
-          comp.konvaRect.draggable(false)
+          this.konvaObjs.selCompsGroup.add(comp.konvaRect())
+          comp.konvaRect().draggable(false)
           if (!comp.tempTr) {
             comp.tempTr = new Konva.Transformer({
-              node: comp.konvaRect,
+              node: comp.konvaRect(),
               name: 'tempTr',
               keepRatio: true,
               resizeEnabled: false,
@@ -575,7 +559,7 @@
       },
       syncKonvaZIndex() {
         this.comps.forEach((comp, index) => {
-          comp.konvaRect.setZIndex(index)
+          comp.konvaRect().setZIndex(index)
         })
         this.konvaObjs.layers[0].draw()
       },
@@ -609,11 +593,11 @@
       },
       showNodeZIndex() {
         this.comps.forEach((comp, index) => {
-          console.log(`${index} : ${comp.konvaRect.name()} ${comp.konvaRect.getZIndex()}`)
+          console.log(`${index} : ${comp.konvaRect().name()} ${comp.konvaRect().getZIndex()}`)
         })
       },
       addCompToCanvas(comp) {
-        Object.assign(comp, { konvaContext: this.konvaObjs })
+        // Object.assign(comp, { konvaContext: this.konvaObjs })
         const c = new CompCtrl(comp)
         this.addComp(c)
       },

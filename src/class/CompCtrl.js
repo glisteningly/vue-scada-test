@@ -3,8 +3,10 @@ import Konva from 'konva'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 
+const _konvaRect = new WeakMap()
+
 class CompCtrl {
-  constructor(options) {
+  constructor(options, isInitKonva = true) {
     const guid = Guid()
     // this.id = guid
 
@@ -29,22 +31,12 @@ class CompCtrl {
 
     this.rotation = options.layout.rotation || 0
 
-    // this.initLayout = {
-    //   x: this.x,
-    //   y: this.y,
-    //   scaleX: this.scaleX,
-    //   scaleY: this.scaleY,
-    //   offsetX: this.offsetX,
-    //   offsetY: this.offsetY,
-    //   rotation: this.rotation
-    // }
-
     this.initBaseLayout()
 
     if (options.children && options.children.length > 0) {
       const children = []
       options.children.forEach((comp) => {
-        children.push(new CompCtrl(comp))
+        children.push(new CompCtrl(comp, false))
       })
 
       // Object.assign(CompGroup1, { konvaContext: this.konvaObjs })
@@ -53,10 +45,14 @@ class CompCtrl {
       // this.syncChildrenCompLayout()
     }
 
-    if (options.konvaContext) {
-      this.konvaContext = options.konvaContext
+    if (isInitKonva) {
+      // this.konvaContext = options.konvaContext
       this.initKonva()
     }
+  }
+
+  konvaRect() {
+    return _konvaRect.get(this)
   }
 
   // get x() {
@@ -81,43 +77,44 @@ class CompCtrl {
 
   initKonva() {
     this.draggable = true
-    this.konvaRect = new Konva.Rect(this)
+    // this.konvaRect() = new Konva.Rect(this)
+    _konvaRect.set(this, new Konva.Rect(this))
     this.tempTr = null
 
     // this.konvaContext = options.konvaContext
     // 拖拽移动时即时变化
-    // this.konvaRect.on('dragmove', () => {
+    // this.konvaRect().on('dragmove', () => {
     //   this.updateLayout()
     // })
 
     this._dragstartPos = { x: 0, y: 0 }
     this._hMove = true
 
-    this.konvaRect.on('mousedown', () => {
-      this._dragstartPos = this.konvaRect.getAbsolutePosition()
+    this.konvaRect().on('mousedown', () => {
+      this._dragstartPos = this.konvaRect().getAbsolutePosition()
     })
 
-    this.konvaRect.on('dragmove', () => {
-      this._hMove = Math.abs(this.konvaRect.getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaRect.getAbsolutePosition().y - this._dragstartPos.y)
+    this.konvaRect().on('dragmove', () => {
+      this._hMove = Math.abs(this.konvaRect().getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaRect().getAbsolutePosition().y - this._dragstartPos.y)
     })
 
-    this.konvaRect.on('dragstart', () => {
-      this.konvaContext.transformer.rotateEnabled(false)
-      this.konvaContext.transformer.resizeEnabled(false)
-      this.konvaRect.getLayer().draw()
+    this.konvaRect().on('dragstart', () => {
+      CompCtrl.konvaContext.transformer.rotateEnabled(false)
+      CompCtrl.konvaContext.transformer.resizeEnabled(false)
+      this.konvaRect().getLayer().draw()
     })
 
-    this.konvaRect.on('dragend transformend', () => {
+    this.konvaRect().on('dragend transformend', () => {
       // console.log(this.children)
       this.syncCompLayout()
-      this.konvaContext.transformer.rotateEnabled(true)
-      this.konvaContext.transformer.resizeEnabled(true)
-      this.konvaContext.transformer.forceUpdate()
-      this.konvaRect.getLayer().draw()
+      CompCtrl.konvaContext.transformer.rotateEnabled(true)
+      CompCtrl.konvaContext.transformer.resizeEnabled(true)
+      CompCtrl.konvaContext.transformer.forceUpdate()
+      this.konvaRect().getLayer().draw()
     })
 
-    this.konvaContext.layers[0].add(this.konvaRect)
-    this.konvaRect.getLayer().draw()
+    CompCtrl.konvaContext.layers[0].add(this.konvaRect())
+    this.konvaRect().getLayer().draw()
 
     if (this.children && this.children.length > 0) {
       this.syncChildrenCompLayout()
@@ -125,7 +122,7 @@ class CompCtrl {
   }
 
   setContext(konvaContext) {
-    this.konvaContext = konvaContext
+    CompCtrl.konvaContext = konvaContext
   }
 
   layout() {
@@ -145,20 +142,20 @@ class CompCtrl {
 
 
   syncCompLayout() {
-    this.x = this.konvaRect.getAbsolutePosition().x
-    this.y = this.konvaRect.getAbsolutePosition().y
-    this.scaleX = this.konvaRect.getAbsoluteScale().x
-    this.scaleY = this.konvaRect.getAbsoluteScale().y
-    this.rotation = this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation()
+    this.x = this.konvaRect().getAbsolutePosition().x
+    this.y = this.konvaRect().getAbsolutePosition().y
+    this.scaleX = this.konvaRect().getAbsoluteScale().x
+    this.scaleY = this.konvaRect().getAbsoluteScale().y
+    this.rotation = this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
     this.syncChildrenCompLayout()
   }
 
   // syncCompLayout() {
-  //   this.x = this.getRoundNum(this.konvaRect.getAbsolutePosition().x)
-  //   this.y = this.getRoundNum(this.konvaRect.getAbsolutePosition().y)
-  //   this.scaleX = this.getRoundNum(this.konvaRect.getAbsoluteScale().x)
-  //   this.scaleY = this.getRoundNum(this.konvaRect.getAbsoluteScale().y)
-  //   this.rotation = this.getRoundNum(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
+  //   this.x = this.getRoundNum(this.konvaRect().getAbsolutePosition().x)
+  //   this.y = this.getRoundNum(this.konvaRect().getAbsolutePosition().y)
+  //   this.scaleX = this.getRoundNum(this.konvaRect().getAbsoluteScale().x)
+  //   this.scaleY = this.getRoundNum(this.konvaRect().getAbsoluteScale().y)
+  //   this.rotation = this.getRoundNum(this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation())
   //   this.syncChildrenCompLayout()
   // }
 
@@ -180,16 +177,16 @@ class CompCtrl {
   }
 
   syncKonva() {
-    this.konvaRect.setAbsolutePosition({
+    this.konvaRect().setAbsolutePosition({
       x: this.x,
       y: this.y
     })
-    this.konvaRect.scale({
+    this.konvaRect().scale({
       x: this.scaleX,
       y: this.scaleY
     })
-    this.konvaRect.rotation(this.rotation)
-    this.konvaRect.getLayer().draw()
+    this.konvaRect().rotation(this.rotation)
+    this.konvaRect().getLayer().draw()
     this.syncChildrenCompLayout()
   }
 
@@ -203,42 +200,42 @@ class CompCtrl {
   removeCompfromGroupSel() {
     this.removeTempTransformer()
 
-    if (this.konvaRect) {
-      const compPosition = this.konvaRect.getAbsolutePosition()
-      this.konvaRect.moveTo(this.konvaRect.getLayer())
-      this.konvaRect.setAbsolutePosition(compPosition)
-      this.konvaRect.scale({
-        x: this.konvaRect.getAbsoluteScale().x,
-        y: this.konvaRect.getAbsoluteScale().y
+    if (this.konvaRect()) {
+      const compPosition = this.konvaRect().getAbsolutePosition()
+      this.konvaRect().moveTo(this.konvaRect().getLayer())
+      this.konvaRect().setAbsolutePosition(compPosition)
+      this.konvaRect().scale({
+        x: this.konvaRect().getAbsoluteScale().x,
+        y: this.konvaRect().getAbsoluteScale().y
       })
-      this.konvaRect.rotation(this.konvaRect.rotation() + this.konvaContext.selCompsGroup.rotation())
-      this.konvaRect.draggable(true)
+      this.konvaRect().rotation(this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation())
+      this.konvaRect().draggable(true)
     }
   }
 
   delete() {
     this.removeTempTransformer()
-    this.konvaRect.destroy()
-    this.konvaRect = null
+    this.konvaRect().destroy()
+    // this.konvaRect() = null
   }
 
   addTransformer() {
     this.removeCompfromGroupSel()
-    this.konvaRect.getLayer().add(this.konvaContext.transformer)
+    this.konvaRect().getLayer().add(CompCtrl.konvaContext.transformer)
     //判断是否是添加到组上
     if (this.type === 'ScadaGroup') {
-      // this.konvaContext.transformer.rotateEnabled(false)
-      this.konvaContext.transformer.keepRatio(true)
-      this.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
+      // CompCtrl.konvaContext.transformer.rotateEnabled(false)
+      CompCtrl.konvaContext.transformer.keepRatio(true)
+      CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
     } else {
-      // this.konvaContext.transformer.rotateEnabled(true)
-      this.konvaContext.transformer.keepRatio(false)
-      this.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
+      // CompCtrl.konvaContext.transformer.rotateEnabled(true)
+      CompCtrl.konvaContext.transformer.keepRatio(false)
+      CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
     }
 
-    this.konvaContext.transformer.attachTo(this.konvaRect)
+    CompCtrl.konvaContext.transformer.attachTo(this.konvaRect())
     this.setDragBound(true)
-    this.konvaRect.getLayer().draw()
+    this.konvaRect().getLayer().draw()
   }
 
   toString() {
@@ -301,7 +298,7 @@ class CompCtrl {
 
   setDragBound(flag) {
     if (flag) {
-      this.konvaRect.dragBoundFunc((pos) => {
+      this.konvaRect().dragBoundFunc((pos) => {
         let p = {
           x: pos.x,
           y: pos.y
@@ -322,7 +319,7 @@ class CompCtrl {
         return p
       })
     } else {
-      this.konvaRect.dragBoundFunc(null)
+      this.konvaRect().dragBoundFunc(null)
     }
 
   }
