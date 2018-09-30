@@ -182,8 +182,8 @@
 
         this.konvaObjs.stage = new Konva.Stage({
           container: 'work_canvas',
-          x: 30,
-          y: 30,
+          x: this.canvasLayout.x,
+          y: this.canvasLayout.y,
           width: width,
           height: height,
           // draggable: true
