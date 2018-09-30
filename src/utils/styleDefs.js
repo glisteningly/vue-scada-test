@@ -14,5 +14,9 @@ export default {
   cornerRadius: {
     label: '圆角尺寸',
     type: 'Int'
+  },
+  fontSize: {
+    label: '字体大小',
+    type: 'Int'
   }
 }
