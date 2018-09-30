@@ -17,10 +17,21 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
+const ScadaCompsLibrary = { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup }
+
+// export default {
+//   install: install,
+//   ScadaCompsLibrary: ScadaCompsLibrary,
+//   // ScadaGroup: ScadaGroup,
+//   // ScadaImage: ScadaImage,
+//   ScadaRect: ScadaRect,
+//   // ScadaLabel: ScadaLabel
+// }
+
+export {
+  ScadaCompsLibrary,
+}
+
 export default {
-  install: install,
-  // ScadaGroup: ScadaGroup,
-  // ScadaImage: ScadaImage,
-  // ScadaRect: ScadaRect,
-  // ScadaLabel: ScadaLabel
+  install: install
 }

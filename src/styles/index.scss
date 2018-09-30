@@ -1,0 +1,45 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.el-input__inner {
+  background-color: #333 !important;
+  color: #EEE !important;
+  font-size: 14px !important;
+  border: 1px solid #666 !important;
+  &:focus {
+    background-color: #444 !important;
+    border: 1px solid #20a0ff !important;
+  }
+}
+
+.el-color-picker--mini .el-color-picker__trigger {
+  width: 38px !important;
+  height: 24px !important;
+  padding: 0;
+  border: 0;
+}
+
+.el-input-number--mini {
+  width: 120px !important;
+  line-height: 26px;
+}
+
+.el-input-number--mini .el-input__inner {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.el-input-number__decrease, .el-input-number__increase {
+  background: #555 !important;
+  color: #DDD !important;
+}
+
+.el-input-number__increase {
+  border-left: 1px solid #555 !important;
+}
+
+.el-input-number__decrease {
+  border-right: 1px solid #555 !important;
+}

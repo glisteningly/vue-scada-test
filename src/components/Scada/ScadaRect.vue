@@ -1,8 +1,12 @@
 <template>
-  <rect fill="#08334C" stroke="#20A0FF" :stroke-width="options.style.strokeWidth || 0"
+  <rect :fill="options.style.fill"
+        :stroke="options.style.stroke"
+        :stroke-width="options.style.strokeWidth"
         :transform="rectTransformStr"
         :width="comp.width * comp.scaleX"
-        :height="comp.height * comp.scaleY"/>
+        :height="comp.height * comp.scaleY"
+        :rx="options.style.cornerRadius"
+        :ry="options.style.cornerRadius"/>
 </template>
 
 <script>
@@ -11,9 +15,21 @@
   export default {
     extends: BaseComp,
     name: 'ScadaRect',
-    // props: {
-    //   layout: Object
-    // }
+    props: {
+      defaultOptions: {
+        type: Object,
+        default: function () {
+          return {
+            style: {
+              fill: '#08334C',
+              stroke: '#20A0FF',
+              strokeWidth: 2,
+              cornerRadius: 0
+            }
+          }
+        }
+      }
+    }
   }
 </script>
 

@@ -8,9 +8,9 @@
   import BaseComp from './BaseComp'
 
   export default {
-    props: {
-      options: Object
-    },
+    // props: {
+    //   options: Object
+    // },
     extends: BaseComp,
     name: 'ScadaImage'
   }

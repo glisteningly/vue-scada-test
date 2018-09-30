@@ -1,64 +1,72 @@
 <template>
-  <section>
-
-    <svg style="position: absolute; left: 0;top: 0;"
-         :width="canvasLayout.width"
-         :height="canvasLayout.height"
-         :viewBox="svgViewbox">
-      <!--<g v-for="item in comps"-->
-      <!--:key="item.id"-->
-      <!--:width="item.width"-->
-      <!--:height="item.height"-->
-      <!--:transform="`translate(${item.x - item.offsetX * item.scaleX} ${item.y - item.offsetY * item.scaleY})-->
-      <!--rotate(${item.rotation} ${item.offsetX * item.scaleX} ${item.offsetY * item.scaleY})-->
-      <!--scale(${item.scaleX} ${item.scaleY})`">-->
-      <!--&lt;!&ndash;<rect fill="#DDD" height="25" width="20"/>&ndash;&gt;-->
-      <!--&lt;!&ndash;<rect fill="#0F0" x="30" y="20" height="35" width="40"/>&ndash;&gt;-->
-      <!--&lt;!&ndash;<image xlink:href="./assets/twitter.svg" width="100" height="100"/>&ndash;&gt;-->
-      <!--<component :is="item.comp.type"/>-->
-      <!--</g>-->
-
-      <component v-for="comp in comps"
-                 :key="comp.name"
-                 :is="comp.type"
-                 :comp="comp"
-                 :options="comp.options"/>
-    </svg>
-    <div id="workarea" @contextmenu.prevent="$refs.ctxMenu.open"></div>
-    <div class="toolbar" style="position: fixed;top: 0;left: 0;">
-      <!--<button @click="btnClicked">add</button>-->
-      <!--<button @click="btnZoomInClicked">zoom+</button>-->
-      <!--<button @click="btnZoomOutClicked">zoom-</button>-->
-      <!--<button @click="btnClicked1">log</button>-->
-      <button @click="addLabel">label</button>
-      <button @click="addRect">rect</button>
-      <!--<button @click="addIcon">twitter</button>-->
-      <!--<button @click="addIcon2">google</button>-->
-      <button @click="addAll">add all</button>
-      <button @click="addCompGroup">add group</button>
-      <button @click="unGroupToComps">ungroup</button>
-      <button @click="jointCompsToGroup">to group</button>
-      <span style="display: inline-block; width: 20px"/>
-      <button @click="showNodeZIndex">z index</button>
-      <span style="display: inline-block; width: 20px"/>
-      <button @click="compsMoveTop">to top</button>
-      <button @click="compsMoveBottom">to bottom</button>
-      <button @click="compsDelete">delete</button>
-      <span style="display: inline-block; width: 20px"/>
-      <button @click="testImport">import</button>
-      <button @click="doTest">test</button>
-      <button @click="loadLocal">load</button>
-      <button @click="initKonvaWorkArea">refreash</button>
-      <span style="display: inline-block; width: 20px"/>
-      <div style="display: inline-block" v-if="curSelCompLayout">
-        <span>x </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutX">
-        <span>y </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutY">
-        <span>w </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutW">
-        <span>h </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutH">
-        <span>r </span><input type="number" class="layout-input" v-model.number="curSelCompLayoutR">
-      </div>
-      <!--<button @click="unGroupSelAll">ungroup</button>-->
-    </div>
+  <div id="main_frame">
+    <section id="scada_editor">
+      <header>
+        <div class="toolbar" style="">
+          <!--<button @click="btnClicked">add</button>-->
+          <!--<button @click="btnZoomInClicked">zoom+</button>-->
+          <!--<button @click="btnZoomOutClicked">zoom-</button>-->
+          <!--<button @click="btnClicked1">log</button>-->
+          <el-button @click="addLabel">label</el-button>
+          <el-button @click="addRect">rect</el-button>
+          <!--<el-button @click="addIcon">twitter</el-button>-->
+          <!--<el-button @click="addIcon2">google</el-button>-->
+          <el-button @click="addAll">add all</el-button>
+          <el-button @click="addCompGroup">add group</el-button>
+          <el-button @click="unGroupToComps">ungroup</el-button>
+          <el-button @click="jointCompsToGroup">to group</el-button>
+          <span style="display: inline-block; width: 20px"/>
+          <el-button @click="showNodeZIndex">z index</el-button>
+          <span style="display: inline-block; width: 20px"/>
+          <el-button @click="compsMoveTop">to top</el-button>
+          <el-button @click="compsMoveBottom">to bottom</el-button>
+          <el-button @click="compsDelete">delete</el-button>
+          <span style="display: inline-block; width: 20px"/>
+          <el-button @click="testImport">import</el-button>
+          <el-button @click="doTest">test</el-button>
+          <el-button @click="loadLocal">load</el-button>
+          <el-button @click="initKonvaWorkArea" type="primary">refreash</el-button>
+          <!--<button @click="unGroupSelAll">ungroup</button>-->
+        </div>
+      </header>
+      <main>
+        <div id="left_sidebar"></div>
+        <div id="work_area">
+          <div id="work_frame">
+            <svg style="position: absolute; left: 0;top: 0;"
+                 width="100%"
+                 height="100%"
+                 :viewBox="svgViewbox">
+              <component v-for="comp in comps"
+                         :key="comp.name"
+                         :is="comp.type"
+                         :comp="comp"
+              />
+            </svg>
+            <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"></div>
+          </div>
+        </div>
+        <div id="right_sidebar">
+          <div id="layout_panel">
+            <div style="display: inline-block" v-if="curSelCompLayout">
+              <span>x </span>
+              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutX"/>
+              <span>y </span>
+              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutY"/>
+              <span>w </span>
+              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutW"/>
+              <span>h </span>
+              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutH"/>
+              <span>r </span>
+              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutR"/>
+            </div>
+          </div>
+          <StylePanel :styleOptions="curSelCompOptions"/>
+        </div>
+      </main>
+      <footer>
+      </footer>
+    </section>
     <context-menu id="context-menu" ref="ctxMenu">
       <li>
         <button>放大</button>
@@ -79,37 +87,40 @@
         <button @click="unGroupToComps">取消编组</button>
       </li>
     </context-menu>
-  </section>
-
+  </div>
 </template>
 
 <script>
-  import CompCtrl from './class/CompCtrl'
+  // for test
+  import CompConfig from './temp/compConfig1'
+  import CompGroup1 from './temp/compGroup2'
+  import CompGroup3 from './temp/compGroup3'
 
   import Konva from 'konva'
   import _ from 'lodash'
   import hotkeys from 'hotkeys-js'
 
-  const WIDTH = window.innerWidth
-  const HEIGHT = window.innerHeight
-
-  import CompConfig from './temp/compConfig1'
-  import CompGroup1 from './temp/compGroup2'
-  import CompGroup3 from './temp/compGroup3'
-
   import ContextMenu from 'vue-context-menu'
+  import { ScadaCompsLibrary } from './components/Scada'
 
+  import utils from './utils'
+  import styleDefs from './utils/styleDefs'
+
+  import CompCtrl from './class/CompCtrl'
+  import ComputeLayout from './mixin/ComputeLayout'
+  import StylePanel from './components/StylePanel'
 
   export default {
-    components: { ContextMenu },
+    components: { ContextMenu, StylePanel },
+    mixins: [ComputeLayout],
     name: 'Editor',
     data() {
       return {
         inited: false,
         comps: [],
         canvasLayout: {
-          width: WIDTH,
-          height: HEIGHT,
+          width: 0,
+          height: 0,
           x: 0,
           y: 0,
           scale: 1,
@@ -125,7 +136,8 @@
         curSelComps: [],
         groupLastPos: { x: 0, y: 0 },
         isDragSelecting: false,
-        testData: 2
+        testData: 2,
+        curSelCompOptions: {}
       }
     },
     mounted() {
@@ -135,8 +147,17 @@
     methods: {
       initKonvaWorkArea() {
         this.curSelComps = []
-        const width = window.innerWidth
-        const height = window.innerHeight
+        // const width = window.innerWidth
+        // const height = window.innerHeight
+        const width = this.$refs['workCanvas'].clientWidth
+        const height = this.$refs['workCanvas'].clientHeight
+
+        this.canvasLayout.width = width
+        this.canvasLayout.height = height
+
+        console.log(width)
+        console.log(height)
+
 
         if (this.konvaObjs.stage) {
           this.konvaObjs.stage.destroyChildren()
@@ -144,7 +165,7 @@
         }
 
         this.konvaObjs.stage = new Konva.Stage({
-          container: 'workarea',
+          container: 'work_canvas',
           width: width,
           height: height
         })
@@ -388,7 +409,9 @@
           },
           options: {
             style: {
-              strokeWidth: 2
+              stroke: '#b90006',
+              strokeWidth: 4,
+              cornerRadius: 5
             }
           }
         })
@@ -614,6 +637,37 @@
           compConfig.push(comp.toConfig())
         })
         localStorage.setItem('comps', JSON.stringify(compConfig))
+
+        const a = {
+          options: {
+            style: {
+              fontSize: 10,
+              stroke: '#ddd',
+              fill: '#red'
+            },
+            param: {
+              text: "123"
+            },
+            bind: {
+              type: "sadasd"
+            }
+          }
+        }
+
+        const b = {
+          options: {
+            style: {
+              fontSize: 16,
+              fill: '#red',
+            }
+          }
+        }
+
+        // const o = ScadaCompsLibrary.ScadaRect.props.defaultOptions.default()
+        // const o = utils.diff(a, b)
+        const o = _.merge({}, a, b)
+
+        console.log(o)
       },
       loadLocal() {
         const compConfig = JSON.parse(localStorage.getItem('comps'))
@@ -623,6 +677,34 @@
       },
       getRoundNum(num) {
         return _.round(num, 2)
+      },
+      getCompOptions() {
+        if (this.curSelComp) {
+          const compType = this.curSelComp.type
+          if (ScadaCompsLibrary[compType]) {
+            if (ScadaCompsLibrary[compType].props) {
+              const defCompOptions = ScadaCompsLibrary[compType].props.defaultOptions.default()
+              return _.merge({}, defCompOptions, this.curSelComp.options)
+            }
+          }
+        }
+        return null
+      },
+      initCompCtrlPanel() {
+        if (this.getCompOptions()) {
+          const compStyles = Object.assign({}, this.getCompOptions().style)
+          // console.log(compStyles)
+          const styleCtrls = {}
+          for (const key in compStyles) {
+            console.log(key)
+            styleCtrls[key] = {
+              value: compStyles[key],
+              label: styleDefs[key].label,
+              type: styleDefs[key].type
+            }
+          }
+          this.curSelCompOptions = styleCtrls
+        }
       }
     },
     computed: {
@@ -632,93 +714,6 @@
         const w = (this.canvasLayout.width / this.canvasLayout.scale).toFixed(2)
         const h = (this.canvasLayout.height / this.canvasLayout.scale).toFixed(2)
         return `${x} ${y} ${w} ${h}`
-      },
-      curSelCompLayoutX: {
-        get() {
-          if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.x - this.curSelComp.offsetX * this.curSelComp.scaleX)
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          this.curSelComp.x = v + this.curSelComp.offsetX * this.curSelComp.scaleX
-        }
-      },
-      curSelCompLayoutY: {
-        get() {
-          if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.y - this.curSelComp.offsetY * this.curSelComp.scaleY)
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          this.curSelComp.y = v + this.curSelComp.offsetY * this.curSelComp.scaleY
-        }
-      },
-      curSelCompLayoutW: {
-        get() {
-          if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.width * this.curSelComp.scaleX)
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
-          this.curSelComp.scaleX = v / this.curSelComp.width
-        }
-      },
-      curSelCompLayoutH: {
-        get() {
-          if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.height * this.curSelComp.scaleY)
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
-          this.curSelComp.scaleY = v / this.curSelComp.height
-        }
-      },
-      curSelCompLayoutR: {
-        get() {
-          if (this.curSelComp) {
-            return this.getRoundNum(this.curSelComp.rotation)
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          this.curSelComp.rotation = v
-          // this.curSelComp.x = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.cos(v * Math.PI / 180) + (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.sin(v * Math.PI / 180) + this.curSelComp.x + this.curSelComp.width * this.curSelComp.scaleX / 2
-          // this.curSelComp.y = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.sin(v * Math.PI / 180) - (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.cos(v * Math.PI / 180) + this.curSelComp.y + this.curSelComp.height * this.curSelComp.scaleY / 2
-        }
-      },
-      curSelCompLayout: {
-        get() {
-          if (this.curSelComp) {
-            return {
-              x: this.getRoundNum(this.curSelComp.x),
-              y: this.getRoundNum(this.curSelComp.y),
-              scaleX: this.curSelComp.scaleX,
-              scaleY: this.curSelComp.scaleY,
-              rotation: this.getRoundNum(this.curSelComp.rotation),
-              width: this.getRoundNum(this.curSelComp.width * this.curSelComp.scaleX),
-              height: this.getRoundNum(this.curSelComp.height * this.curSelComp.scaleY),
-            }
-          } else {
-            return null
-          }
-        },
-        set(v) {
-          console.log('vvv')
-          if (this.curSelComp) {
-            this.curSelComp.x = v.x
-          }
-        }
       },
       curSelComp() {
         if (this.curSelComps.length === 1) {
@@ -735,23 +730,23 @@
       },
       canUnGroupComps() {
         return (this.curSelComps.length === 1 && this.curSelComps[0].type === 'ScadaGroup')
-      }
+      },
     },
     watch: {
       curSelComps() {
         console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
-            // this.curSelComps[0].removeCompfromGroupSel()
+            this.initCompCtrlPanel()
             this.curSelComps[0].addTransformer()
             this.cancelSelGroup()
           } else {
             this.addToGroup()
           }
         } else {
-          // console.log('ungroup')
           this.konvaObjs.transformer.detach()
           this.cancelSelGroup()
+          this.curSelCompOptions = null
         }
         this.syncKonvaZIndex()
       },
@@ -776,20 +771,100 @@
 
 </script>
 <style lang="scss">
+  @import "styles/index";
+
   body {
     width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
-    background: #2B2B2B;
+    /*background: #2B2B2B;*/
     overflow: hidden;
   }
 
-  #workarea {
+  #main_frame {
     width: 100%;
     height: 100%;
-    user-select: none;
+  }
 
+  #scada_editor {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    header {
+      background: #3C3F41;
+      flex: 0 0 54px;
+      border-bottom: 1.5px solid #2B2B2B;
+    }
+    main {
+      display: flex;
+      flex: 1;
+      /*flex-basis: auto;*/
+      /*width: 100%;*/
+      /*height: 100%;*/
+      #left_sidebar {
+        flex: 0 0 100px;
+        background: #3C3F41;
+        border-right: 1px solid #000;
+        /*border-top: 1px solid #2B2B2B;*/
+      }
+      #work_area {
+        width: 100%;
+        height: 100%;
+        /*overflow: scroll;*/
+        #work_frame {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          background: #2B2B2B;
+          overflow: auto;
+          #work_canvas {
+            width: 100%;
+            height: 100%;
+            user-select: none;
+          }
+        }
+      }
+      #right_sidebar {
+        /*border-top: 1px solid #2B2B2B;*/
+        border-left: 1px solid #000;
+        flex: 0 0 280px;
+        background: #3C3F41;
+        #layout_panel {
+          border-bottom: 1.5px solid #2B2B2B;
+          padding: 12px;
+          span {
+            display: inline-block;
+            width: 15px;
+            color: #DDD;
+          }
+          .layout-input {
+            width: 75px;
+            margin-right: 30px;
+            margin-bottom: 6px;
+            text-align: right;
+            padding: 0 3px;
+          }
+        }
+      }
+    }
+    footer {
+      border-top: 1.5px solid #2B2B2B;
+      background: #3C3F41;
+      flex: 0 0 28px;
+    }
+
+    .toolbar {
+      margin: 7px;
+      padding: 5px;
+      button {
+        margin-right: 5px;
+      }
+      span {
+        /*color: #DDD;*/
+      }
+    }
   }
 
   #context-menu {
@@ -806,7 +881,7 @@
             background: #D3D3D3;
           }
           button {
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             font-size: 15px;
             color: #333;
             text-align: left;
@@ -816,22 +891,6 @@
           }
         }
       }
-    }
-  }
-
-  .toolbar {
-    padding: 5px;
-    button {
-      margin-right: 5px;
-    }
-    span {
-      color: #DDD;
-    }
-    .layout-input {
-      width: 60px;
-      margin-right: 8px;
-      text-align: right;
-      padding: 0 3px;
     }
   }
 

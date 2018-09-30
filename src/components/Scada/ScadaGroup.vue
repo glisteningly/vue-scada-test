@@ -4,7 +4,7 @@
                :key="childrenComp.name"
                :is="childrenComp.type"
                :comp="childrenComp"
-               :options="childrenComp.options"/>
+               />
   </g>
 </template>
 
@@ -13,9 +13,9 @@
 
   export default {
     name: 'ScadaGroup',
-    props: {
-      options: Object
-    },
+    // props: {
+    //   options: Object
+    // },
     extends: BaseComp,
   }
 </script>
