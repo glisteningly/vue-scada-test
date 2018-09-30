@@ -3,43 +3,91 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 
+.el-button + .el-button {
+  margin-left: 4px;
+}
+
 .el-input__inner {
-  background-color: #333 !important;
-  color: #EEE !important;
-  font-size: 14px !important;
-  border: 1px solid #666 !important;
+  background-color: #333;
+  color: #EEE;
+  font-size: 13px;
+  border: 1px solid #666;
+  padding: 0 8px;
   &:focus {
-    background-color: #444 !important;
-    border: 1px solid #20a0ff !important;
+    background-color: #444;
+    border: 1px solid #20a0ff;
   }
 }
 
 .el-color-picker--mini .el-color-picker__trigger {
-  width: 38px !important;
-  height: 24px !important;
+  width: 38px;
+  height: 24px;
   padding: 0;
   border: 0;
 }
 
 .el-input-number--mini {
-  width: 120px !important;
+  width: 100px;
   line-height: 26px;
 }
 
 .el-input-number--mini .el-input__inner {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .el-input-number__decrease, .el-input-number__increase {
-  background: #555 !important;
-  color: #DDD !important;
+  background: #555;
+  color: #DDD;
 }
 
 .el-input-number__increase {
-  border-left: 1px solid #555 !important;
+  border-left: 1px solid #555;
 }
 
 .el-input-number__decrease {
-  border-right: 1px solid #555 !important;
+  border-right: 1px solid #555;
+}
+
+.el-color-picker__panel {
+  position: absolute;
+  z-index: 10;
+  padding: 6px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  background-color: #3C3F41;
+  border: 1px solid #111;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+}
+
+.el-color-dropdown__btn {
+  border: 1px solid #666;
+  color: #EEE;
+  background-color: #555;
+
+}
+
+.el-button.is-plain:focus, .el-button.is-plain:hover {
+  background-color: #666;
+  border-color: #409EFF;
+  color: #DDD;
+}
+
+.el-input-group__append, .el-input-group__prepend {
+  background-color: #444;
+  color: #3c97e0;
+  vertical-align: middle;
+  display: table-cell;
+  position: relative;
+  border: 1px solid #666;
+  border-radius: 4px;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-right: none;
+  padding: 0 5px;
+  width: 15px;
+  white-space: nowrap;
+  font-size: 12px;
 }

@@ -9,7 +9,8 @@ class CompCtrl {
   constructor(options, isInitKonva = true) {
     const guid = Guid()
     // this.id = guid
-
+    // this.stroke = 'green'
+    // this.strokeWidtg = 1
 
     this.type = options.type
     this.options = options.options
@@ -20,7 +21,6 @@ class CompCtrl {
     this.offsetY = options.layout.offsetY || (options.layout.height / 2)
     // this.offsetX = 0
     // this.offsetY = 0
-
 
     this.width = options.layout.width
     this.height = options.layout.height
@@ -142,8 +142,10 @@ class CompCtrl {
 
 
   syncCompLayout() {
-    this.x = this.konvaRect().getAbsolutePosition().x
-    this.y = this.konvaRect().getAbsolutePosition().y
+    // this.x = this.konvaRect().getAbsolutePosition().x
+    // this.y = this.konvaRect().getAbsolutePosition().y
+    this.x = this.konvaRect().getAbsolutePosition(CompCtrl.konvaContext.stage).x
+    this.y = this.konvaRect().getAbsolutePosition(CompCtrl.konvaContext.stage).y
     this.scaleX = this.konvaRect().getAbsoluteScale().x
     this.scaleY = this.konvaRect().getAbsoluteScale().y
     this.rotation = this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
@@ -177,7 +179,11 @@ class CompCtrl {
   }
 
   syncKonva() {
-    this.konvaRect().setAbsolutePosition({
+    // this.konvaRect().setAbsolutePosition({
+    //   x: this.x,
+    //   y: this.y
+    // })
+    this.konvaRect().position({
       x: this.x,
       y: this.y
     })

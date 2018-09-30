@@ -13,8 +13,8 @@
           <!--<el-button @click="addIcon2">google</el-button>-->
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
-          <el-button @click="unGroupToComps">ungroup</el-button>
-          <el-button @click="jointCompsToGroup">to group</el-button>
+          <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
+          <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="showNodeZIndex">z index</el-button>
           <span style="display: inline-block; width: 20px"/>
@@ -48,24 +48,38 @@
         </div>
         <div id="right_sidebar">
           <div id="layout_panel" v-if="curSelComp">
-            <div style="display: inline-block" v-if="curSelCompLayout">
-              <span>x </span>
-              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutX"/>
-              <span>y </span>
-              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutY"/>
-              <span>w </span>
-              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutW"/>
-              <span>h </span>
-              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutH"/>
-              <span>r </span>
-              <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutR"/>
+            <div v-if="curSelCompLayout">
+              <div>
+                <label>位置</label>
+                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutX">
+                  <template slot="prepend">X</template>
+                </el-input>
+                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutY">
+                  <template slot="prepend">Y</template>
+                </el-input>
+              </div>
+              <div>
+                <label>尺寸</label>
+                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutW">
+                  <template slot="prepend">W</template>
+                </el-input>
+                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutH">
+                  <template slot="prepend">H</template>
+                </el-input>
+              </div>
+              <div>
+                <label>旋转</label>
+                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutR">
+                  <template slot="prepend">R</template>
+                </el-input>
+              </div>
             </div>
           </div>
           <StylePanel :styleOptions="curSelCompStyleOptions" @compStyleOptionsChanged="compStyleOptionsChanged"/>
         </div>
       </main>
-      <footer>
-      </footer>
+      <!--<footer>-->
+      <!--</footer>-->
     </section>
     <context-menu id="context-menu" ref="ctxMenu">
       <li>
@@ -108,11 +122,13 @@
 
   import CompCtrl from './class/CompCtrl'
   import ComputeLayout from './mixin/ComputeLayout'
+  import Keyboard from './mixin/Keyboard'
+
   import StylePanel from './components/StylePanel'
 
   export default {
     components: { ContextMenu, StylePanel },
-    mixins: [ComputeLayout],
+    mixins: [ComputeLayout, Keyboard],
     name: 'Editor',
     data() {
       return {
@@ -121,8 +137,8 @@
         canvasLayout: {
           width: 0,
           height: 0,
-          x: 0,
-          y: 0,
+          x: 30,
+          y: 30,
           scale: 1,
         },
         konvaObjs: {
@@ -137,11 +153,11 @@
         groupLastPos: { x: 0, y: 0 },
         isDragSelecting: false,
         testData: 2,
-        curSelCompStyleOptions: {}
+        curSelCompStyleOptions: {},
+        isKeySpacepressing: false
       }
     },
     mounted() {
-      this.initHotkeyBinding()
       this.initKonvaWorkArea()
     },
     methods: {
@@ -166,9 +182,23 @@
 
         this.konvaObjs.stage = new Konva.Stage({
           container: 'work_canvas',
+          x: 30,
+          y: 30,
           width: width,
-          height: height
+          height: height,
+          // draggable: true
         })
+
+        const layerPaper = new Konva.Layer()
+        layerPaper.add(new Konva.Rect({
+          width: 1600,
+          height: 800,
+          stroke: '#666',
+          strokeWidth: 1,
+          listening: false
+        }))
+        this.konvaObjs.stage.add(layerPaper)
+
 
         this.konvaObjs.layers = []
         const layer = new Konva.Layer()
@@ -179,6 +209,7 @@
           anchorSize: 6,
           rotationSnaps: [0, 90, 180, 270]
         })
+
 
         this.konvaObjs.groupTransformer = new Konva.Transformer({
           keepRatio: true,
@@ -224,7 +255,8 @@
           width: 50,
           height: 50,
           strokeWidth: 1,
-          stroke: '#AAA',
+          fill: 'rgba(60,151,224,0.06)',
+          stroke: '#3c97e0',
           dash: [3, 1]
         })
 
@@ -266,6 +298,12 @@
 
         //click
         this.konvaObjs.stage.on('mousedown', (e) => {
+          // console.log(hotkeys.isPressed("space"))
+          if (hotkeys.isPressed("space")) {
+            this.konvaObjs.stage.draggable(true)
+            return
+          }
+
           if (e.target === this.konvaObjs.stage && e.evt.button === 0) {
             // console.log(e)
             console.log('stage mousedown')
@@ -286,8 +324,8 @@
           // console.log('mousemove')
           if (this.isDragSelecting) {
             const mousePos = this.konvaObjs.stage.getPointerPosition()
-            const x = mousePos.x
-            const y = mousePos.y
+            const x = mousePos.x - this.konvaObjs.stage.x()
+            const y = mousePos.y - this.konvaObjs.stage.y()
             this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
             this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
             this.konvaObjs.layers[0].draw()
@@ -295,6 +333,7 @@
         })
 
         this.konvaObjs.stage.on('mouseup', (e) => {
+          this.konvaObjs.stage.draggable(false)
 
           if (e.evt.button === 0) {
 
@@ -302,7 +341,7 @@
 
             if (this.isDragSelecting) {
               const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
-              console.log(l)
+              // console.log(l)
 
               const newSels = []
               for (const comp of this.comps) {
@@ -320,16 +359,28 @@
                 this.konvaObjs.layers[0].draw()
               }
 
-              this.konvaObjs.selCompsRect.remove()
-              this.konvaObjs.selCompsRect.width(0)
-              this.konvaObjs.selCompsRect.height(0)
-              this.konvaObjs.layers[0].draw()
-              this.isDragSelecting = false
+              // this.konvaObjs.selCompsRect.remove()
+              // this.konvaObjs.selCompsRect.width(0)
+              // this.konvaObjs.selCompsRect.height(0)
+              // this.konvaObjs.layers[0].draw()
+              // this.isDragSelecting = false
             }
           }
+
+          this.konvaObjs.selCompsRect.remove()
+          this.konvaObjs.selCompsRect.width(0)
+          this.konvaObjs.selCompsRect.height(0)
+          this.konvaObjs.layers[0].draw()
+          this.isDragSelecting = false
+        })
+
+        this.konvaObjs.stage.on('dragmove', (e) => {
+          this.canvasLayout.x = this.konvaObjs.stage.x()
+          this.canvasLayout.y = this.konvaObjs.stage.y()
         })
 
         CompCtrl.konvaContext = this.konvaObjs
+
 
         this.comps.forEach((comp) => {
           // comp.konvaContext = this.konvaObjs
@@ -339,8 +390,6 @@
 
         // this.konvaObjs.layers[0].draw()
         this.konvaObjs.stage.draw()
-
-        // CompCtrl.konvaContext = this.konvaObjs
       },
 
       addCompEvent(compCtrl) {
@@ -537,22 +586,6 @@
         this.konvaObjs.selCompsGroup.rotation(0)
         this.konvaObjs.layers[0].draw()
       },
-      initHotkeyBinding() {
-        hotkeys('delete,ctrl+g,ctrl+shift+g ', (e, handler) => {
-          e.preventDefault()
-          switch (handler.key) {
-            case "delete":
-              this.compsDelete()
-              break;
-            case "ctrl+g":
-              this.jointCompsToGroup()
-              break;
-            case "ctrl+shift+g":
-              this.unGroupToComps()
-              break;
-          }
-        })
-      },
       isInSelGroup(comp) {
         return _.findIndex(this.curSelComps, comp) >= 0
       },
@@ -564,16 +597,20 @@
         this.addToGroup()
       },
       getDragSelectingRect(node) {
+        const x = node.getAbsolutePosition().x
+        const y = node.getAbsolutePosition().y
         return {
-          x: node.width() >= 0 ? node.x() : node.x() + node.width(),
-          y: node.height() >= 0 ? node.y() : node.y() + node.height(),
+          x: node.width() >= 0 ? x : x + node.width(),
+          y: node.height() >= 0 ? y : y + node.height(),
           width: Math.abs(node.width()),
           height: Math.abs(node.height())
         }
       },
       isRectContain(r1, node) {
         // const r1 = rect
+        console.log(r1)
         const r2 = node.getClientRect()
+        console.log(r2)
         return (r1.x <= r2.x &&
           r1.x + r1.width >= r2.x + r2.width &&
           r1.y <= r2.y &&
@@ -665,9 +702,11 @@
 
         // const o = ScadaCompsLibrary.ScadaRect.props.defaultOptions.default()
         // const o = utils.diff(a, b)
-        const o = _.merge({}, a, b)
+        // const o = _.merge({}, a, b)
 
-        console.log(o)
+        // console.log(o)
+        // console.log('state x: ' + this.konvaObjs.stage.x())
+        // console.log('comp x: ' + this.curSelComp.konvaRect().x())
       },
       loadLocal() {
         const compConfig = JSON.parse(localStorage.getItem('comps'))
@@ -701,7 +740,6 @@
           // console.log(compStyles)
           const styleCtrls = {}
           for (const key in compStyles) {
-            console.log(key)
             styleCtrls[key] = {
               value: compStyles[key],
               label: styleDefs[key].label,
@@ -785,14 +823,23 @@
       //   },
       //   // deep: true
       // }
+      isKeySpacepressing() {
+        console.log(this.isKeySpacepressing)
+        if (this.isKeySpacepressing) {
+          this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
+        } else {
+          this.konvaObjs.stage.container().style.cursor = 'default'
+        }
+      }
     }
   }
 
 </script>
 <style lang="scss">
-  @import "styles/index";
+  /*@import "styles/index";*/
 
   body {
+    user-select: none;
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -829,6 +876,7 @@
         /*border-top: 1px solid #2B2B2B;*/
       }
       #work_area {
+        /*flex: 1;*/
         width: 100%;
         height: 100%;
         /*overflow: scroll;*/
@@ -852,18 +900,19 @@
         background: #3C3F41;
         #layout_panel {
           border-bottom: 1.5px solid #2B2B2B;
-          padding: 12px;
-          span {
+          padding: 12px 16px;
+          label {
+            letter-spacing: 1.5px;
             display: inline-block;
-            width: 15px;
             color: #DDD;
+            font-size: 13px;
           }
           .layout-input {
-            width: 85px;
-            margin-right: 20px;
-            margin-bottom: 6px;
+            width: 95px;
+            margin-left: 10px;
+            margin-bottom: 8px;
             text-align: right;
-            padding: 0 3px;
+            padding: 0 2px;
           }
         }
       }
@@ -871,7 +920,7 @@
     footer {
       border-top: 1.5px solid #2B2B2B;
       background: #3C3F41;
-      flex: 0 0 28px;
+      flex: 0 0 24px;
     }
 
     .toolbar {

@@ -56,9 +56,9 @@
       margin: 4px 4px;
 
       label {
-        font-size: 14px;
-        letter-spacing: 2px;
-        color: #EEE;
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        color: #DDD;
         display: block;
         margin-top: 4px;
       }
