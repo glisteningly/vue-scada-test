@@ -47,7 +47,7 @@
           </div>
         </div>
         <div id="right_sidebar">
-          <div id="layout_panel">
+          <div id="layout_panel" v-if="curSelComp">
             <div style="display: inline-block" v-if="curSelCompLayout">
               <span>x </span>
               <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutX"/>
@@ -61,7 +61,7 @@
               <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutR"/>
             </div>
           </div>
-          <StylePanel :styleOptions="curSelCompOptions"/>
+          <StylePanel :styleOptions="curSelCompStyleOptions" @compStyleOptionsChanged="compStyleOptionsChanged"/>
         </div>
       </main>
       <footer>
@@ -137,7 +137,7 @@
         groupLastPos: { x: 0, y: 0 },
         isDragSelecting: false,
         testData: 2,
-        curSelCompOptions: {}
+        curSelCompStyleOptions: {}
       }
     },
     mounted() {
@@ -678,15 +678,20 @@
       getRoundNum(num) {
         return _.round(num, 2)
       },
-      getCompOptions() {
+      getCompDefaultOptions() {
         if (this.curSelComp) {
           const compType = this.curSelComp.type
           if (ScadaCompsLibrary[compType]) {
             if (ScadaCompsLibrary[compType].props) {
-              const defCompOptions = ScadaCompsLibrary[compType].props.defaultOptions.default()
-              return _.merge({}, defCompOptions, this.curSelComp.options)
+              return ScadaCompsLibrary[compType].props.defaultOptions.default()
             }
           }
+        }
+        return null
+      },
+      getCompOptions() {
+        if (this.curSelComp) {
+          return _.merge({}, this.getCompDefaultOptions(), this.curSelComp.options)
         }
         return null
       },
@@ -703,7 +708,21 @@
               type: styleDefs[key].type
             }
           }
-          this.curSelCompOptions = styleCtrls
+          this.curSelCompStyleOptions = styleCtrls
+        }
+      },
+      compStyleOptionsChanged() {
+        const newVal = {}
+        for (const key in this.curSelCompStyleOptions) {
+          newVal[key] = this.curSelCompStyleOptions[key].value
+        }
+        // console.log(newVal)
+        if (this.curSelComp) {
+          const compStyles = this.getCompDefaultOptions().style
+          // console.log(newVal)
+          // console.log(compStyles)
+          // console.log(utils.diff(newVal, compStyles))
+          this.curSelComp.options.style = utils.diff(newVal, compStyles)
         }
       }
     },
@@ -746,7 +765,7 @@
         } else {
           this.konvaObjs.transformer.detach()
           this.cancelSelGroup()
-          this.curSelCompOptions = null
+          this.curSelCompStyleOptions = null
         }
         this.syncKonvaZIndex()
       },
@@ -840,8 +859,8 @@
             color: #DDD;
           }
           .layout-input {
-            width: 75px;
-            margin-right: 30px;
+            width: 85px;
+            margin-right: 20px;
             margin-bottom: 6px;
             text-align: right;
             padding: 0 3px;

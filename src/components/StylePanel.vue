@@ -41,7 +41,7 @@
       },
       compValInputChanged() {
         this.$nextTick(() => {
-          this.$emit('compValInputChanged')
+          this.$emit('compStyleOptionsChanged')
         })
       }
     },
@@ -56,7 +56,9 @@
       margin: 4px 4px;
 
       label {
-        color: #DDD;
+        font-size: 14px;
+        letter-spacing: 2px;
+        color: #EEE;
         display: block;
         margin-top: 4px;
       }
