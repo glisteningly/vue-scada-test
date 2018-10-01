@@ -1,6 +1,11 @@
 import hotkeys from 'hotkeys-js'
 
 export default {
+  data() {
+    return {
+      isKeySpacepressing: false
+    }
+  },
   methods: {
     initHotkeyBinding() {
       hotkeys('delete,ctrl+g,ctrl+shift+g,space', (e, handler) => {

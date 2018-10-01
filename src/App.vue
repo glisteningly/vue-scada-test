@@ -154,7 +154,7 @@
         isDragSelecting: false,
         testData: 2,
         curSelCompStyleOptions: {},
-        isKeySpacepressing: false
+        // isKeySpacepressing: false
       }
     },
     mounted() {
@@ -299,8 +299,8 @@
         //click
         this.konvaObjs.stage.on('mousedown', (e) => {
           // console.log(hotkeys.isPressed("space"))
-          if (hotkeys.isPressed("space")) {
-            this.konvaObjs.stage.draggable(true)
+          if (this.isKeySpacepressing) {
+            // this.konvaObjs.stage.draggable(true)
             return
           }
 
@@ -333,8 +333,6 @@
         })
 
         this.konvaObjs.stage.on('mouseup', (e) => {
-          this.konvaObjs.stage.draggable(false)
-
           if (e.evt.button === 0) {
 
             console.log('state mouseup')
@@ -524,8 +522,8 @@
           const g = {
             type: 'ScadaGroup',
             layout: {
-              x: groupRect.x + 1,
-              y: groupRect.y + 1,
+              x: groupRect.x + 1 - this.konvaObjs.stage.x(),
+              y: groupRect.y + 1 - this.konvaObjs.stage.y(),
               width: groupRect.width - 2,
               height: groupRect.height - 2
             },
@@ -826,8 +824,10 @@
       isKeySpacepressing() {
         console.log(this.isKeySpacepressing)
         if (this.isKeySpacepressing) {
+          this.konvaObjs.stage.draggable(true)
           this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
         } else {
+          this.konvaObjs.stage.draggable(false)
           this.konvaObjs.stage.container().style.cursor = 'default'
         }
       }
