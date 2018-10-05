@@ -3,6 +3,10 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 
+.konvajs-content {
+  position: absolute !important;
+}
+
 .el-button + .el-button {
   margin-left: 4px;
 }
@@ -90,4 +94,5 @@ input::-webkit-inner-spin-button {
   width: 15px;
   white-space: nowrap;
   font-size: 12px;
+  text-align: center;
 }

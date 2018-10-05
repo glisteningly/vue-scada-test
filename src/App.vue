@@ -25,7 +25,11 @@
           <el-button @click="testImport">import</el-button>
           <el-button @click="doTest">test</el-button>
           <el-button @click="loadLocal">load</el-button>
+          <el-button @click="zoomOut">zoom -</el-button>
+          <el-button @click="zoom100">100%</el-button>
+          <el-button @click="zoomIn">zoom +</el-button>
           <el-button @click="initKonvaWorkArea" type="primary">refreash</el-button>
+          <el-button @click="canvasRedraw" type="primary">redraw</el-button>
           <!--<button @click="unGroupSelAll">ungroup</button>-->
         </div>
       </header>
@@ -34,9 +38,10 @@
         <div id="work_area">
           <div id="work_frame">
             <svg style="position: absolute; left: 0;top: 0;"
-                 width="100%"
-                 height="100%"
+                 :width="this.canvasLayout.width"
+                 :height="this.canvasLayout.height"
                  :viewBox="svgViewbox">
+              <!--<rect fill="#222" width="100%" height="100%" stroke="#666"></rect>-->
               <component v-for="comp in comps"
                          :key="comp.name"
                          :is="comp.type"
@@ -94,7 +99,7 @@
       <li v-if="canDoSelCompAction">
         <button @click="compsMoveBottom">置于底层</button>
       </li>
-      <li v-if="canGroupComps">
+      <li v-if="multiCompsSelected">
         <button @click="jointCompsToGroup">编组</button>
       </li>
       <li v-if="canUnGroupComps">
@@ -148,6 +153,7 @@
           groupTransformer: null,
           selCompsGroup: null,
           selCompsRect: null,
+          paperRect: null,
         },
         curSelComps: [],
         groupLastPos: { x: 0, y: 0 },
@@ -171,10 +177,6 @@
         this.canvasLayout.width = width
         this.canvasLayout.height = height
 
-        console.log(width)
-        console.log(height)
-
-
         if (this.konvaObjs.stage) {
           this.konvaObjs.stage.destroyChildren()
           this.konvaObjs.stage.destroy()
@@ -186,17 +188,20 @@
           y: this.canvasLayout.y,
           width: width,
           height: height,
+          scaleX: this.canvasLayout.scale,
+          scaleY: this.canvasLayout.scale,
           // draggable: true
         })
 
         const layerPaper = new Konva.Layer()
-        layerPaper.add(new Konva.Rect({
+        this.konvaObjs.paperRect = new Konva.Rect({
           width: 1600,
           height: 800,
-          stroke: '#666',
+          stroke: '#888',
           strokeWidth: 1,
           listening: false
-        }))
+        })
+        layerPaper.add(this.konvaObjs.paperRect)
         this.konvaObjs.stage.add(layerPaper)
 
 
@@ -257,7 +262,7 @@
           strokeWidth: 1,
           fill: 'rgba(60,151,224,0.06)',
           stroke: '#3c97e0',
-          dash: [3, 1]
+          // dash: [3, 1]
         })
 
         this.konvaObjs.selCompsGroup = new Konva.Group({
@@ -317,6 +322,7 @@
             this.konvaObjs.selCompsRect.height(0)
             this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
             this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
+            // this.konvaObjs.selCompsRect.strokeWidth(1 / this.canvasLayout.scale)
           }
         })
 
@@ -324,8 +330,8 @@
           // console.log('mousemove')
           if (this.isDragSelecting) {
             const mousePos = this.konvaObjs.stage.getPointerPosition()
-            const x = mousePos.x - this.konvaObjs.stage.x()
-            const y = mousePos.y - this.konvaObjs.stage.y()
+            const x = (mousePos.x - this.konvaObjs.stage.x()) / this.konvaObjs.stage.scaleX()
+            const y = (mousePos.y - this.konvaObjs.stage.y()) / this.konvaObjs.stage.scaleY()
             this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
             this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
             this.konvaObjs.layers[0].draw()
@@ -338,12 +344,13 @@
             console.log('state mouseup')
 
             if (this.isDragSelecting) {
-              const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
+              // const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
               // console.log(l)
 
               const newSels = []
               for (const comp of this.comps) {
-                if (this.isRectContain(l, comp.konvaRect())) {
+                // if (this.isRectContain(l, comp.konvaRect())) {
+                if (this.isRectContain(this.konvaObjs.selCompsRect.getClientRect(), comp.konvaRect().getClientRect())) {
                   newSels.push(comp)
                 }
               }
@@ -379,15 +386,12 @@
 
         CompCtrl.konvaContext = this.konvaObjs
 
-
         this.comps.forEach((comp) => {
           // comp.konvaContext = this.konvaObjs
           comp.initKonva()
           this.addCompEvent(comp)
         })
-
-        // this.konvaObjs.layers[0].draw()
-        this.konvaObjs.stage.draw()
+        this.canvasRedraw()
       },
 
       addCompEvent(compCtrl) {
@@ -518,14 +522,21 @@
       jointCompsToGroup() {
         // console.log(this.konvaObjs.selCompsGroup.getAbsoluteScale())
         if (this.curSelComps.length > 1) {
-          const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
+          // const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
+          const groupRect = this.konvaObjs.selCompsGroup.getClientRect({ relativeTo: this.konvaObjs.stage })
           const g = {
             type: 'ScadaGroup',
             layout: {
-              x: groupRect.x + 1 - this.konvaObjs.stage.x(),
-              y: groupRect.y + 1 - this.konvaObjs.stage.y(),
+              x: groupRect.x + 1,
+              y: groupRect.y + 1,
               width: groupRect.width - 2,
-              height: groupRect.height - 2
+              height: groupRect.height - 2,
+              // x: groupRect.x + 1 - this.konvaObjs.stage.x() * this.konvaObjs.stage.scaleX(),
+              // y: groupRect.y + 1 - this.konvaObjs.stage.y() * this.konvaObjs.stage.scaleY(),
+              // width: groupRect.width / this.konvaObjs.stage.scaleX() - 2,
+              // height: groupRect.height / this.konvaObjs.stage.scaleY() - 2,
+              // scaleX: 1 / this.konvaObjs.stage.scaleX(),
+              // scaleY: 1 / this.konvaObjs.stage.scaleY(),
             },
             konvaContext: this.konvaObjs
           }
@@ -597,17 +608,18 @@
       getDragSelectingRect(node) {
         const x = node.getAbsolutePosition().x
         const y = node.getAbsolutePosition().y
-        return {
-          x: node.width() >= 0 ? x : x + node.width(),
-          y: node.height() >= 0 ? y : y + node.height(),
-          width: Math.abs(node.width()),
-          height: Math.abs(node.height())
-        }
+        // return {
+        //   x: node.width() >= 0 ? x : x + node.width(),
+        //   y: node.height() >= 0 ? y : y + node.height(),
+        //   width: Math.abs(node.width()),
+        //   height: Math.abs(node.height())
+        // }
+        return node.getClientRect()
       },
-      isRectContain(r1, node) {
+      isRectContain(r1, r2) {
         // const r1 = rect
         console.log(r1)
-        const r2 = node.getClientRect()
+        // const r2 = node.getClientRect()
         console.log(r2)
         return (r1.x <= r2.x &&
           r1.x + r1.width >= r2.x + r2.width &&
@@ -760,6 +772,43 @@
           // console.log(utils.diff(newVal, compStyles))
           this.curSelComp.options.style = utils.diff(newVal, compStyles)
         }
+      },
+      zoomIn() {
+        this.canvasLayout.scale *= 1.1
+      },
+      zoomOut() {
+        this.canvasLayout.scale /= 1.1
+      },
+      zoom100() {
+        this.canvasLayout.scale = 1
+      },
+      setCanvasZoom(scale) {
+        this.konvaObjs.stage.scaleX(scale)
+        this.konvaObjs.stage.scaleY(scale)
+        if (this.curSelComp) {
+          this.konvaObjs.transformer.forceUpdate()
+        }
+        if (this.multiCompsSelected) {
+          this.konvaObjs.groupTransformer.forceUpdate()
+        }
+        this.konvaObjs.selCompsRect.strokeWidth(1 / scale)
+        this.konvaObjs.paperRect.strokeWidth(1 / scale)
+        this.canvasRedraw()
+      },
+      canvasRedraw() {
+        const container = this.$refs['workCanvas']
+        // console.log(container)
+        // this.konvaObjs.stage.container(container)
+
+        const width = container.clientWidth
+        const height = container.clientHeight
+
+        this.canvasLayout.width = width
+        this.canvasLayout.height = height
+
+        this.konvaObjs.stage.width(width)
+        this.konvaObjs.stage.height(height)
+        this.konvaObjs.stage.batchDraw()
       }
     },
     computed: {
@@ -777,7 +826,7 @@
           return null
         }
       },
-      canGroupComps() {
+      multiCompsSelected() {
         return this.curSelComps.length > 1
       },
       canDoSelCompAction() {
@@ -786,6 +835,9 @@
       canUnGroupComps() {
         return (this.curSelComps.length === 1 && this.curSelComps[0].type === 'ScadaGroup')
       },
+      canvasZoom() {
+        return this.canvasLayout.scale
+      }
     },
     watch: {
       curSelComps() {
@@ -821,12 +873,23 @@
       //   },
       //   // deep: true
       // }
+      canvasZoom() {
+        this.setCanvasZoom(this.canvasLayout.scale)
+      },
       isKeySpacepressing() {
+
         console.log(this.isKeySpacepressing)
         if (this.isKeySpacepressing) {
+          this.comps.forEach((comp) => {
+            comp.konvaRect().draggable(false)
+          })
           this.konvaObjs.stage.draggable(true)
           this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
         } else {
+          this.comps.forEach((comp) => {
+            // TODO: 判断组件是否锁定
+            comp.konvaRect().draggable(true)
+          })
           this.konvaObjs.stage.draggable(false)
           this.konvaObjs.stage.container().style.cursor = 'default'
         }
@@ -867,34 +930,33 @@
       display: flex;
       flex: 1;
       /*flex-basis: auto;*/
-      /*width: 100%;*/
+      width: 100vw;
       /*height: 100%;*/
       #left_sidebar {
         flex: 0 0 100px;
         background: #3C3F41;
         border-right: 1px solid #000;
-        /*border-top: 1px solid #2B2B2B;*/
       }
       #work_area {
-        /*flex: 1;*/
-        width: 100%;
-        height: 100%;
+        flex: 1;
+        /*width: 100%;*/
+        /*height: 100%;*/
         /*overflow: scroll;*/
         #work_frame {
           width: 100%;
           height: 100%;
           position: relative;
           background: #2B2B2B;
-          overflow: auto;
+          overflow: hidden;
           #work_canvas {
             width: 100%;
             height: 100%;
             user-select: none;
+            overflow: hidden;
           }
         }
       }
       #right_sidebar {
-        /*border-top: 1px solid #2B2B2B;*/
         border-left: 1px solid #000;
         flex: 0 0 280px;
         background: #3C3F41;
@@ -926,6 +988,7 @@
     .toolbar {
       margin: 7px;
       padding: 5px;
+      white-space: nowrap;
       button {
         margin-right: 5px;
       }

@@ -10,7 +10,7 @@ class CompCtrl {
     const guid = Guid()
     // this.id = guid
     // this.stroke = 'green'
-    // this.strokeWidtg = 1
+    // this.strokeWidtg = 0.5
 
     this.type = options.type
     this.options = options.options
@@ -146,8 +146,11 @@ class CompCtrl {
     // this.y = this.konvaRect().getAbsolutePosition().y
     this.x = this.konvaRect().getAbsolutePosition(CompCtrl.konvaContext.stage).x
     this.y = this.konvaRect().getAbsolutePosition(CompCtrl.konvaContext.stage).y
-    this.scaleX = this.konvaRect().getAbsoluteScale().x
-    this.scaleY = this.konvaRect().getAbsoluteScale().y
+    // TODO:
+    this.scaleX = this.konvaRect().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
+    this.scaleY = this.konvaRect().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
+    // this.scaleX = this.konvaRect().getAbsoluteScale().x
+    // this.scaleY = this.konvaRect().getAbsoluteScale().y
     this.rotation = this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
     this.syncChildrenCompLayout()
   }
@@ -210,9 +213,10 @@ class CompCtrl {
       const compPosition = this.konvaRect().getAbsolutePosition()
       this.konvaRect().moveTo(this.konvaRect().getLayer())
       this.konvaRect().setAbsolutePosition(compPosition)
+      // TODO:
       this.konvaRect().scale({
-        x: this.konvaRect().getAbsoluteScale().x,
-        y: this.konvaRect().getAbsoluteScale().y
+        x: this.konvaRect().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX(),
+        y: this.konvaRect().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
       })
       this.konvaRect().rotation(this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation())
       this.konvaRect().draggable(true)
