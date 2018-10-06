@@ -8,7 +8,7 @@ export default {
   },
   methods: {
     initHotkeyBinding() {
-      hotkeys('delete,ctrl+g,ctrl+shift+g,space', (e, handler) => {
+      hotkeys('delete,ctrl+g,ctrl+shift+g,space,ctrl+-,ctrl+=,ctrl+0', (e, handler) => {
         // hotkeys('*', (e, handler) => {
         e.preventDefault()
         // console.log(hotkeys.isPressed("space"))
@@ -25,6 +25,15 @@ export default {
           case "space":
             this.isKeySpacepressing = true
             break;
+          case "ctrl+-":
+            this.zoomOut()
+            break;
+          case "ctrl+=":
+            this.zoomIn()
+            break;
+          case "ctrl+0":
+            this.zoom100()
+            break;
         }
       })
     },
@@ -32,10 +41,21 @@ export default {
       if (e.code === 'Space') {
         this.isKeySpacepressing = false
       }
+    },
+    preventBrowserZoom(e) {
+      if (e.ctrlKey) {
+        e.preventDefault()
+        if (e.deltaY > 0) {
+          this.zoomOut()
+        } else {
+          this.zoomIn()
+        }
+      }
     }
   },
   created() {
     document.addEventListener('keyup', this.setSpaceKeyState)
+    window.addEventListener('wheel', this.preventBrowserZoom)
   },
   destroyed() {
     document.removeEventListener('keyup', this.setSpaceKeyState)

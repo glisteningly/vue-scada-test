@@ -25,11 +25,12 @@
           <el-button @click="testImport">import</el-button>
           <el-button @click="doTest">test</el-button>
           <el-button @click="loadLocal">load</el-button>
-          <el-button @click="zoomOut">zoom -</el-button>
+          <span style="display: inline-block; width: 40px; color: #EEE; text-align: center; font-size: 12px">{{ curZoomScale | numPercent }}</span>
+          <el-button @click="zoomOut"><i class="el-icon-zoom-out"></i></el-button>
           <el-button @click="zoom100">100%</el-button>
-          <el-button @click="zoomIn">zoom +</el-button>
-          <el-button @click="initKonvaWorkArea" type="primary">refreash</el-button>
-          <el-button @click="canvasRedraw" type="primary">redraw</el-button>
+          <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
+          <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
+          <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
           <!--<button @click="unGroupSelAll">ungroup</button>-->
         </div>
       </header>
@@ -88,11 +89,15 @@
     </section>
     <context-menu id="context-menu" ref="ctxMenu">
       <li>
-        <button>放大</button>
+        <button @click="zoomIn">放大</button>
       </li>
       <li>
-        <button>缩小</button>
+        <button @click="zoomOut">缩小</button>
       </li>
+      <li>
+        <button @click="zoom100">原始尺寸</button>
+      </li>
+      <hr>
       <li v-if="canDoSelCompAction">
         <button @click="compsMoveTop">置于顶层</button>
       </li>
@@ -131,6 +136,12 @@
 
   import StylePanel from './components/StylePanel'
 
+  const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
+  const CanvasDefaultSettings = {
+    width: 1000,
+    height: 600
+  }
+
   export default {
     components: { ContextMenu, StylePanel },
     mixins: [ComputeLayout, Keyboard],
@@ -161,6 +172,7 @@
         testData: 2,
         curSelCompStyleOptions: {},
         // isKeySpacepressing: false
+        zoomScaleIndex: 4
       }
     },
     mounted() {
@@ -195,8 +207,8 @@
 
         const layerPaper = new Konva.Layer()
         this.konvaObjs.paperRect = new Konva.Rect({
-          width: 1600,
-          height: 800,
+          width: CanvasDefaultSettings.width,
+          height: CanvasDefaultSettings.height,
           stroke: '#888',
           strokeWidth: 1,
           listening: false
@@ -774,13 +786,22 @@
         }
       },
       zoomIn() {
-        this.canvasLayout.scale *= 1.1
+        if (this.zoomScaleIndex < ZoomScaleSettings.length - 1) {
+          this.zoomScaleIndex += 1
+          this.canvasLayout.scale = this.curZoomScale
+        }
       },
       zoomOut() {
-        this.canvasLayout.scale /= 1.1
+        if (this.zoomScaleIndex > 0) {
+          this.zoomScaleIndex -= 1
+          this.canvasLayout.scale = this.curZoomScale
+        }
       },
       zoom100() {
-        this.canvasLayout.scale = 1
+        if (this.zoomScaleIndex !== 4) {
+          this.zoomScaleIndex = 4
+          this.canvasLayout.scale = this.curZoomScale
+        }
       },
       setCanvasZoom(scale) {
         this.konvaObjs.stage.scaleX(scale)
@@ -837,6 +858,15 @@
       },
       canvasZoom() {
         return this.canvasLayout.scale
+      },
+      curZoomScale() {
+        return ZoomScaleSettings[this.zoomScaleIndex]
+      }
+    },
+    filters: {
+      numPercent(value) {
+        if (!value) return ''
+        return _.round(value * 100) + '%'
       }
     },
     watch: {
@@ -1020,6 +1050,10 @@
             background: none;
             border: none;
           }
+        }
+        hr {
+          /*background-color: #DDD;*/
+          border: 1px solid #CCC;
         }
       }
     }
