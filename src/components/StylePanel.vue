@@ -53,8 +53,6 @@
     padding: 12px;
 
     .ctrl-item {
-      margin: 4px 4px;
-
       label {
         font-size: 13px;
         letter-spacing: 1.5px;

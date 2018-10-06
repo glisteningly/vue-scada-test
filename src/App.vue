@@ -988,20 +988,21 @@
       }
       #right_sidebar {
         border-left: 1px solid #000;
-        flex: 0 0 280px;
+        flex: 0 0 260px;
         background: #3C3F41;
         #layout_panel {
           border-bottom: 1.5px solid #2B2B2B;
-          padding: 12px 16px;
+          padding: 12px;
           label {
             letter-spacing: 1.5px;
             display: inline-block;
             color: #DDD;
             font-size: 13px;
+            margin-right: 8px;
           }
           .layout-input {
-            width: 95px;
-            margin-left: 10px;
+            width: 88px;
+            margin-left: 5px;
             margin-bottom: 8px;
             text-align: right;
             padding: 0 2px;
