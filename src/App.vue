@@ -9,6 +9,7 @@
           <!--<button @click="btnClicked1">log</button>-->
           <el-button @click="addLabel">label</el-button>
           <el-button @click="addRect">rect</el-button>
+          <el-button @click="addPath">path</el-button>
           <!--<el-button @click="addIcon">twitter</el-button>-->
           <!--<el-button @click="addIcon2">google</el-button>-->
           <el-button @click="addAll">add all</el-button>
@@ -477,6 +478,21 @@
             y: 0,
             width: 100,
             height: 100
+          },
+          options: {
+            style: {
+              stroke: '#b90006',
+              strokeWidth: 4,
+              cornerRadius: 5
+            }
+          }
+        })
+      },
+      addPath() {
+        this.addCompToCanvas({
+          type: 'ScadaTube',
+          layout: {
+            points: [0, 0, 100, 0, 100, 100, 150, 100, 150, 50]
           },
           options: {
             style: {

@@ -4,6 +4,7 @@ import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 
 const _konvaRect = new WeakMap()
+const _konvaPath = new WeakMap()
 
 class CompCtrl {
   constructor(options, isInitKonva = true) {
@@ -20,8 +21,8 @@ class CompCtrl {
     this.width = options.layout.width || 0
     this.height = options.layout.height || 0
 
-    this.offsetX = options.layout.offsetX || (options.layout.width / 2)
-    this.offsetY = options.layout.offsetY || (options.layout.height / 2)
+    this.offsetX = options.layout.offsetX || (this.width / 2)
+    this.offsetY = options.layout.offsetY || (this.height / 2)
     // this.offsetX = 0
     // this.offsetY = 0
 
@@ -32,6 +33,13 @@ class CompCtrl {
     this.y = options.layout.y + this.offsetY * this.scaleY || 0
 
     this.rotation = options.layout.rotation || 0
+
+    this.isPathCtrl = false
+
+    if (options.layout.points) {
+      this.points = options.layout.points || []
+      this.isPathCtrl = true
+    }
 
     this.initBaseLayout()
 
@@ -57,6 +65,14 @@ class CompCtrl {
     return _konvaRect.get(this)
   }
 
+  konvaPath() {
+    return _konvaPath.get(this)
+  }
+
+  konvaCtrl() {
+    return this.isPathCtrl ? this.konvaPath() : this.konvaRect()
+  }
+
   // get x() {
   //   return this._x
   // }
@@ -79,11 +95,58 @@ class CompCtrl {
 
   initKonva() {
     this.draggable = true
-    // this.konvaRect() = new Konva.Rect(this)
+
+    if (this.isPathCtrl) {
+      this.initKonvaPath()
+    } else {
+      this.initKonvaRect()
+    }
+    // _konvaRect.set(this, new Konva.Rect(this))
+    // this.tempTr = null
+    //
+    // // 拖拽移动时即时变化
+    // // this.konvaRect().on('dragmove', () => {
+    // //   this.updateLayout()
+    // // })
+    //
+    // this._dragstartPos = { x: 0, y: 0 }
+    // this._hMove = true
+    //
+    // this.konvaRect().on('mousedown', () => {
+    //   this._dragstartPos = this.konvaRect().getAbsolutePosition()
+    // })
+    //
+    // this.konvaRect().on('dragmove', () => {
+    //   this._hMove = Math.abs(this.konvaRect().getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaRect().getAbsolutePosition().y - this._dragstartPos.y)
+    // })
+    //
+    // this.konvaRect().on('dragstart', () => {
+    //   CompCtrl.konvaContext.transformer.rotateEnabled(false)
+    //   CompCtrl.konvaContext.transformer.resizeEnabled(false)
+    //   this.konvaRect().getLayer().draw()
+    // })
+    //
+    // this.konvaRect().on('dragend transformend', () => {
+    //   // console.log(this.children)
+    //   this.syncCompLayout()
+    //   CompCtrl.konvaContext.transformer.rotateEnabled(true)
+    //   CompCtrl.konvaContext.transformer.resizeEnabled(true)
+    //   CompCtrl.konvaContext.transformer.forceUpdate()
+    //   this.konvaRect().getLayer().draw()
+    // })
+    //
+    // CompCtrl.konvaContext.layers[0].add(this.konvaRect())
+    // this.konvaRect().getLayer().draw()
+    //
+    // if (this.children && this.children.length > 0) {
+    //   this.syncChildrenCompLayout()
+    // }
+  }
+
+  initKonvaRect() {
     _konvaRect.set(this, new Konva.Rect(this))
     this.tempTr = null
 
-    // this.konvaContext = options.konvaContext
     // 拖拽移动时即时变化
     // this.konvaRect().on('dragmove', () => {
     //   this.updateLayout()
@@ -92,35 +155,65 @@ class CompCtrl {
     this._dragstartPos = { x: 0, y: 0 }
     this._hMove = true
 
-    this.konvaRect().on('mousedown', () => {
-      this._dragstartPos = this.konvaRect().getAbsolutePosition()
+    this.konvaCtrl().on('mousedown', () => {
+      this._dragstartPos = this.konvaCtrl().getAbsolutePosition()
     })
 
-    this.konvaRect().on('dragmove', () => {
-      this._hMove = Math.abs(this.konvaRect().getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaRect().getAbsolutePosition().y - this._dragstartPos.y)
+    this.konvaCtrl().on('dragmove', () => {
+      this._hMove = Math.abs(this.konvaCtrl().getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaCtrl().getAbsolutePosition().y - this._dragstartPos.y)
     })
 
-    this.konvaRect().on('dragstart', () => {
+    this.konvaCtrl().on('dragstart', () => {
       CompCtrl.konvaContext.transformer.rotateEnabled(false)
       CompCtrl.konvaContext.transformer.resizeEnabled(false)
-      this.konvaRect().getLayer().draw()
+      this.konvaCtrl().getLayer().draw()
     })
 
-    this.konvaRect().on('dragend transformend', () => {
+    this.konvaCtrl().on('dragend transformend', () => {
       // console.log(this.children)
       this.syncCompLayout()
       CompCtrl.konvaContext.transformer.rotateEnabled(true)
       CompCtrl.konvaContext.transformer.resizeEnabled(true)
       CompCtrl.konvaContext.transformer.forceUpdate()
-      this.konvaRect().getLayer().draw()
+      this.konvaCtrl().getLayer().draw()
     })
 
-    CompCtrl.konvaContext.layers[0].add(this.konvaRect())
-    this.konvaRect().getLayer().draw()
+    CompCtrl.konvaContext.layers[0].add(this.konvaCtrl())
+    this.konvaCtrl().getLayer().draw()
 
     if (this.children && this.children.length > 0) {
       this.syncChildrenCompLayout()
     }
+  }
+
+  initKonvaPath() {
+    this.stroke = '#00D2FF'
+    this.strokeWidth = 5
+    this.draggable = true
+    this.lineJoin = 'round'
+    _konvaPath.set(this, new Konva.Line(this))
+
+    // this._dragstartPos = { x: 0, y: 0 }
+    // this._hMove = true
+    //
+    // this.konvaCtrl().on('mousedown', () => {
+    //   this._dragstartPos = this.konvaCtrl().getAbsolutePosition()
+    // })
+    //
+    // this.konvaCtrl().on('dragmove', () => {
+    //   this._hMove = Math.abs(this.konvaCtrl().getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(this.konvaCtrl().getAbsolutePosition().y - this._dragstartPos.y)
+    // })
+    //
+    // this.konvaCtrl().on('dragstart', () => {
+    // })
+
+    this.konvaCtrl().on('dragend transformend', () => {
+      // console.log(this.children)
+      this.syncCompLayout()
+    })
+
+    CompCtrl.konvaContext.layers[0].add(this.konvaCtrl())
+    this.konvaCtrl().getLayer().draw()
   }
 
   setContext(konvaContext) {
