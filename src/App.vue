@@ -223,14 +223,22 @@
         this.konvaObjs.stage.add(this.konvaObjs.layers[0])
         this.konvaObjs.transformer = new Konva.Transformer({
           keepRatio: false,
-          anchorSize: 6,
+          anchorSize: 8,
+          anchorFill: '#27b0ff',
+          anchorStroke: '#FFF',
+          anchorStrokeWidth: 1.5,
+          // anchorCornerRadius: 4,
           rotationSnaps: [0, 90, 180, 270]
         })
 
 
         this.konvaObjs.groupTransformer = new Konva.Transformer({
           keepRatio: true,
-          anchorSize: 6,
+          anchorSize: 8,
+          anchorFill: '#27b0ff',
+          anchorStroke: '#FFF',
+          anchorStrokeWidth: 1.5,
+          // anchorCornerRadius: 4,
           // resizeEnabled: false,
           // rotateEnabled: false,
           // rotationSnaps: [],
@@ -274,7 +282,7 @@
           strokeWidth: 1,
           fill: 'rgba(60,151,224,0.06)',
           stroke: '#3c97e0',
-          // dash: [3, 1]
+          dash: [3, 1]
         })
 
         this.konvaObjs.selCompsGroup = new Konva.Group({
@@ -679,7 +687,6 @@
         })
       },
       addCompToCanvas(comp) {
-        // Object.assign(comp, { konvaContext: this.konvaObjs })
         const c = new CompCtrl(comp)
         this.addComp(c)
       },
