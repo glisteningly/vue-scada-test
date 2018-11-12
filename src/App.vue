@@ -229,7 +229,8 @@
           anchorStroke: '#FFF',
           anchorStrokeWidth: 1.5,
           // anchorCornerRadius: 4,
-          rotationSnaps: [0, 90, 180, 270]
+          rotationSnaps: [0, 90, 180, 270],
+          // padding: -3
         })
 
 
@@ -371,7 +372,7 @@
               const newSels = []
               for (const comp of this.comps) {
                 // if (this.isRectContain(l, comp.konvaRect())) {
-                if (this.isRectContain(this.konvaObjs.selCompsRect.getClientRect(), comp.konvaRect().getClientRect())) {
+                if (this.isRectContain(this.konvaObjs.selCompsRect.getClientRect(), comp.konvaCtrl().getClientRect())) {
                   newSels.push(comp)
                 }
               }
@@ -417,7 +418,7 @@
 
       addCompEvent(compCtrl) {
         // comp.setContext(this.konvaObjs)
-        compCtrl.konvaRect().on('click', (e) => {
+        compCtrl.konvaCtrl().on('click', (e) => {
           if (e.evt.button === 0) {
             if (!this.isInSelGroup(compCtrl)) {
               // 不在多选组内
@@ -441,7 +442,7 @@
           }
         })
 
-        compCtrl.konvaRect().on('dragstart', () => {
+        compCtrl.konvaCtrl().on('dragstart', () => {
           console.log('dragstart')
           if (!this.isInSelGroup(compCtrl)) {
             this.unGroupSelAll()
@@ -492,7 +493,12 @@
         this.addCompToCanvas({
           type: 'ScadaTube',
           layout: {
-            points: [0, 0, 100, 0, 100, 100, 150, 100, 150, 50]
+            x: 100,
+            y: 200,
+            rotation: 0,
+            // offsetX: 75,
+            // offsetY: 50,
+            points: [0, 0, 100, 0, 100, 100, 150, 100, 170, -50]
           },
           options: {
             style: {
@@ -602,11 +608,11 @@
       addToGroup() {
         this.konvaObjs.transformer.detach()
         this.curSelComps.forEach((comp) => {
-          this.konvaObjs.selCompsGroup.add(comp.konvaRect())
-          comp.konvaRect().draggable(false)
+          this.konvaObjs.selCompsGroup.add(comp.konvaCtrl())
+          comp.konvaCtrl().draggable(false)
           if (!comp.tempTr) {
             comp.tempTr = new Konva.Transformer({
-              node: comp.konvaRect(),
+              node: comp.konvaCtrl(),
               name: 'tempTr',
               keepRatio: true,
               resizeEnabled: false,
@@ -665,7 +671,7 @@
       },
       syncKonvaZIndex() {
         this.comps.forEach((comp, index) => {
-          comp.konvaRect().setZIndex(index)
+          comp.konvaCtrl().setZIndex(index)
         })
         this.konvaObjs.layers[0].draw()
       },
