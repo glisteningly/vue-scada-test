@@ -502,6 +502,7 @@
           },
           options: {
             style: {
+              fill: 'rgba(0,0,0,0.5)',
               stroke: '#CCC',
               strokeWidth: 10,
               cornerRadius: 10

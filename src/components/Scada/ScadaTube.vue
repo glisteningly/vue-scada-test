@@ -5,13 +5,13 @@
           :stroke="options.style.stroke"
           :stroke-width="options.style.strokeWidth"
           :d="roundPath"
-          :transform="pathTransformStr"/>
+          :transform="rectTransformStr"/>
     <path class="flow-path"
           fill="none"
           :stroke="options.style.fill"
           :stroke-width="4"
           :d="roundPath"
-          :transform="pathTransformStr"/>
+          :transform="rectTransformStr"/>
   </g>
 </template>
 
@@ -46,12 +46,17 @@
 
           this.comp.points.forEach((pt, index) => {
             if ((index + 1) % 2 === 0) {
-              tempPt.y = pt
+              tempPt.y = pt * this.comp.scaleY
               pathPts.push(Object.assign({}, tempPt))
             } else {
-              tempPt.x = pt
+              tempPt.x = pt * this.comp.scaleX
             }
           })
+
+          // pathPts.forEach(pt => {
+          //   pt.x *= this.comp.scaleX
+          //   pt.y *= this.comp.scaleY
+          // })
 
           return roundPathCorners(pathPts, this.options.style.cornerRadius)
         }

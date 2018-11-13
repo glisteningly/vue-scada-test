@@ -142,7 +142,7 @@ const roundPathCorners = (pathPoints, radius) => {
     return str + c.join(' ') + ' '
   }, '')
 
-  console.log(result)
+  // console.log(result)
 
   return result
 }

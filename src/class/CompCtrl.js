@@ -128,7 +128,7 @@ class CompCtrl {
 
     this.konvaCtrl().on('dragend transformend', () => {
       // console.log(this.children)
-      this.doLog()
+      // this.doLog()
       this.syncCompLayout()
       CompCtrl.konvaContext.transformer.rotateEnabled(true)
       CompCtrl.konvaContext.transformer.resizeEnabled(true)
@@ -170,20 +170,20 @@ class CompCtrl {
       newPts.push(absPos.y - this.konvaCtrl().y())
     })
 
-    this.konvaCtrl().scaleX(1)
-    this.konvaCtrl().scaleY(1)
-    this.konvaCtrl().rotation(0)
-    this.points = newPts
-    this.konvaCtrl().points(newPts)
+    // this.konvaCtrl().scaleX(1)
+    // this.konvaCtrl().scaleY(1)
+    // this.konvaCtrl().rotation(0)
+    // this.points = newPts
+    // this.konvaCtrl().points(newPts)
 
-    // console.log(newPts)
+    console.log(newPts)
   }
 
   doLog() {
     if (!this.isPathCtrl) {
       return
     } else {
-      this.syncPathPoints()
+      // this.syncPathPoints()
     }
 
     const rect = this.konvaCtrl().getClientRect({ relativeTo: CompCtrl.konvaContext.stage })
@@ -208,8 +208,8 @@ class CompCtrl {
 
   initKonvaPath() {
     // this.stroke = '#00D2FF'
-    this.stroke = 'rgba(0,210,255,0.3)'
-    this.strokeWidth = 8
+    this.stroke = 'rgba(0,210,255,0.1)'
+    this.strokeWidth = 10
     this.draggable = true
     this.lineJoin = 'round'
     this.strokeScaleEnabled = false
@@ -235,25 +235,12 @@ class CompCtrl {
     }
   }
 
-
   syncCompLayout() {
     // this.x = this.konvaRect().getAbsolutePosition().x
     // this.y = this.konvaRect().getAbsolutePosition().y
     this.x = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).x
     this.y = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).y
     // TODO:
-
-    // if (this.isPathCtrl) {
-    //   this.syncPathPoints()
-    // } else {
-    //   // console.log(comp.initLayout)
-    //   this.scaleX = this.konvaCtrl().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
-    //   this.scaleY = this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
-    //   // this.scaleX = this.konvaRect().getAbsoluteScale().x
-    //   // this.scaleY = this.konvaRect().getAbsoluteScale().y
-    //   this.rotation = this.konvaCtrl().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
-    //   this.syncChildrenCompLayout()
-    // }
 
     this.scaleX = this.konvaCtrl().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
     this.scaleY = this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
@@ -262,15 +249,6 @@ class CompCtrl {
     this.rotation = this.konvaCtrl().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
     this.syncChildrenCompLayout()
   }
-
-  // syncCompLayout() {
-  //   this.x = this.getRoundNum(this.konvaRect().getAbsolutePosition().x)
-  //   this.y = this.getRoundNum(this.konvaRect().getAbsolutePosition().y)
-  //   this.scaleX = this.getRoundNum(this.konvaRect().getAbsoluteScale().x)
-  //   this.scaleY = this.getRoundNum(this.konvaRect().getAbsoluteScale().y)
-  //   this.rotation = this.getRoundNum(this.konvaRect().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation())
-  //   this.syncChildrenCompLayout()
-  // }
 
   syncChildrenCompLayout() {
     // console.log(this.children)
@@ -282,7 +260,6 @@ class CompCtrl {
         comp.y = (x - this.x) * Math.sin(this.rotation * Math.PI / 180) + (y - this.y) * Math.cos(this.rotation * Math.PI / 180) + this.y
 
         if (this.isPathCtrl) {
-          this.syncPathPoints()
         } else {
           // console.log(comp.initLayout)
           comp.scaleX = comp.initLayout.scaleX * this.scaleX
@@ -376,7 +353,7 @@ class CompCtrl {
   }
 
   getCompLayout() {
-    return {
+    const layout = {
       x: this._roundNum(this.x - this.offsetX * this.scaleX),
       y: this._roundNum(this.y - this.offsetY * this.scaleY),
       width: this._roundNum(this.width),
@@ -387,6 +364,12 @@ class CompCtrl {
       offsetY: this._roundNum(this.offsetY),
       rotation: this._roundNum(this.rotation)
     }
+
+    if (this.points) {
+      Object.assign(layout, { points: this.points })
+    }
+
+    return layout
   }
 
   getChildLayout(comp) {
@@ -396,7 +379,7 @@ class CompCtrl {
     const ry0 = this.y
     const x = (x1 - rx0) * Math.cos(-this.rotation * Math.PI / 180) - (y1 - ry0) * Math.sin(-this.rotation * Math.PI / 180) + rx0
     const y = (x1 - rx0) * Math.sin(-this.rotation * Math.PI / 180) + (y1 - ry0) * Math.cos(-this.rotation * Math.PI / 180) + ry0
-    return {
+    const layout = {
       x: this._roundNum((x - this.x) / this.scaleX + this.offsetX - comp.offsetX * comp.scaleX / this.scaleX),
       y: this._roundNum((y - this.y) / this.scaleY + this.offsetY - comp.offsetY * comp.scaleY / this.scaleY),
       width: this._roundNum(comp.width),
@@ -405,6 +388,12 @@ class CompCtrl {
       scaleY: this._roundNum(comp.scaleY / this.scaleY),
       rotation: this._roundNum(comp.rotation - this.rotation)
     }
+
+    if (comp.points) {
+      Object.assign(layout, { points: comp.points })
+    }
+
+    return layout
   }
 
   toConfig() {
