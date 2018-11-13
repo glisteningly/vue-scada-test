@@ -26,6 +26,10 @@
       rectTransformStr() {
         return `translate(${this.comp.x - this.comp.offsetX * this.comp.scaleX} ${this.comp.y - this.comp.offsetY * this.comp.scaleY})
             rotate(${this.comp.rotation} ${this.comp.offsetX * this.comp.scaleX} ${this.comp.offsetY * this.comp.scaleY})`
+      },
+
+      pathTransformStr() {
+        return `translate(${this.comp.x - this.comp.offsetX} ${this.comp.y - this.comp.offsetY})`
       }
     }
   }

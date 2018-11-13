@@ -2,9 +2,10 @@ import ScadaImage from './ScadaImage'
 import ScadaRect from './ScadaRect'
 import ScadaLabel from './ScadaLabel'
 import ScadaGroup from './ScadaGroup'
+import ScadaTube from './ScadaTube'
 import CompWrapper from './CompWrapper'
 
-const components = [CompWrapper, ScadaImage, ScadaRect, ScadaLabel, ScadaGroup]
+const components = [CompWrapper, ScadaImage, ScadaRect, ScadaLabel, ScadaGroup, ScadaTube]
 const install = function (Vue) {
   if (install.installed) return
 
@@ -17,7 +18,7 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
-const ScadaCompsLibrary = { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup }
+const ScadaCompsLibrary = { ScadaImage, ScadaRect, ScadaLabel, ScadaGroup, ScadaTube }
 
 // export default {
 //   install: install,

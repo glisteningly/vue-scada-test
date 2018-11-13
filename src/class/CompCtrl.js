@@ -144,14 +144,7 @@ class CompCtrl {
     }
   }
 
-  doLog() {
-    const rect = this.konvaCtrl().getClientRect({ relativeTo: CompCtrl.konvaContext.stage })
-    rect.x += 3
-    rect.y -= 3
-    rect.width -= 6
-    rect.height -= 6
-    console.log(rect)
-
+  syncPathPoints() {
     const pathPts = []
 
     let tempPt = { x: 0, y: 0 }
@@ -166,11 +159,45 @@ class CompCtrl {
       }
     })
 
+    // const transform = this.konvaCtrl().getAbsoluteTransform()
+    const transform = this.konvaCtrl().getTransform()
+
+    const newPts = []
+
+    pathPts.forEach(pt => {
+      const absPos = transform.point(pt)
+      newPts.push(absPos.x - this.konvaCtrl().x())
+      newPts.push(absPos.y - this.konvaCtrl().y())
+    })
+
+    this.konvaCtrl().scaleX(1)
+    this.konvaCtrl().scaleY(1)
+    this.konvaCtrl().rotation(0)
+    this.points = newPts
+    this.konvaCtrl().points(newPts)
+
+    // console.log(newPts)
+  }
+
+  doLog() {
+    if (!this.isPathCtrl) {
+      return
+    } else {
+      this.syncPathPoints()
+    }
+
+    const rect = this.konvaCtrl().getClientRect({ relativeTo: CompCtrl.konvaContext.stage })
+    rect.x += 3
+    rect.y -= 3
+    rect.width -= 6
+    rect.height -= 6
+    // console.log(rect)
+
     // console.log(pathPts)
-    console.log(_.minBy(pathPts, 'x').x)
-    console.log(_.minBy(pathPts, 'y').y)
-    console.log(_.maxBy(pathPts, 'x').x)
-    console.log(_.maxBy(pathPts, 'y').y)
+    // console.log(_.minBy(pathPts, 'x').x)
+    // console.log(_.minBy(pathPts, 'y').y)
+    // console.log(_.maxBy(pathPts, 'x').x)
+    // console.log(_.maxBy(pathPts, 'y').y)
     // console.log(this.konvaCtrl().getPoints())
   }
 
@@ -180,8 +207,9 @@ class CompCtrl {
   }
 
   initKonvaPath() {
-    this.stroke = '#00D2FF'
-    this.strokeWidth = 6
+    // this.stroke = '#00D2FF'
+    this.stroke = 'rgba(0,210,255,0.3)'
+    this.strokeWidth = 8
     this.draggable = true
     this.lineJoin = 'round'
     this.strokeScaleEnabled = false
@@ -214,6 +242,19 @@ class CompCtrl {
     this.x = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).x
     this.y = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).y
     // TODO:
+
+    // if (this.isPathCtrl) {
+    //   this.syncPathPoints()
+    // } else {
+    //   // console.log(comp.initLayout)
+    //   this.scaleX = this.konvaCtrl().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
+    //   this.scaleY = this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
+    //   // this.scaleX = this.konvaRect().getAbsoluteScale().x
+    //   // this.scaleY = this.konvaRect().getAbsoluteScale().y
+    //   this.rotation = this.konvaCtrl().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
+    //   this.syncChildrenCompLayout()
+    // }
+
     this.scaleX = this.konvaCtrl().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
     this.scaleY = this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
     // this.scaleX = this.konvaRect().getAbsoluteScale().x
@@ -235,15 +276,20 @@ class CompCtrl {
     // console.log(this.children)
     if (this.children && this.children.length > 0) {
       this.children.forEach((comp) => {
-        // console.log(comp.initLayout)
-        comp.scaleX = comp.initLayout.scaleX * this.scaleX
-        comp.scaleY = comp.initLayout.scaleY * this.scaleY
         const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.x
         const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.y
         comp.x = (x - this.x) * Math.cos(this.rotation * Math.PI / 180) - (y - this.y) * Math.sin(this.rotation * Math.PI / 180) + this.x
         comp.y = (x - this.x) * Math.sin(this.rotation * Math.PI / 180) + (y - this.y) * Math.cos(this.rotation * Math.PI / 180) + this.y
-        comp.rotation = comp.initLayout.rotation + this.rotation
-        comp.syncChildrenCompLayout()
+
+        if (this.isPathCtrl) {
+          this.syncPathPoints()
+        } else {
+          // console.log(comp.initLayout)
+          comp.scaleX = comp.initLayout.scaleX * this.scaleX
+          comp.scaleY = comp.initLayout.scaleY * this.scaleY
+          comp.rotation = comp.initLayout.rotation + this.rotation
+          comp.syncChildrenCompLayout()
+        }
       })
     }
   }
@@ -298,11 +344,11 @@ class CompCtrl {
 
   addTransformer() {
     //TODO:
-    if (this.isPathCtrl) {
-      CompCtrl.konvaContext.transformer.padding(-3)
-    } else {
-      CompCtrl.konvaContext.transformer.padding(0)
-    }
+    // if (this.isPathCtrl) {
+    //   CompCtrl.konvaContext.transformer.padding(-3)
+    // } else {
+    //   CompCtrl.konvaContext.transformer.padding(0)
+    // }
     this.removeCompfromGroupSel()
     this.konvaCtrl().getLayer().add(CompCtrl.konvaContext.transformer)
     //判断是否是添加到组上

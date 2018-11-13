@@ -498,13 +498,13 @@
             rotation: 0,
             // offsetX: 75,
             // offsetY: 50,
-            points: [0, 0, 100, 0, 100, 100, 150, 100, 170, -50]
+            points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
           },
           options: {
             style: {
-              stroke: '#b90006',
-              strokeWidth: 4,
-              cornerRadius: 5
+              stroke: '#CCC',
+              strokeWidth: 10,
+              cornerRadius: 10
             }
           }
         })
@@ -660,9 +660,9 @@
       },
       isRectContain(r1, r2) {
         // const r1 = rect
-        console.log(r1)
+        // console.log(r1)
         // const r2 = node.getClientRect()
-        console.log(r2)
+        // console.log(r2)
         return (r1.x <= r2.x &&
           r1.x + r1.width >= r2.x + r2.width &&
           r1.y <= r2.y &&
@@ -705,7 +705,7 @@
       },
       showNodeZIndex() {
         this.comps.forEach((comp, index) => {
-          console.log(`${index} : ${comp.konvaRect().name()} ${comp.konvaRect().getZIndex()}`)
+          console.log(`${index} : ${comp.konvaCtrl().name()} ${comp.konvaCtrl().getZIndex()}`)
         })
       },
       addCompToCanvas(comp) {
@@ -940,14 +940,17 @@
         console.log(this.isKeySpacepressing)
         if (this.isKeySpacepressing) {
           this.comps.forEach((comp) => {
-            comp.konvaRect().draggable(false)
+            comp.konvaCtrl().draggable(false)
           })
           this.konvaObjs.stage.draggable(true)
           this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
         } else {
           this.comps.forEach((comp) => {
             // TODO: 判断组件是否锁定
-            comp.konvaRect().draggable(true)
+            comp.konvaCtrl().draggable(true)
+          })
+          this.curSelComps.forEach((comp) => {
+            comp.konvaCtrl().draggable(false)
           })
           this.konvaObjs.stage.draggable(false)
           this.konvaObjs.stage.container().style.cursor = 'default'
