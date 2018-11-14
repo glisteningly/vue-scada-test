@@ -62,6 +62,10 @@ class CompCtrl {
     }
   }
 
+  reDraw() {
+    this.konvaCtrl().getLayer().draw()
+  }
+
   konvaRect() {
     return _konvaRect.get(this)
   }
@@ -211,10 +215,6 @@ class CompCtrl {
       this.konvaCtrl().getLayer().add(circle)
       this.reDraw()
     })
-  }
-
-  reDraw() {
-    this.konvaCtrl().getLayer().draw()
   }
 
   getPathAbsPoints() {
@@ -371,6 +371,7 @@ class CompCtrl {
   }
 
   delete() {
+    this.removeAnchors()
     this.removeTempTransformer()
     this.konvaCtrl().destroy()
     // this.konvaRect() = null

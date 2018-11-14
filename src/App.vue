@@ -423,6 +423,7 @@
             if (!this.isInSelGroup(compCtrl)) {
               // 不在多选组内
               if (!hotkeys.shift) {
+                this.detchCompTransformer()
                 this.unGroupSelAll()
                 this.curSelComps.push(compCtrl)
               } else {
