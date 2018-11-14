@@ -377,7 +377,7 @@
                 }
               }
 
-              this.konvaObjs.transformer.detach()
+              this.detchCompTransformer()
               this.unGroupSelAll()
               if (newSels.length > 0) {
                 // this.unGroupSelAll()
@@ -499,6 +499,7 @@
             // offsetX: 75,
             // offsetY: 50,
             points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
+            // points: [0, 0, 200, 100]
           },
           options: {
             style: {
@@ -607,7 +608,7 @@
         this.curSelComps = []
       },
       addToGroup() {
-        this.konvaObjs.transformer.detach()
+        this.detchCompTransformer()
         this.curSelComps.forEach((comp) => {
           this.konvaObjs.selCompsGroup.add(comp.konvaCtrl())
           comp.konvaCtrl().draggable(false)
@@ -860,6 +861,14 @@
         this.konvaObjs.stage.width(width)
         this.konvaObjs.stage.height(height)
         this.konvaObjs.stage.batchDraw()
+      },
+      detchCompTransformer() {
+        this.konvaObjs.transformer.detach()
+        this.comps.forEach(comp => {
+          if (comp.isPathCtrl) {
+            comp.removeAnchors()
+          }
+        })
       }
     },
     computed: {
@@ -911,7 +920,7 @@
             this.addToGroup()
           }
         } else {
-          this.konvaObjs.transformer.detach()
+          this.detchCompTransformer()
           this.cancelSelGroup()
           this.curSelCompStyleOptions = null
         }

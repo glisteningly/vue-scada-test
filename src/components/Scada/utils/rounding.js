@@ -70,7 +70,7 @@ const roundPathCorners = (pathPoints, radius) => {
   // The resulting commands, also grouped
   let resultCommands = []
 
-  if (pathPoints.length > 2) {
+  if (pathPoints.length > 1) {
     const startPoint = pathPoints[0]
 
 

@@ -39,6 +39,7 @@ class CompCtrl {
     if (options.layout.points) {
       this.points = options.layout.points || []
       this.isPathCtrl = true
+      this.ctrlAnchors = []
     }
 
     this.initBaseLayout()
@@ -129,6 +130,10 @@ class CompCtrl {
     this.konvaCtrl().on('dragend transformend', () => {
       // console.log(this.children)
       // this.doLog()
+      if (this.isPathCtrl) {
+        this.addAnchors()
+      }
+
       this.syncCompLayout()
       CompCtrl.konvaContext.transformer.rotateEnabled(true)
       CompCtrl.konvaContext.transformer.resizeEnabled(true)
@@ -144,39 +149,91 @@ class CompCtrl {
     }
   }
 
-  syncPathPoints() {
+  removeAnchors() {
+    if (this.ctrlAnchors) {
+      this.ctrlAnchors.forEach(circle => {
+        circle.destroy()
+      })
+      this.ctrlAnchors = []
+    }
+  }
+
+  addAnchors() {
+    this.removeAnchors()
+
+    const anchorPts = this.getPathAbsPoints()
+    console.log(anchorPts)
+
+    anchorPts.forEach((pt, index) => {
+      const circle = new Konva.Circle({
+        x: pt.x,
+        y: pt.y,
+        radius: 5,
+        fill: '#ea5f50',
+        stroke: 'white',
+        strokeWidth: 1,
+        draggable: true
+      })
+
+      this.ctrlAnchors.push(circle)
+
+      circle.on('dragmove', () => {
+        const tf = this.konvaCtrl().getTransform()
+        const it = tf.copy().invert()
+
+        const anchorAbsPt = { x: circle.x(), y: circle.y() }
+        const relativePt = it.point(anchorAbsPt)
+
+        this.points[index * 2] = relativePt.x
+        this.points[index * 2 + 1] = relativePt.y
+      })
+
+      circle.on('dragend', () => {
+        const pts = _.clone(this.points)
+        this.points = pts
+        this.konvaCtrl().points(this.points)
+        CompCtrl.konvaContext.transformer.forceUpdate()
+        this.reDraw()
+      })
+
+      circle.on('mouseover', () => {
+        document.body.style.cursor = 'pointer';
+        circle.setStrokeWidth(2);
+        this.reDraw()
+      })
+      circle.on('mouseout', () => {
+        document.body.style.cursor = 'default';
+        circle.setStrokeWidth(1);
+        this.reDraw()
+      })
+
+//   pathGroup.add(circle)
+      this.konvaCtrl().getLayer().add(circle)
+      this.reDraw()
+    })
+  }
+
+  reDraw() {
+    this.konvaCtrl().getLayer().draw()
+  }
+
+  getPathAbsPoints() {
     const pathPts = []
+    const transform = this.konvaCtrl().getTransform()
 
     let tempPt = { x: 0, y: 0 }
 
     this.konvaCtrl().points().forEach((pt, index) => {
       if ((index + 1) % 2 === 0) {
         tempPt.y = pt
+        const absPos = transform.point(tempPt)
 //     console.log(tempPt)
-        pathPts.push(Object.assign({}, tempPt))
+        pathPts.push(Object.assign({}, absPos))
       } else {
         tempPt.x = pt
       }
     })
-
-    // const transform = this.konvaCtrl().getAbsoluteTransform()
-    const transform = this.konvaCtrl().getTransform()
-
-    const newPts = []
-
-    pathPts.forEach(pt => {
-      const absPos = transform.point(pt)
-      newPts.push(absPos.x - this.konvaCtrl().x())
-      newPts.push(absPos.y - this.konvaCtrl().y())
-    })
-
-    // this.konvaCtrl().scaleX(1)
-    // this.konvaCtrl().scaleY(1)
-    // this.konvaCtrl().rotation(0)
-    // this.points = newPts
-    // this.konvaCtrl().points(newPts)
-
-    console.log(newPts)
+    return pathPts
   }
 
   doLog() {
@@ -259,14 +316,14 @@ class CompCtrl {
         comp.x = (x - this.x) * Math.cos(this.rotation * Math.PI / 180) - (y - this.y) * Math.sin(this.rotation * Math.PI / 180) + this.x
         comp.y = (x - this.x) * Math.sin(this.rotation * Math.PI / 180) + (y - this.y) * Math.cos(this.rotation * Math.PI / 180) + this.y
 
-        if (this.isPathCtrl) {
-        } else {
-          // console.log(comp.initLayout)
-          comp.scaleX = comp.initLayout.scaleX * this.scaleX
-          comp.scaleY = comp.initLayout.scaleY * this.scaleY
-          comp.rotation = comp.initLayout.rotation + this.rotation
-          comp.syncChildrenCompLayout()
-        }
+        // if (this.isPathCtrl) {
+        // } else {
+        // console.log(comp.initLayout)
+        comp.scaleX = comp.initLayout.scaleX * this.scaleX
+        comp.scaleY = comp.initLayout.scaleY * this.scaleY
+        comp.rotation = comp.initLayout.rotation + this.rotation
+        comp.syncChildrenCompLayout()
+        // }
       })
     }
   }
@@ -341,6 +398,11 @@ class CompCtrl {
 
     CompCtrl.konvaContext.transformer.attachTo(this.konvaCtrl())
     this.setDragBound(true)
+
+    if (this.isPathCtrl) {
+      this.addAnchors()
+    }
+
     this.konvaCtrl().getLayer().draw()
   }
 
