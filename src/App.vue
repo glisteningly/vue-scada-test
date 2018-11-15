@@ -803,6 +803,10 @@
           this.curSelCompStyleOptions = styleCtrls
         }
       },
+      initMulitCompCtrlPanel() {
+        //TODO: 多选组件面板
+        this.curSelCompStyleOptions = {}
+      },
       compStyleOptionsChanged() {
         const newVal = {}
         for (const key in this.curSelCompStyleOptions) {
@@ -918,6 +922,7 @@
             this.curSelComps[0].addTransformer()
             this.cancelSelGroup()
           } else {
+            this.initMulitCompCtrlPanel()
             this.addToGroup()
           }
         } else {
