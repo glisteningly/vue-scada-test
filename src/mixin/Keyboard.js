@@ -13,25 +13,26 @@ export default {
         e.preventDefault()
         // console.log(hotkeys.isPressed("space"))
         switch (handler.key) {
-          case "delete":
+          case 'delete':
             this.compsDelete()
             break;
-          case "ctrl+g":
+          case 'ctrl+g':
             this.jointCompsToGroup()
             break;
-          case "ctrl+shift+g":
+          case 'ctrl+shift+g':
             this.unGroupToComps()
             break;
-          case "space":
+          case 'space':
             this.isKeySpacepressing = true
+            console.log('escape')
             break;
-          case "ctrl+-":
+          case 'ctrl+-':
             this.zoomOut()
             break;
-          case "ctrl+=":
+          case 'ctrl+=':
             this.zoomIn()
             break;
-          case "ctrl+0":
+          case 'ctrl+0':
             this.zoom100()
             break;
         }
@@ -40,6 +41,10 @@ export default {
     setSpaceKeyState(e) {
       if (e.code === 'Space') {
         this.isKeySpacepressing = false
+      }
+
+      if (e.code === 'Escape') {
+        this.toolState = ''
       }
     },
     preventBrowserZoom(e) {

@@ -14,6 +14,7 @@
           <!--<el-button @click="addIcon2">google</el-button>-->
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
+          <el-button @click="addPathPoint">add point</el-button>
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
           <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
           <span style="display: inline-block; width: 20px"/>
@@ -137,6 +138,10 @@
 
   import StylePanel from './components/StylePanel'
 
+
+  const TOOL_STATE = {
+    addPathPoint: 'ADD_PATH_POINT'
+  }
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
   const CanvasDefaultSettings = {
     width: 1000,
@@ -149,6 +154,7 @@
     name: 'Editor',
     data() {
       return {
+        toolState: '',
         inited: false,
         comps: [],
         canvasLayout: {
@@ -325,6 +331,9 @@
 
         //click
         this.konvaObjs.stage.on('mousedown', (e) => {
+          if (this.toolState) {
+            return
+          }
           // console.log(hotkeys.isPressed("space"))
           if (this.isKeySpacepressing) {
             // this.konvaObjs.stage.draggable(true)
@@ -361,6 +370,14 @@
         })
 
         this.konvaObjs.stage.on('mouseup', (e) => {
+          if (this.toolState === TOOL_STATE.addPathPoint && this.curSelComp && this.curSelComp.points) {
+            const mousePos = this.konvaObjs.stage.getPointerPosition()
+            const x = mousePos.x
+            const y = mousePos.y
+            this.curSelComp.addNewAnchor({ x, y })
+            return
+          }
+
           if (e.evt.button === 0) {
 
             console.log('state mouseup')
@@ -548,6 +565,15 @@
       },
       addCompGroup() {
         this.addCompToCanvas(CompGroup3)
+      },
+      addPathPoint() {
+        if (this.curSelComp && this.curSelComp.points) {
+
+          this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
+
+          // this.curSelComp.addNewAnchor({ x: 300, y: 300 })
+          // this.curSelComp.removeAnchor(1)
+        }
       },
       unGroupToComps() {
         if (this.curSelComp && this.curSelComp.type === 'ScadaGroup') {
@@ -970,6 +996,21 @@
           })
           this.konvaObjs.stage.draggable(false)
           this.konvaObjs.stage.container().style.cursor = 'default'
+        }
+      },
+      toolState(val) {
+        console.log(val)
+        switch (val) {
+          case TOOL_STATE.addPathPoint : {
+            // this.konvaObjs.transformer.detach()
+            this.konvaObjs.stage.container().style.cursor = 'crosshair'
+            this.konvaObjs.stage.draw()
+            break
+          }
+          default: {
+            this.konvaObjs.stage.container().style.cursor = 'default'
+            this.konvaObjs.stage.draw()
+          }
         }
       }
     }

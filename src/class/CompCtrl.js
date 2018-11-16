@@ -121,8 +121,8 @@ class CompCtrl {
         x: pos.x,
         y: pos.y
       }
-      console.log(p)
-      console.log(this._dragstartPos)
+      // console.log(p)
+      // console.log(this._dragstartPos)
       if (hotkeys.shift) {
         if (this._hMove) {
           p = {
@@ -136,7 +136,7 @@ class CompCtrl {
           }
         }
       }
-      console.log(p)
+      // console.log(p)
       return p
     })
   }
@@ -149,6 +149,7 @@ class CompCtrl {
     } else {
       this.initKonvaRect()
     }
+    this.tempTr = null
     //TODO:
     // this.syncCompLayout()
 
@@ -177,7 +178,7 @@ class CompCtrl {
       CompCtrl.konvaContext.transformer.rotateEnabled(true)
       CompCtrl.konvaContext.transformer.resizeEnabled(true)
       CompCtrl.konvaContext.transformer.forceUpdate()
-      this.konvaCtrl().getLayer().draw()
+      this.reDraw()
     })
 
     CompCtrl.konvaContext.layers[0].add(this.konvaCtrl())
@@ -239,7 +240,7 @@ class CompCtrl {
           this.points[index * 2 + 1] = getRelativePt(circle).y
 
           if (hotkeys.ctrl) {
-            console.log(this._anchorPosDragstartPos)
+            // console.log(this._anchorPosDragstartPos)
             const dragDeltaX = this._anchorPosDragstartPos[index].x - circle.x()
             const dragDeltaY = this._anchorPosDragstartPos[index].y - circle.y()
             for (let i = index + 1; i < this.ctrlAnchors.length; i++) {
@@ -254,20 +255,30 @@ class CompCtrl {
 
         circle.on('dragend', () => {
           this.reCalcPathPoints()
-          const pts = _.clone(this.points)
-          this.points = pts
+          // const pts = _.clone(this.points)
+          this.points = _.clone(this.points)
           this.konvaCtrl().points(this.points)
           CompCtrl.konvaContext.transformer.forceUpdate()
           this.reDraw()
         })
 
-        circle.on('mouseover', () => {
-          circle.setStrokeWidth(2);
+        circle.on('mouseenter', () => {
+          console.log(hotkeys.alt)
+          if (hotkeys.alt) {
+            circle.setStroke('#740800')
+          }
+          circle.setStrokeWidth(2)
           this.reDraw()
         })
         circle.on('mouseout', () => {
-          circle.setStrokeWidth(1);
+          circle.setStrokeWidth(1)
+          circle.setStroke('white')
           this.reDraw()
+        })
+        circle.on('click', () => {
+          if (hotkeys.alt) {
+            this.removeAnchor(index)
+          }
         })
 
         // 按住shift拖动时水平垂直方向约束
@@ -277,6 +288,43 @@ class CompCtrl {
         this.reDraw()
       })
     }
+  }
+
+  addNewAnchor(newPt) {
+    if (!this.isPathCtrl) {
+      return
+    }
+
+    const stageM = CompCtrl.konvaContext.stage.getTransform().copy()
+    console.log(stageM)
+    // const iStageTf = stageTf.
+
+    const tf = this.konvaCtrl().getTransform()
+    const it = tf.copy().multiply(stageM).invert()
+
+    const getRelativePt = (anchor) => {
+      const anchorAbsPt = { x: anchor.x, y: anchor.y }
+      return it.point(anchorAbsPt)
+    }
+
+    const pt = [getRelativePt(newPt).x, getRelativePt(newPt).y]
+    // const newPathPts = this.points.concat(pt)
+    // console.log(newPathPts)
+    this.points = this.points.concat(pt)
+    this.konvaCtrl().points(this.points)
+    CompCtrl.konvaContext.transformer.forceUpdate()
+    this.addAnchors()
+  }
+
+  removeAnchor(index) {
+    if (!this.isPathCtrl) {
+      return
+    }
+
+    this.points.splice(index * 2, 2)
+    this.konvaCtrl().points(this.points)
+    CompCtrl.konvaContext.transformer.forceUpdate()
+    this.addAnchors()
   }
 
   reCalcPathPoints() {
@@ -344,7 +392,6 @@ class CompCtrl {
 
   initKonvaRect() {
     _konvaRect.set(this, new Konva.Rect(this))
-    this.tempTr = null
   }
 
   initKonvaPath() {
