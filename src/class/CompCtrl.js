@@ -86,13 +86,6 @@ class CompCtrl {
   //   this.x = value
   //   console.log('setter: ' + value)
   // }
-  // getRoundNum(num) {
-  //   return Math.round(num * 100) / 100
-  // }
-
-  // getRoundNum(num, precision = 12) {
-  //   return +parseFloat(num.toPrecision(precision));
-  // }
 
   initBaseLayout() {
     this.initLayout = this.layout()
@@ -150,13 +143,6 @@ class CompCtrl {
       this.initKonvaRect()
     }
     this.tempTr = null
-    //TODO:
-    // this.syncCompLayout()
-
-    // 拖拽移动时即时变化
-    // this.konvaRect().on('dragmove', () => {
-    //   this.updateLayout()
-    // })
 
     // 按住shift拖动时水平垂直方向约束
     this.setShapeDragConstraint(this.konvaCtrl())
@@ -263,7 +249,7 @@ class CompCtrl {
         })
 
         circle.on('mouseenter', () => {
-          console.log(hotkeys.alt)
+          // console.log(hotkeys.alt)
           if (hotkeys.alt) {
             circle.setStroke('#740800')
           }
@@ -295,25 +281,23 @@ class CompCtrl {
       return
     }
 
-    const stageM = CompCtrl.konvaContext.stage.getTransform().copy()
-    console.log(stageM)
-    // const iStageTf = stageTf.
+    const stageM = CompCtrl.konvaContext.stage.getTransform()
+    // console.log(stageM)
 
     const tf = this.konvaCtrl().getTransform()
-    const it = tf.copy().multiply(stageM).invert()
+    const it = tf.copy().invert()
+    const iSTf = stageM.copy().invert()
 
     const getRelativePt = (anchor) => {
       const anchorAbsPt = { x: anchor.x, y: anchor.y }
-      return it.point(anchorAbsPt)
+      return it.point(iSTf.point(anchorAbsPt))
     }
 
     const pt = [getRelativePt(newPt).x, getRelativePt(newPt).y]
     // const newPathPts = this.points.concat(pt)
     // console.log(newPathPts)
     this.points = this.points.concat(pt)
-    this.konvaCtrl().points(this.points)
-    CompCtrl.konvaContext.transformer.forceUpdate()
-    this.addAnchors()
+    this.rePathPoints()
   }
 
   removeAnchor(index) {
@@ -322,9 +306,7 @@ class CompCtrl {
     }
 
     this.points.splice(index * 2, 2)
-    this.konvaCtrl().points(this.points)
-    CompCtrl.konvaContext.transformer.forceUpdate()
-    this.addAnchors()
+    this.rePathPoints()
   }
 
   reCalcPathPoints() {
@@ -347,6 +329,18 @@ class CompCtrl {
       this.points[i] -= offsetX
       this.points[i + 1] -= offsetY
     }
+  }
+
+  reCalcPathSize() {
+    this.width = this.konvaCtrl().width()
+    this.height = this.konvaCtrl().height()
+  }
+
+  rePathPoints() {
+    this.konvaCtrl().points(this.points)
+    this.reCalcPathSize()
+    CompCtrl.konvaContext.transformer.forceUpdate()
+    this.addAnchors()
   }
 
   getPathAbsPoints() {
@@ -402,6 +396,7 @@ class CompCtrl {
     this.lineJoin = 'round'
     this.strokeScaleEnabled = false
     _konvaPath.set(this, new Konva.Line(this))
+    this.reCalcPathSize()
   }
 
   setContext(konvaContext) {

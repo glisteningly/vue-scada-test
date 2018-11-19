@@ -1,13 +1,11 @@
 <template>
-  <g>
+  <g class="scada-tube">
     <path class="round-path"
-          fill="none"
           :stroke="options.style.stroke"
           :stroke-width="options.style.strokeWidth"
           :d="roundPath"
           :transform="rectTransformStr"/>
     <path class="flow-path"
-          fill="none"
           :stroke="options.style.fill"
           :stroke-width="4"
           :d="roundPath"
@@ -53,14 +51,8 @@
             }
           })
 
-          // pathPts.forEach(pt => {
-          //   pt.x *= this.comp.scaleX
-          //   pt.y *= this.comp.scaleY
-          // })
-
           return roundPathCorners(pathPts, this.options.style.cornerRadius)
         }
-        // return `M0 0 L 100 0 L100 100 L 0 50`
         else {
           return ''
         }
@@ -70,12 +62,9 @@
 </script>
 
 <style>
-  .round-path {
-    /*stroke: deepskyblue;*/
-  }
-
-  .flow-path {
-    /*stroke: rgba(0, 0, 0, 0.2);*/
+  .scada-tube {
+    fill: none;
+    stroke-linejoin: round;
   }
 
   .flow-path {
