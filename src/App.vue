@@ -14,7 +14,7 @@
           <!--<el-button @click="addIcon2">google</el-button>-->
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
-          <el-button @click="addPathPoint">add point</el-button>
+          <el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
           <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
           <span style="display: inline-block; width: 20px"/>
@@ -172,6 +172,7 @@
           selCompsGroup: null,
           selCompsRect: null,
           paperRect: null,
+          pathAuxLine: null,
         },
         curSelComps: [],
         groupLastPos: { x: 0, y: 0 },
@@ -293,6 +294,14 @@
           dash: [3, 1]
         })
 
+        this.konvaObjs.pathAuxLine = new Konva.Line({
+          points: [],
+          stroke: '#3c97e0',
+          strokeWidth: 1,
+          lineJoin: 'round',
+          dash: [5, 5]
+        })
+
         this.konvaObjs.selCompsGroup = new Konva.Group({
           draggable: true,
           // dragBoundFunc: function (pos) {
@@ -331,12 +340,13 @@
 
         //click
         this.konvaObjs.stage.on('mousedown', (e) => {
-          if (this.toolState) {
+          if (this.isKeySpacepressing) {
+            // this.konvaObjs.stage.draggable(true)
             return
           }
           // console.log(hotkeys.isPressed("space"))
-          if (this.isKeySpacepressing) {
-            // this.konvaObjs.stage.draggable(true)
+
+          if (this.toolState) {
             return
           }
 
@@ -359,6 +369,24 @@
 
         this.konvaObjs.stage.on('mousemove', (e) => {
           // console.log('mousemove')
+          if (this.toolState) {
+            if (this.curSelComp && this.curSelComp.points) {
+              // 当前鼠标位置
+              const mousePos = this.konvaObjs.stage.getPointerPosition()
+              const stageTf = this.konvaObjs.stage.getTransform().copy().invert()
+              const relativeMousePt = stageTf.point(mousePos)
+
+              // path最后节点位置
+              const pathTf = this.curSelComp.konvaCtrl().getTransform()
+              const pathLastPointPos = { x: this.pathLastPoint[0], y: this.pathLastPoint[1] }
+              // const relativePathLastPt = stageTf.point(pathTf.point(pathLastPointPos))
+              const relativePathLastPt = pathTf.point(pathLastPointPos)
+
+              this.konvaObjs.pathAuxLine.points([relativePathLastPt.x, relativePathLastPt.y, relativeMousePt.x, relativeMousePt.y])
+              this.konvaObjs.layers[0].draw()
+            }
+          }
+
           if (this.isDragSelecting) {
             const mousePos = this.konvaObjs.stage.getPointerPosition()
             const x = (mousePos.x - this.konvaObjs.stage.x()) / this.konvaObjs.stage.scaleX()
@@ -370,22 +398,28 @@
         })
 
         this.konvaObjs.stage.on('mouseup', (e) => {
-          if (this.toolState === TOOL_STATE.addPathPoint && this.curSelComp && this.curSelComp.points) {
-            const mousePos = this.konvaObjs.stage.getPointerPosition()
-            const x = mousePos.x
-            const y = mousePos.y
-            this.curSelComp.addNewAnchor({ x, y })
+          // console.log(this.konvaObjs.stage.getPointerPosition())
+
+          if (this.isKeySpacepressing) {
+            // this.konvaObjs.stage.draggable(true)
             return
           }
 
           if (e.evt.button === 0) {
-
-            console.log('state mouseup')
+            // console.log('state mouseup')
+            if (this.toolState === TOOL_STATE.addPathPoint) {
+              const mousePos = this.konvaObjs.stage.getPointerPosition()
+              const x = mousePos.x
+              const y = mousePos.y
+              if (this.curSelComp && this.curSelComp.points) {
+                this.curSelComp.addNewAnchor({ x, y })
+              } else {
+                this.addPathStartPoint({ x, y })
+              }
+              return
+            }
 
             if (this.isDragSelecting) {
-              // const l = this.getDragSelectingRect(this.konvaObjs.selCompsRect)
-              // console.log(l)
-
               const newSels = []
               for (const comp of this.comps) {
                 // if (this.isRectContain(l, comp.konvaRect())) {
@@ -402,13 +436,9 @@
               } else {
                 this.konvaObjs.layers[0].draw()
               }
-
-              // this.konvaObjs.selCompsRect.remove()
-              // this.konvaObjs.selCompsRect.width(0)
-              // this.konvaObjs.selCompsRect.height(0)
-              // this.konvaObjs.layers[0].draw()
-              // this.isDragSelecting = false
             }
+          } else {
+            this.toolState = ''
           }
 
           this.konvaObjs.selCompsRect.remove()
@@ -430,6 +460,7 @@
           comp.initKonva()
           this.addCompEvent(comp)
         })
+
         this.canvasRedraw()
       },
 
@@ -566,14 +597,35 @@
       addCompGroup() {
         this.addCompToCanvas(CompGroup3)
       },
-      addPathPoint() {
-        if (this.curSelComp && this.curSelComp.points) {
-
-          this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
-
-          // this.curSelComp.addNewAnchor({ x: 300, y: 300 })
-          // this.curSelComp.removeAnchor(1)
-        }
+      addPathStartPoint(pos = { x: 300, y: 300 }) {
+        const stageTf = this.konvaObjs.stage.getTransform().copy().invert()
+        const relativePt = stageTf.point(pos)
+        const newComp = this.addCompToCanvas({
+          type: 'ScadaTube',
+          layout: {
+            x: relativePt.x,
+            y: relativePt.y,
+            points: [0, 0]
+          },
+          options: {
+            style: {
+              fill: 'rgba(0,0,0,0.5)',
+              stroke: '#CCC',
+              strokeWidth: 10,
+              cornerRadius: 10
+            }
+          }
+        })
+        const newSels = []
+        newSels.push(newComp)
+        this.detchCompTransformer()
+        this.unGroupSelAll()
+        this.curSelComps = newSels
+      },
+      toolPathPoint() {
+        // if (this.curSelComp && this.curSelComp.points) {
+        this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
+        // }
       },
       unGroupToComps() {
         if (this.curSelComp && this.curSelComp.type === 'ScadaGroup') {
@@ -676,17 +728,6 @@
         this.cancelSelGroup()
         this.addToGroup()
       },
-      getDragSelectingRect(node) {
-        const x = node.getAbsolutePosition().x
-        const y = node.getAbsolutePosition().y
-        // return {
-        //   x: node.width() >= 0 ? x : x + node.width(),
-        //   y: node.height() >= 0 ? y : y + node.height(),
-        //   width: Math.abs(node.width()),
-        //   height: Math.abs(node.height())
-        // }
-        return node.getClientRect()
-      },
       isRectContain(r1, r2) {
         // const r1 = rect
         // console.log(r1)
@@ -740,6 +781,7 @@
       addCompToCanvas(comp) {
         const c = new CompCtrl(comp)
         this.addComp(c)
+        return c
       },
       testImport() {
         CompConfig.comps.forEach((comp) => {
@@ -931,6 +973,27 @@
       },
       curZoomScale() {
         return ZoomScaleSettings[this.zoomScaleIndex]
+      },
+      isToolStatePath() {
+        return (this.toolState === TOOL_STATE.addPathPoint) ? 'primary' : 'default'
+      },
+      canvasCursorStyle() {
+        switch (this.toolState) {
+          case TOOL_STATE.addPathPoint : {
+            return 'crosshair'
+          }
+          default: {
+            return 'default'
+          }
+        }
+      },
+      pathLastPoint() {
+        if (this.curSelComp && this.curSelComp.points) {
+          const l = this.curSelComp.points.length
+          return [this.curSelComp.points[l - 2], this.curSelComp.points[l - 1]]
+        } else {
+          return null
+        }
       }
     },
     filters: {
@@ -960,7 +1023,7 @@
       },
       curSelCompLayout: {
         handler: function () {
-          console.log('comp layout changed')
+          // console.log('comp layout changed')
           if (this.curSelComp) {
             this.curSelComp.syncKonva()
           }
@@ -995,21 +1058,23 @@
             comp.konvaCtrl().draggable(false)
           })
           this.konvaObjs.stage.draggable(false)
-          this.konvaObjs.stage.container().style.cursor = 'default'
+          this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle
         }
       },
-      toolState(val) {
-        console.log(val)
-        switch (val) {
+      toolState() {
+        this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle
+
+        switch (this.toolState) {
           case TOOL_STATE.addPathPoint : {
-            // this.konvaObjs.transformer.detach()
-            this.konvaObjs.stage.container().style.cursor = 'crosshair'
+            this.konvaObjs.layers[0].add(this.konvaObjs.pathAuxLine)
             this.konvaObjs.stage.draw()
-            break
+            return 'crosshair'
           }
           default: {
-            this.konvaObjs.stage.container().style.cursor = 'default'
+            this.konvaObjs.pathAuxLine.remove()
+            this.konvaObjs.pathAuxLine.points([0, 0])
             this.konvaObjs.stage.draw()
+            return 'default'
           }
         }
       }

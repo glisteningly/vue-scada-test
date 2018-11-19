@@ -301,7 +301,7 @@ class CompCtrl {
   }
 
   removeAnchor(index) {
-    if (!this.isPathCtrl) {
+    if (!this.isPathCtrl || this.points.length <= 2) {
       return
     }
 
