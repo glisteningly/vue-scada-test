@@ -280,22 +280,13 @@ class CompCtrl {
     if (!this.isPathCtrl) {
       return
     }
-
-    const stageM = CompCtrl.konvaContext.stage.getTransform()
-    // console.log(stageM)
-
-    const tf = this.konvaCtrl().getTransform()
-    const it = tf.copy().invert()
-    const iSTf = stageM.copy().invert()
-
+    const tf = this.konvaCtrl().getTransform().copy().invert()
     const getRelativePt = (anchor) => {
       const anchorAbsPt = { x: anchor.x, y: anchor.y }
-      return it.point(iSTf.point(anchorAbsPt))
+      return tf.point(anchorAbsPt)
     }
-
     const pt = [getRelativePt(newPt).x, getRelativePt(newPt).y]
-    // const newPathPts = this.points.concat(pt)
-    // console.log(newPathPts)
+
     this.points = this.points.concat(pt)
     this.rePathPoints()
   }
@@ -304,7 +295,6 @@ class CompCtrl {
     if (!this.isPathCtrl || this.points.length <= 2) {
       return
     }
-
     this.points.splice(index * 2, 2)
     this.rePathPoints()
   }

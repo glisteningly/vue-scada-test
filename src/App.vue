@@ -59,27 +59,27 @@
             <div v-if="curSelCompLayout">
               <div>
                 <label>位置</label>
-                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutX">
-                  <template slot="prepend">X</template>
-                </el-input>
-                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutY">
-                  <template slot="prepend">Y</template>
-                </el-input>
+                <span class="layout_panel_label">X:</span>
+                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutX">
+                </el-input-number>
+                <span class="layout_panel_label">Y:</span>
+                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutY">
+                </el-input-number>
               </div>
               <div>
                 <label>尺寸</label>
-                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutW">
-                  <template slot="prepend">W</template>
-                </el-input>
-                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutH">
-                  <template slot="prepend">H</template>
-                </el-input>
+                <span class="layout_panel_label">W:</span>
+                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutW">
+                </el-input-number>
+                <span class="layout_panel_label">H:</span>
+                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutH">
+                </el-input-number>
               </div>
               <div>
                 <label>旋转</label>
-                <el-input type="number" class="layout-input" v-model.number="curSelCompLayoutR">
-                  <template slot="prepend">R</template>
-                </el-input>
+                <span class="layout_panel_label">R:</span>
+                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
+                </el-input-number>
               </div>
             </div>
           </div>
@@ -180,7 +180,8 @@
         testData: 2,
         curSelCompStyleOptions: {},
         // isKeySpacepressing: false
-        zoomScaleIndex: 4
+        zoomScaleIndex: 4,
+        curFixedPathPoint: null
       }
     },
     mounted() {
@@ -297,26 +298,13 @@
         this.konvaObjs.pathAuxLine = new Konva.Line({
           points: [],
           stroke: '#3c97e0',
-          strokeWidth: 1,
+          strokeWidth: 4,
           lineJoin: 'round',
-          dash: [5, 5]
+          dash: [6, 4]
         })
 
         this.konvaObjs.selCompsGroup = new Konva.Group({
           draggable: true,
-          // dragBoundFunc: function (pos) {
-          //   if (hotkeys.shift) {
-          //     return {
-          //       x: pos.x,
-          //       y: this.getAbsolutePosition().y
-          //     }
-          //   } else {
-          //     return {
-          //       x: pos.x,
-          //       y: pos.y,
-          //     }
-          //   }
-          // }
         })
 
         this.konvaObjs.selCompsGroup.on('dragstart ', () => {
@@ -371,18 +359,21 @@
           // console.log('mousemove')
           if (this.toolState) {
             if (this.curSelComp && this.curSelComp.points) {
-              // 当前鼠标位置
-              const mousePos = this.konvaObjs.stage.getPointerPosition()
-              const stageTf = this.konvaObjs.stage.getTransform().copy().invert()
-              const relativeMousePt = stageTf.point(mousePos)
 
               // path最后节点位置
               const pathTf = this.curSelComp.konvaCtrl().getTransform()
               const pathLastPointPos = { x: this.pathLastPoint[0], y: this.pathLastPoint[1] }
-              // const relativePathLastPt = stageTf.point(pathTf.point(pathLastPointPos))
-              const relativePathLastPt = pathTf.point(pathLastPointPos)
+              const _pathLastPt_Stage = pathTf.point(pathLastPointPos)
 
-              this.konvaObjs.pathAuxLine.points([relativePathLastPt.x, relativePathLastPt.y, relativeMousePt.x, relativeMousePt.y])
+              // 当前鼠标位置
+              const mousePos = this.konvaObjs.stage.getPointerPosition()
+              const stageTf = this.konvaObjs.stage.getTransform().copy().invert()
+              const _pathMousePt_Stage = stageTf.point(mousePos)
+
+              const _fixedPt_Stage = (hotkeys.shift) ? _pathMousePt_Stage : utils.getHVPos(_pathLastPt_Stage, _pathMousePt_Stage)
+              this.curFixedPathPoint = _fixedPt_Stage
+
+              this.konvaObjs.pathAuxLine.points([_pathLastPt_Stage.x, _pathLastPt_Stage.y, _fixedPt_Stage.x, _fixedPt_Stage.y])
               this.konvaObjs.layers[0].draw()
             }
           }
@@ -412,7 +403,8 @@
               const x = mousePos.x
               const y = mousePos.y
               if (this.curSelComp && this.curSelComp.points) {
-                this.curSelComp.addNewAnchor({ x, y })
+                // this.curSelComp.addNewAnchor({ x, y })
+                this.curSelComp.addNewAnchor(this.curFixedPathPoint)
               } else {
                 this.addPathStartPoint({ x, y })
               }
@@ -1146,17 +1138,26 @@
         background: #3C3F41;
         #layout_panel {
           border-bottom: 1.5px solid #2B2B2B;
-          padding: 12px;
+          padding: 12px 12px 6px 12px;
+          span.layout_panel_label {
+            text-align: right;
+            letter-spacing: 1px;
+            display: inline-block;
+            width: 15px;
+            color: #DDD;
+            font-size: 13px;
+            margin-left: 6px;
+          }
           label {
             letter-spacing: 1.5px;
             display: inline-block;
             color: #DDD;
-            font-size: 13px;
-            margin-right: 8px;
+            font-size: 14px;
+            margin-right: 10px;
           }
           .layout-input {
-            width: 88px;
-            margin-left: 5px;
+            width: 70px;
+            margin-left: 2px;
             margin-bottom: 8px;
             text-align: right;
             padding: 0 2px;

@@ -18,7 +18,8 @@ input::-webkit-inner-spin-button {
   border: 1px solid #666;
   padding: 0 6px;
   &:focus {
-    background-color: #444;
+    color: #333;
+    background-color: #EEE;
     border: 1px solid #20a0ff;
   }
 }
@@ -38,6 +39,7 @@ input::-webkit-inner-spin-button {
 .el-input-number--mini .el-input__inner {
   padding-left: 10px;
   padding-right: 10px;
+  box-shadow:2px 2px 2px rgba(0,0,0,.25) inset;
 }
 
 .el-input-number__decrease, .el-input-number__increase {
@@ -51,6 +53,13 @@ input::-webkit-inner-spin-button {
 
 .el-input-number__decrease {
   border-right: 1px solid #555;
+}
+
+.el-input-number.is-without-controls .el-input__inner {
+  padding-left: 8px;
+  padding-right: 0;
+  text-align: left;
+
 }
 
 .el-color-picker__panel {

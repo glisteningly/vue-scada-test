@@ -54,7 +54,7 @@
 
     .ctrl-item {
       label {
-        font-size: 13px;
+        font-size: 14px;
         letter-spacing: 1.5px;
         color: #DDD;
         display: block;
