@@ -33,7 +33,9 @@ export default {
         }
       },
       set(v) {
-        this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
+        if (!this.curSelComp.points) {
+          this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
+        }
         this.curSelComp.scaleX = (v / this.curSelComp.width) || 1
       }
     },
@@ -46,7 +48,9 @@ export default {
         }
       },
       set(v) {
-        this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
+        if (!this.curSelComp.points) {
+          this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
+        }
         this.curSelComp.scaleY = (v / this.curSelComp.height) || 1
       }
     },

@@ -21,8 +21,8 @@ class CompCtrl {
     this.width = options.layout.width || 0
     this.height = options.layout.height || 0
 
-    this.offsetX = options.layout.offsetX || (this.width / 2)
-    this.offsetY = options.layout.offsetY || (this.height / 2)
+    this.offsetX = (options.layout.offsetX || (this.width / 2)) || 0
+    this.offsetY = (options.layout.offsetY || (this.height / 2)) || 0
     // this.offsetX = 0
     // this.offsetY = 0
 
@@ -147,10 +147,14 @@ class CompCtrl {
     // 按住shift拖动时水平垂直方向约束
     this.setShapeDragConstraint(this.konvaCtrl())
 
+    this.konvaCtrl().on('dragstart transformstart', () => {
+      this.showPathCtrl(true)
+    })
+
     this.konvaCtrl().on('dragstart', () => {
       CompCtrl.konvaContext.transformer.rotateEnabled(false)
       CompCtrl.konvaContext.transformer.resizeEnabled(false)
-      this.konvaCtrl().getLayer().draw()
+      this.reDraw()
     })
 
     this.konvaCtrl().on('dragend transformend', () => {
@@ -159,11 +163,11 @@ class CompCtrl {
       if (this.isPathCtrl) {
         this.addAnchors()
       }
-
       this.syncCompLayout()
       CompCtrl.konvaContext.transformer.rotateEnabled(true)
       CompCtrl.konvaContext.transformer.resizeEnabled(true)
       CompCtrl.konvaContext.transformer.forceUpdate()
+      this.showPathCtrl(false)
       this.reDraw()
     })
 
@@ -173,6 +177,14 @@ class CompCtrl {
     if (this.children && this.children.length > 0) {
       this.syncChildrenCompLayout()
     }
+  }
+
+  showPathCtrl(show) {
+    const color = show ? 'rgba(0,210,255,0.1)' : 'rgba(0,0,0,0)'
+    if (this.isPathCtrl) {
+      this.konvaCtrl().stroke(color)
+    }
+    this.reDraw()
   }
 
   removeAnchors() {
@@ -213,6 +225,10 @@ class CompCtrl {
           })
         })
 
+        circle.on('dragstart', () => {
+          this.showPathCtrl(true)
+        })
+
         circle.on('dragmove', () => {
           const tf = this.konvaCtrl().getTransform()
           const it = tf.copy().invert()
@@ -245,6 +261,7 @@ class CompCtrl {
           this.points = _.clone(this.points)
           this.konvaCtrl().points(this.points)
           CompCtrl.konvaContext.transformer.forceUpdate()
+          this.showPathCtrl(false)
           this.reDraw()
         })
 
@@ -380,7 +397,8 @@ class CompCtrl {
 
   initKonvaPath() {
     // this.stroke = '#00D2FF'
-    this.stroke = 'rgba(0,210,255,0.1)'
+    // this.stroke = 'rgba(0,210,255,0.1)'
+    this.stroke = 'rgba(0,0,0,0)'
     this.strokeWidth = 10
     this.draggable = true
     this.lineJoin = 'round'

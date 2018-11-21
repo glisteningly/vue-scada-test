@@ -33,6 +33,9 @@
           <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
+          <el-button @click="getCompsCRectX">alignX</el-button>
+          <el-button @click="getCompsCRectY">alignY</el-button>
+          <el-button @click="getCompsCRectC">alignC</el-button>
           <!--<button @click="unGroupSelAll">ungroup</button>-->
         </div>
       </header>
@@ -927,12 +930,43 @@
         this.konvaObjs.stage.height(height)
         this.konvaObjs.stage.batchDraw()
       },
+      //移除组件的tr
       detchCompTransformer() {
         this.konvaObjs.transformer.detach()
         this.comps.forEach(comp => {
           if (comp.isPathCtrl) {
             comp.removeAnchors()
           }
+        })
+      },
+      getCompsCRectC() {
+        const destX = this.curSelComps[0].x
+        this.curSelComps.forEach((comp) => {
+          comp.x = destX 
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+      },
+      getCompsCRectX() {
+        const destX = this.curSelComps[0].x - this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
+        this.curSelComps.forEach((comp) => {
+          comp.x = destX + comp.offsetX * comp.scaleX
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+      },
+      getCompsCRectY() {
+        const destY = this.curSelComps[0].y - this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
+        this.curSelComps.forEach((comp) => {
+          comp.y = destY + comp.offsetY * comp.scaleY
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
         })
       }
     },
