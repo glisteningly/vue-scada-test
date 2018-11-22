@@ -540,10 +540,8 @@
             x: 100,
             y: 200,
             rotation: 0,
-            // offsetX: 75,
-            // offsetY: 50,
             points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
-            // points: [0, 0, 200, 100]
+            // points: [-10, -20, 200, 100]
           },
           options: {
             style: {
@@ -942,7 +940,7 @@
       getCompsCRectC() {
         const destX = this.curSelComps[0].x
         this.curSelComps.forEach((comp) => {
-          comp.x = destX 
+          comp.x = destX
           comp.syncKonva()
           this.syncGroupSel()
           this.konvaObjs.groupTransformer.forceUpdate()

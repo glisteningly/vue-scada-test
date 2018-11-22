@@ -2,6 +2,7 @@ import Guid from '../utils/guid'
 import Konva from 'konva'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
+import utils from '../utils'
 
 const _konvaRect = new WeakMap()
 const _konvaPath = new WeakMap()
@@ -21,11 +22,19 @@ class CompCtrl {
     this.width = options.layout.width || 0
     this.height = options.layout.height || 0
 
+    this.isPathCtrl = false
+    if (options.layout.points) {
+      this.points = options.layout.points || []
+      this.isPathCtrl = true
+      this.ctrlAnchors = []
+      this.width = utils.getPathRect(this.points).width
+      this.height = utils.getPathRect(this.points).height
+    }
+
     this.offsetX = (options.layout.offsetX || (this.width / 2)) || 0
     this.offsetY = (options.layout.offsetY || (this.height / 2)) || 0
     // this.offsetX = 0
     // this.offsetY = 0
-
 
     this.scaleX = options.layout.scaleX || 1
     this.scaleY = options.layout.scaleY || 1
@@ -34,13 +43,13 @@ class CompCtrl {
 
     this.rotation = options.layout.rotation || 0
 
-    this.isPathCtrl = false
+    // this.isPathCtrl = false
 
-    if (options.layout.points) {
-      this.points = options.layout.points || []
-      this.isPathCtrl = true
-      this.ctrlAnchors = []
-    }
+    // if (options.layout.points) {
+    //   this.points = options.layout.points || []
+    //   this.isPathCtrl = true
+    //   this.ctrlAnchors = []
+    // }
 
     this.initBaseLayout()
 
@@ -257,9 +266,13 @@ class CompCtrl {
 
         circle.on('dragend', () => {
           this.reCalcPathPoints()
-          // const pts = _.clone(this.points)
           this.points = _.clone(this.points)
           this.konvaCtrl().points(this.points)
+          // this.konvaCtrl().offsetX(this.konvaCtrl().width() / 2)
+          // this.konvaCtrl().offsetY(this.konvaCtrl().height() / 2)
+
+          // this.syncCompLayout()
+          // this.reCalcPathPoints()
           CompCtrl.konvaContext.transformer.forceUpdate()
           this.showPathCtrl(false)
           this.reDraw()
@@ -297,6 +310,7 @@ class CompCtrl {
     if (!this.isPathCtrl) {
       return
     }
+
     const tf = this.konvaCtrl().getTransform().copy().invert()
     const getRelativePt = (anchor) => {
       const anchorAbsPt = { x: anchor.x, y: anchor.y }
@@ -305,6 +319,7 @@ class CompCtrl {
     const pt = [getRelativePt(newPt).x, getRelativePt(newPt).y]
 
     this.points = this.points.concat(pt)
+    this.reCalcPathPoints()
     this.rePathPoints()
   }
 
@@ -312,7 +327,9 @@ class CompCtrl {
     if (!this.isPathCtrl || this.points.length <= 2) {
       return
     }
+
     this.points.splice(index * 2, 2)
+    this.reCalcPathPoints()
     this.rePathPoints()
   }
 
@@ -321,15 +338,21 @@ class CompCtrl {
       return
     }
 
-    const offsetX = this.points[0]
-    const offsetY = this.points[1]
+    this.konvaCtrl().points(this.points)
+    const pathRect = utils.getPathRect(this.konvaCtrl().points())
+
+    const offsetX = pathRect.x
+    const offsetY = pathRect.y
     const tf = this.konvaCtrl().getTransform()
     const stageTf = CompCtrl.konvaContext.stage.getTransform()
-
-    const originPt = { x: offsetX, y: offsetY }
+    const originPt = { x: offsetX + pathRect.width / 2, y: offsetY + pathRect.height / 2 }
     const relativePt = stageTf.point(tf.point(originPt))
 
-    this.konvaCtrl().setAbsolutePosition({ x: relativePt.x, y: relativePt.y })
+    this.konvaCtrl().setAbsolutePosition({
+      x: relativePt.x,
+      y: relativePt.y
+    })
+
     this.syncCompLayout()
 
     for (let i = 0; i < this.points.length - 1; i += 2) {
@@ -338,14 +361,10 @@ class CompCtrl {
     }
   }
 
-  reCalcPathSize() {
-    this.width = this.konvaCtrl().width()
-    this.height = this.konvaCtrl().height()
-  }
-
   rePathPoints() {
     this.konvaCtrl().points(this.points)
-    this.reCalcPathSize()
+    // this.reCalcPathSize()
+    // this.syncCompLayout()
     CompCtrl.konvaContext.transformer.forceUpdate()
     this.addAnchors()
   }
@@ -360,7 +379,6 @@ class CompCtrl {
       if ((index + 1) % 2 === 0) {
         tempPt.y = pt
         const absPos = transform.point(tempPt)
-//     console.log(tempPt)
         pathPts.push(Object.assign({}, absPos))
       } else {
         tempPt.x = pt
@@ -381,14 +399,6 @@ class CompCtrl {
     rect.y -= 3
     rect.width -= 6
     rect.height -= 6
-    // console.log(rect)
-
-    // console.log(pathPts)
-    // console.log(_.minBy(pathPts, 'x').x)
-    // console.log(_.minBy(pathPts, 'y').y)
-    // console.log(_.maxBy(pathPts, 'x').x)
-    // console.log(_.maxBy(pathPts, 'y').y)
-    // console.log(this.konvaCtrl().getPoints())
   }
 
   initKonvaRect() {
@@ -404,7 +414,7 @@ class CompCtrl {
     this.lineJoin = 'round'
     this.strokeScaleEnabled = false
     _konvaPath.set(this, new Konva.Line(this))
-    this.reCalcPathSize()
+    // this.reCalcPathSize()
   }
 
   setContext(konvaContext) {
@@ -427,40 +437,35 @@ class CompCtrl {
   }
 
   syncCompLayout() {
-    // this.x = this.konvaRect().getAbsolutePosition().x
-    // this.y = this.konvaRect().getAbsolutePosition().y
     this.x = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).x
     this.y = this.konvaCtrl().getAbsolutePosition(CompCtrl.konvaContext.stage).y
     // TODO:
 
     this.scaleX = this.konvaCtrl().getAbsoluteScale().x / CompCtrl.konvaContext.stage.scaleX()
     this.scaleY = this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
-    // this.scaleX = this.konvaRect().getAbsoluteScale().x
-    // this.scaleY = this.konvaRect().getAbsoluteScale().y
     this.rotation = this.konvaCtrl().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation()
 
     this.width = this.konvaCtrl().width()
     this.height = this.konvaCtrl().height()
+    this.offsetX = this.width / 2
+    this.offsetY = this.height / 2
+    this.konvaCtrl().offsetX(this.konvaCtrl().width() / 2)
+    this.konvaCtrl().offsetY(this.konvaCtrl().height() / 2)
+
     this.syncChildrenCompLayout()
   }
 
   syncChildrenCompLayout() {
-    // console.log(this.children)
     if (this.children && this.children.length > 0) {
       this.children.forEach((comp) => {
         const x = (comp.initLayout.x - this.offsetX) * this.scaleX + this.x
         const y = (comp.initLayout.y - this.offsetY) * this.scaleY + this.y
         comp.x = (x - this.x) * Math.cos(this.rotation * Math.PI / 180) - (y - this.y) * Math.sin(this.rotation * Math.PI / 180) + this.x
         comp.y = (x - this.x) * Math.sin(this.rotation * Math.PI / 180) + (y - this.y) * Math.cos(this.rotation * Math.PI / 180) + this.y
-
-        // if (this.isPathCtrl) {
-        // } else {
-        // console.log(comp.initLayout)
         comp.scaleX = comp.initLayout.scaleX * this.scaleX
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
         comp.rotation = comp.initLayout.rotation + this.rotation
         comp.syncChildrenCompLayout()
-        // }
       })
     }
   }
