@@ -19,6 +19,21 @@
           <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="showNodeZIndex">z index</el-button>
+          <el-popover>
+            <div id="align_panel">
+              <div class="align-panel-direct">
+                <label>水平对齐:</label>
+                <el-button @click="getCompsCRectX">左</el-button>
+                <el-button @click="getCompsCRectHC">居中</el-button>
+              </div>
+              <div class="align-panel-direct">
+                <label>垂直对齐:</label>
+                <el-button @click="getCompsCRectY">上</el-button>
+                <el-button @click="getCompsCRectVC">居中</el-button>
+              </div>
+            </div>
+            <el-button slot="reference">对齐</el-button>
+          </el-popover>
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="compsMoveTop">to top</el-button>
           <el-button @click="compsMoveBottom">to bottom</el-button>
@@ -937,10 +952,20 @@
           }
         })
       },
-      getCompsCRectC() {
+      getCompsCRectHC() {
         const destX = this.curSelComps[0].x
         this.curSelComps.forEach((comp) => {
           comp.x = destX
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+      },
+      getCompsCRectVC() {
+        const destY = this.curSelComps[0].y
+        this.curSelComps.forEach((comp) => {
+          comp.y = destY
           comp.syncKonva()
           this.syncGroupSel()
           this.konvaObjs.groupTransformer.forceUpdate()
@@ -1244,6 +1269,19 @@
           border: 1px solid #CCC;
         }
       }
+    }
+  }
+
+  #align_panel {
+    .align-panel-direct {
+      label {
+        font-size: 13px;
+        margin-right: 8px;
+      }
+      &:first-of-type {
+        margin-bottom: 4px;
+      }
+
     }
   }
 
