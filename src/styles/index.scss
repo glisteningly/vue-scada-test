@@ -105,3 +105,17 @@ input::-webkit-inner-spin-button {
   font-size: 12px;
   text-align: center;
 }
+
+.el-popover {
+  background: #3b3e40;
+  border: 1px solid #666;
+  color: #FFF;
+}
+
+.el-popper[x-placement^=bottom] .popper__arrow::after {
+  border-bottom-color: #444;
+}
+
+.el-popper[x-placement^=bottom] .popper__arrow {
+  border-bottom-color: #666;
+}

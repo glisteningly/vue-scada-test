@@ -19,24 +19,34 @@
           <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="showNodeZIndex">z index</el-button>
+          <span class="toolbar-gutter-h"/>
+          <div class="img-btn-group">
+            <ImgButton :icon="'ic-move-top'" @click="compsMoveTop"/>
+            <ImgButton :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
+          </div>
+          <span class="toolbar-gutter-h"/>
           <el-popover>
             <div id="align_panel">
               <div class="align-panel-direct">
                 <label>水平对齐:</label>
-                <el-button @click="getCompsCRectX">左</el-button>
-                <el-button @click="getCompsCRectHC">居中</el-button>
+                <div class="img-btn-group">
+                  <ImgButton :icon="'ic-align-left'" @click="getCompsCRectL"/>
+                  <ImgButton :icon="'ic-align-h-center'" @click="getCompsCRectHC"/>
+                  <ImgButton :icon="'ic-align-right'" @click="getCompsCRectR"/>
+                </div>
               </div>
               <div class="align-panel-direct">
                 <label>垂直对齐:</label>
-                <el-button @click="getCompsCRectY">上</el-button>
-                <el-button @click="getCompsCRectVC">居中</el-button>
+                <div class="img-btn-group">
+                  <ImgButton :icon="'ic-align-top'" @click="getCompsCRectT"/>
+                  <ImgButton :icon="'ic-align-v-center'" @click="getCompsCRectVC"/>
+                  <ImgButton :icon="'ic-align-bottom'" @click="getCompsCRectB"/>
+                </div>
               </div>
             </div>
-            <el-button slot="reference">对齐</el-button>
+            <ImgButton slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
           </el-popover>
-          <span style="display: inline-block; width: 20px"/>
-          <el-button @click="compsMoveTop">to top</el-button>
-          <el-button @click="compsMoveBottom">to bottom</el-button>
+          <span class="toolbar-gutter-h"/>
           <el-button @click="compsDelete">delete</el-button>
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="testImport">import</el-button>
@@ -48,10 +58,6 @@
           <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
-          <el-button @click="getCompsCRectX">alignX</el-button>
-          <el-button @click="getCompsCRectY">alignY</el-button>
-          <el-button @click="getCompsCRectC">alignC</el-button>
-          <!--<button @click="unGroupSelAll">ungroup</button>-->
         </div>
       </header>
       <main>
@@ -155,7 +161,7 @@
   import Keyboard from './mixin/Keyboard'
 
   import StylePanel from './components/StylePanel'
-
+  import ImgButton from './components/ImgButton'
 
   const TOOL_STATE = {
     addPathPoint: 'ADD_PATH_POINT'
@@ -167,7 +173,7 @@
   }
 
   export default {
-    components: { ContextMenu, StylePanel },
+    components: { ContextMenu, StylePanel, ImgButton },
     mixins: [ComputeLayout, Keyboard],
     name: 'Editor',
     data() {
@@ -310,7 +316,7 @@
           strokeWidth: 1,
           fill: 'rgba(60,151,224,0.06)',
           stroke: '#3c97e0',
-          dash: [3, 1]
+          // dash: [3, 1]
         })
 
         this.konvaObjs.pathAuxLine = new Konva.Line({
@@ -972,7 +978,7 @@
           this.konvaObjs.layers[0].draw()
         })
       },
-      getCompsCRectX() {
+      getCompsCRectL() {
         const destX = this.curSelComps[0].x - this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
         this.curSelComps.forEach((comp) => {
           comp.x = destX + comp.offsetX * comp.scaleX
@@ -982,10 +988,30 @@
           this.konvaObjs.layers[0].draw()
         })
       },
-      getCompsCRectY() {
+      getCompsCRectR() {
+        const destX = this.curSelComps[0].x + this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
+        this.curSelComps.forEach((comp) => {
+          comp.x = destX - comp.offsetX * comp.scaleX
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+      },
+      getCompsCRectT() {
         const destY = this.curSelComps[0].y - this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
         this.curSelComps.forEach((comp) => {
           comp.y = destY + comp.offsetY * comp.scaleY
+          comp.syncKonva()
+          this.syncGroupSel()
+          this.konvaObjs.groupTransformer.forceUpdate()
+          this.konvaObjs.layers[0].draw()
+        })
+      },
+      getCompsCRectB() {
+        const destY = this.curSelComps[0].y + this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
+        this.curSelComps.forEach((comp) => {
+          comp.y = destY - comp.offsetY * comp.scaleY
           comp.syncKonva()
           this.syncGroupSel()
           this.konvaObjs.groupTransformer.forceUpdate()
@@ -1155,6 +1181,7 @@
     display: flex;
     flex-direction: column;
     header {
+      display: flex;
       background: #3C3F41;
       flex: 0 0 54px;
       border-bottom: 1.5px solid #2B2B2B;
@@ -1229,14 +1256,13 @@
     }
 
     .toolbar {
-      margin: 7px;
-      padding: 5px;
+      display: flex;
+      align-items: center;
+      padding: 10px;
       white-space: nowrap;
-      button {
-        margin-right: 5px;
-      }
-      span {
-        /*color: #DDD;*/
+      .toolbar-gutter-h {
+        display: inline-block;
+        width: 20px;
       }
     }
   }
@@ -1274,14 +1300,33 @@
 
   #align_panel {
     .align-panel-direct {
+      display: flex;
+      align-items: center;
       label {
         font-size: 13px;
         margin-right: 8px;
       }
       &:first-of-type {
-        margin-bottom: 4px;
+        margin-bottom: 10px;
       }
+    }
+  }
 
+  .img-btn-group {
+    display: flex;
+    .img-btn {
+      &:nth-of-type(n) {
+        border-radius: 0;
+        border-right: none;
+      }
+      &:first-of-type {
+        border-right: none;
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-of-type {
+        border-right-width: 1px;
+        border-radius: 0 4px 4px 0;
+      }
     }
   }
 
