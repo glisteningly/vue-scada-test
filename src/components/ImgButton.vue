@@ -29,6 +29,7 @@
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     border: 1px solid #333;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
     &:disabled {
       img {
         filter: grayscale(100%) opacity(30%);
@@ -41,6 +42,24 @@
     img.btn-icon {
       width: 24px;
       height: 24px;
+    }
+  }
+
+  .img-btn-group {
+    display: flex;
+    .img-btn {
+      &:nth-of-type(n) {
+        border-radius: 0;
+        border-right: none;
+      }
+      &:first-of-type {
+        border-right: none;
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-of-type {
+        border-right: 1px solid #333;
+        border-radius: 0 4px 4px 0;
+      }
     }
   }
 </style>

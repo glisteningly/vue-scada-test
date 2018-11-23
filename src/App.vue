@@ -21,8 +21,8 @@
           <el-button @click="showNodeZIndex">z index</el-button>
           <span class="toolbar-gutter-h"/>
           <div class="img-btn-group">
-            <ImgButton :icon="'ic-move-top'" @click="compsMoveTop"/>
-            <ImgButton :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
+            <ImgButton title="移至顶层" :icon="'ic-move-top'" @click="compsMoveTop"/>
+            <ImgButton title="移至底层" :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
           </div>
           <span class="toolbar-gutter-h"/>
           <el-popover>
@@ -44,7 +44,7 @@
                 </div>
               </div>
             </div>
-            <ImgButton slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
+            <ImgButton title="对齐" slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
           </el-popover>
           <span class="toolbar-gutter-h"/>
           <el-button @click="compsDelete">delete</el-button>
@@ -1308,24 +1308,6 @@
       }
       &:first-of-type {
         margin-bottom: 10px;
-      }
-    }
-  }
-
-  .img-btn-group {
-    display: flex;
-    .img-btn {
-      &:nth-of-type(n) {
-        border-radius: 0;
-        border-right: none;
-      }
-      &:first-of-type {
-        border-right: none;
-        border-radius: 4px 0 0 4px;
-      }
-      &:last-of-type {
-        border-right-width: 1px;
-        border-radius: 0 4px 4px 0;
       }
     }
   }
