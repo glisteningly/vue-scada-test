@@ -1,6 +1,7 @@
 <template>
   <CompWrapper :layout="comp">
-    <image :xlink:href="options.url" :width="comp.width" :height="comp.height"/>
+    <image :xlink:href="options.url" :width="comp.width" :height="comp.height" class="scada-image"/>
+    <!--<image :xlink:href="options.url" :width="comp.width" :height="comp.height" filter="url(#filter-red-overlay)"/>-->
   </CompWrapper>
 </template>
 
@@ -16,6 +17,14 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss">
+  .scada-image{
+    &.alarm {
+      filter: url("#filter-red-overlay");
+    }
+  }
 
+  .scada-image.alarm1 {
+    filter: url("#filter-orange-overlay");
+  }
 </style>
