@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'StylePanel',
+    name: 'ImageButton',
     props: {
       disabled: false,
       icon: ''

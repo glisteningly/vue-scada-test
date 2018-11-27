@@ -30,17 +30,17 @@
               <div class="align-panel-direct">
                 <label>水平对齐:</label>
                 <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-left'" @click="alignCompsL"/>
-                  <ImgButton :icon="'ic-align-h-center'" @click="alignCompsHC"/>
-                  <ImgButton :icon="'ic-align-right'" @click="alignCompsR"/>
+                  <ImgButton :icon="'ic-align-left'" @click="compsAlignL"/>
+                  <ImgButton :icon="'ic-align-h-center'" @click="compsAlignHC"/>
+                  <ImgButton :icon="'ic-align-right'" @click="compsAlignR"/>
                 </div>
               </div>
               <div class="align-panel-direct">
                 <label>垂直对齐:</label>
                 <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-top'" @click="alignCompsT"/>
-                  <ImgButton :icon="'ic-align-v-center'" @click="alignCompsVC"/>
-                  <ImgButton :icon="'ic-align-bottom'" @click="alignCompsB"/>
+                  <ImgButton :icon="'ic-align-top'" @click="compsAlignT"/>
+                  <ImgButton :icon="'ic-align-v-center'" @click="compsAlignVC"/>
+                  <ImgButton :icon="'ic-align-bottom'" @click="compsAlignB"/>
                 </div>
               </div>
             </div>
@@ -69,7 +69,7 @@
           </div>
         </div>
         <div id="right_sidebar">
-          <div id="layout_panel" v-if="curSelComp && curSelComps.length === 1">
+          <div id="layout_panel" v-show="curSelComp && curSelComps.length === 1">
             <div v-if="curSelCompLayout">
               <div>
                 <label>位置</label>
@@ -97,9 +97,7 @@
               </div>
             </div>
           </div>
-          <StylePanel v-if="curSelCompStyleOptions"
-                      :styleOptions="curSelCompStyleOptions"
-                      :selCompType="curSelCompsType"
+          <StylePanel :selComps="curSelComps"
                       @compStyleOptionsChanged="compStyleOptionsChanged"/>
         </div>
       </main>
@@ -151,11 +149,13 @@
 
   import CompCtrl from '../class/CompCtrl'
 
+  import CommonUtils from '../mixin/CommonUtils'
   import ComputeLayout from '../mixin/ComputeLayout'
   import Keyboard from '../mixin/Keyboard'
   import InitKonva from '../mixin/InitKonva'
-  import ActionAlignComps from '../mixin/ActionAlignComps'
-  import CommonUtils from '../mixin/CommonUtils'
+  import ActionAlign from '../mixin/ActionAlign'
+  import ActionMove from '../mixin/ActionMove'
+
 
   import StylePanel from '../components/StylePanel'
   import ImgButton from '../components/ImgButton'
@@ -167,7 +167,7 @@
 
   export default {
     components: { ContextMenu, StylePanel, ImgButton, SvgScadaView },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlignComps],
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove],
     name: 'MainEditor',
     data() {
       return {
@@ -239,7 +239,6 @@
           }
         })
       },
-
       addComp(compCtrl) {
         this.addCompEvent(compCtrl)
         this.comps.push(compCtrl)
@@ -361,9 +360,7 @@
         this.curSelComps = newSels
       },
       toolPathPoint() {
-        // if (this.curSelComp && this.curSelComp.points) {
         this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
-        // }
       },
       unGroupToComps() {
         if (this.curSelComp && this.curSelComp.type === 'ScadaGroup') {
@@ -392,12 +389,6 @@
               y: groupRect.y + 1,
               width: groupRect.width - 2,
               height: groupRect.height - 2,
-              // x: groupRect.x + 1 - this.konvaObjs.stage.x() * this.konvaObjs.stage.scaleX(),
-              // y: groupRect.y + 1 - this.konvaObjs.stage.y() * this.konvaObjs.stage.scaleY(),
-              // width: groupRect.width / this.konvaObjs.stage.scaleX() - 2,
-              // height: groupRect.height / this.konvaObjs.stage.scaleY() - 2,
-              // scaleX: 1 / this.konvaObjs.stage.scaleX(),
-              // scaleY: 1 / this.konvaObjs.stage.scaleY(),
             },
             konvaContext: this.konvaObjs
           }
@@ -466,40 +457,11 @@
         this.cancelSelGroup()
         this.addToGroup()
       },
-      isRectContain(r1, r2) {
-        // const r1 = rect
-        // console.log(r1)
-        // const r2 = node.getClientRect()
-        // console.log(r2)
-        return (r1.x <= r2.x &&
-          r1.x + r1.width >= r2.x + r2.width &&
-          r1.y <= r2.y &&
-          r1.y + r1.height >= r2.y + r2.height
-        )
-      },
       syncKonvaZIndex() {
         this.comps.forEach((comp, index) => {
           comp.konvaCtrl().setZIndex(index)
         })
         this.konvaObjs.layers[0].draw()
-      },
-      compsMoveTop() {
-        this.curSelComps.forEach((selComp) => {
-          const i = _.findIndex(this.comps, selComp)
-          if (i >= 0) {
-            this.comps.splice(i, 1)
-            this.comps.push(selComp)
-          }
-        })
-      },
-      compsMoveBottom() {
-        this.curSelComps.forEach((selComp) => {
-          const i = _.findIndex(this.comps, selComp)
-          if (i >= 0) {
-            this.comps.splice(i, 1)
-            this.comps.unshift(selComp)
-          }
-        })
       },
       compsDelete() {
         this.curSelComps.forEach((selComp) => {
@@ -541,73 +503,13 @@
           this.addCompToCanvas(comp)
         }))
       },
-      getCompDefaultOptions() {
-        if (this.curSelComp) {
-          const compType = this.curSelComp.type
-          if (ScadaCompsLibrary[compType]) {
-            if (ScadaCompsLibrary[compType].props) {
-              return ScadaCompsLibrary[compType].props.defaultOptions.default()
-            }
-          }
-        }
-        return null
-      },
-      getCompOptions(comp) {
-        if (comp) {
-          return _.merge({}, this.getCompDefaultOptions(), comp.options)
-        }
-        return null
-      },
-      getCompStyleOptions() {
-        if (this.getCompOptions(this.curSelComp)) {
-          const compStyles = Object.assign({}, this.getCompOptions(this.curSelComp).style)
-          // console.log(compStyles)
-          const styleCtrls = {}
-          for (const key in compStyles) {
-            styleCtrls[key] = {
-              value: compStyles[key],
-              label: styleDefs[key].label,
-              type: styleDefs[key].type
-            }
-          }
-          return styleCtrls
-        } else {
-          return null
-        }
-      },
-      initCompCtrlPanel() {
-        this.curSelCompStyleOptions = this.getCompStyleOptions()
-      },
-      initMulitCompCtrlPanel() {
-        //TODO: 多选组件面板
-
-        // if (this.curSelComps.length > 1) {
-        //   const compType = this.curSelComp.type
-        //   console.log(compType)
-        //   let _isSameType = true
-        //   this.curSelComps.forEach(comp => {
-        //     _isSameType = (comp.type === compType)
-        //   })
-        //   if (_isSameType) {
-        //     this.curSelCompStyleOptions = this.getCompStyleOptions()
-        //     return
-        //   }
-        // }
-        // if (this.curSelCompsType) {
-        //   this.curSelCompStyleOptions = this.getCompStyleOptions()
-        //   return
-        // }
-
-        this.curSelCompStyleOptions = (this.curSelCompsType) ? this.getCompStyleOptions() : null
-      },
-      compStyleOptionsChanged() {
+      compStyleOptionsChanged(newOptions) {
         const newVal = {}
-        for (const key in this.curSelCompStyleOptions) {
-          newVal[key] = this.curSelCompStyleOptions[key].value
+        for (const key in newOptions) {
+          newVal[key] = newOptions[key].value
         }
-        // console.log(newVal)
         if (this.curSelComp) {
-          const compStyles = this.getCompDefaultOptions().style
+          const compStyles = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary).style
           // console.log(newVal)
           // console.log(compStyles)
           // console.log(utils.diff(newVal, compStyles))
@@ -739,22 +641,16 @@
         return null
       }
     },
-    filters: {
-      numPercent(value) {
-        if (!value) return ''
-        return _.round(value * 100) + '%'
-      }
-    },
     watch: {
-      curSelComps() {
+      curSelComps(val) {
         console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
-            this.initCompCtrlPanel()
+            // this.initCompCtrlPanel()
             this.curSelComps[0].addTransformer()
             this.cancelSelGroup()
           } else {
-            this.initMulitCompCtrlPanel()
+            // this.initMulitCompCtrlPanel()
             this.addToGroup()
           }
         } else {
@@ -763,6 +659,7 @@
           this.curSelCompStyleOptions = null
         }
         this.syncKonvaZIndex()
+        this.curSelComps = val
       },
       curSelCompLayout: {
         handler: function () {

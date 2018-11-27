@@ -1,6 +1,6 @@
 export default {
   methods: {
-    alignCompsHC() {
+    compsAlignHC() {
       const destX = this.curSelComps[0].x
       this.curSelComps.forEach((comp) => {
         comp.x = destX
@@ -10,7 +10,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
     },
-    alignCompsVC() {
+    compsAlignVC() {
       const destY = this.curSelComps[0].y
       this.curSelComps.forEach((comp) => {
         comp.y = destY
@@ -20,7 +20,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
     },
-    alignCompsL() {
+    compsAlignL() {
       const destX = this.curSelComps[0].x - this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
       this.curSelComps.forEach((comp) => {
         comp.x = destX + comp.offsetX * comp.scaleX
@@ -30,7 +30,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
     },
-    alignCompsR() {
+    compsAlignR() {
       const destX = this.curSelComps[0].x + this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
       this.curSelComps.forEach((comp) => {
         comp.x = destX - comp.offsetX * comp.scaleX
@@ -40,7 +40,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
     },
-    alignCompsT() {
+    compsAlignT() {
       const destY = this.curSelComps[0].y - this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
       this.curSelComps.forEach((comp) => {
         comp.y = destY + comp.offsetY * comp.scaleY
@@ -50,7 +50,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
     },
-    alignCompsB() {
+    compsAlignB() {
       const destY = this.curSelComps[0].y + this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
       this.curSelComps.forEach((comp) => {
         comp.y = destY - comp.offsetY * comp.scaleY

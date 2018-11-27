@@ -17,6 +17,13 @@ import { TOOL_STATE } from '../utils/CONST'
 
 export default {
   methods: {
+    isRectContain(r1, r2) {
+      return (r1.x <= r2.x &&
+        r1.x + r1.width >= r2.x + r2.width &&
+        r1.y <= r2.y &&
+        r1.y + r1.height >= r2.y + r2.height
+      )
+    },
     initKonvaWorkArea() {
       this.curSelComps = []
       const width = this.$refs['workCanvas'].clientWidth

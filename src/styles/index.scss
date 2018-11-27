@@ -31,6 +31,11 @@ input::-webkit-inner-spin-button {
   border: 0;
 }
 
+.el-input-number.is-controls-right .el-input__inner {
+  padding-left: 0;
+  padding-right: 35px;
+}
+
 .el-input-number--mini {
   width: 80px;
   line-height: 26px;
