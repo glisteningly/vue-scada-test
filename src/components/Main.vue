@@ -30,17 +30,17 @@
               <div class="align-panel-direct">
                 <label>水平对齐:</label>
                 <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-left'" @click="getCompsCRectL"/>
-                  <ImgButton :icon="'ic-align-h-center'" @click="getCompsCRectHC"/>
-                  <ImgButton :icon="'ic-align-right'" @click="getCompsCRectR"/>
+                  <ImgButton :icon="'ic-align-left'" @click="alignCompsL"/>
+                  <ImgButton :icon="'ic-align-h-center'" @click="alignCompsHC"/>
+                  <ImgButton :icon="'ic-align-right'" @click="alignCompsR"/>
                 </div>
               </div>
               <div class="align-panel-direct">
                 <label>垂直对齐:</label>
                 <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-top'" @click="getCompsCRectT"/>
-                  <ImgButton :icon="'ic-align-v-center'" @click="getCompsCRectVC"/>
-                  <ImgButton :icon="'ic-align-bottom'" @click="getCompsCRectB"/>
+                  <ImgButton :icon="'ic-align-top'" @click="alignCompsT"/>
+                  <ImgButton :icon="'ic-align-v-center'" @click="alignCompsVC"/>
+                  <ImgButton :icon="'ic-align-bottom'" @click="alignCompsB"/>
                 </div>
               </div>
             </div>
@@ -97,7 +97,9 @@
               </div>
             </div>
           </div>
-          <StylePanel v-if="curSelCompStyleOptions" :styleOptions="curSelCompStyleOptions"
+          <StylePanel v-if="curSelCompStyleOptions"
+                      :styleOptions="curSelCompStyleOptions"
+                      :selCompType="curSelCompsType"
                       @compStyleOptionsChanged="compStyleOptionsChanged"/>
         </div>
       </main>
@@ -148,9 +150,12 @@
   import styleDefs from '../utils/styleDefs'
 
   import CompCtrl from '../class/CompCtrl'
+
   import ComputeLayout from '../mixin/ComputeLayout'
   import Keyboard from '../mixin/Keyboard'
   import InitKonva from '../mixin/InitKonva'
+  import ActionAlignComps from '../mixin/ActionAlignComps'
+  import CommonUtils from '../mixin/CommonUtils'
 
   import StylePanel from '../components/StylePanel'
   import ImgButton from '../components/ImgButton'
@@ -162,7 +167,7 @@
 
   export default {
     components: { ContextMenu, StylePanel, ImgButton, SvgScadaView },
-    mixins: [InitKonva, ComputeLayout, Keyboard],
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlignComps],
     name: 'MainEditor',
     data() {
       return {
@@ -529,48 +534,12 @@
           compConfig.push(comp.toConfig())
         })
         localStorage.setItem('comps', JSON.stringify(compConfig))
-
-        const a = {
-          options: {
-            style: {
-              fontSize: 10,
-              stroke: '#ddd',
-              fill: '#red'
-            },
-            param: {
-              text: "123"
-            },
-            bind: {
-              type: "sadasd"
-            }
-          }
-        }
-
-        const b = {
-          options: {
-            style: {
-              fontSize: 16,
-              fill: '#red',
-            }
-          }
-        }
-
-        // const o = ScadaCompsLibrary.ScadaRect.props.defaultOptions.default()
-        // const o = utils.diff(a, b)
-        // const o = _.merge({}, a, b)
-
-        // console.log(o)
-        // console.log('state x: ' + this.konvaObjs.stage.x())
-        // console.log('comp x: ' + this.curSelComp.konvaRect().x())
       },
       loadLocal() {
         const compConfig = JSON.parse(localStorage.getItem('comps'))
         compConfig.forEach((comp => {
           this.addCompToCanvas(comp)
         }))
-      },
-      getRoundNum(num) {
-        return _.round(num, 2)
       },
       getCompDefaultOptions() {
         if (this.curSelComp) {
@@ -612,7 +581,24 @@
       initMulitCompCtrlPanel() {
         //TODO: 多选组件面板
 
-        this.curSelCompStyleOptions = this.getCompStyleOptions()
+        // if (this.curSelComps.length > 1) {
+        //   const compType = this.curSelComp.type
+        //   console.log(compType)
+        //   let _isSameType = true
+        //   this.curSelComps.forEach(comp => {
+        //     _isSameType = (comp.type === compType)
+        //   })
+        //   if (_isSameType) {
+        //     this.curSelCompStyleOptions = this.getCompStyleOptions()
+        //     return
+        //   }
+        // }
+        // if (this.curSelCompsType) {
+        //   this.curSelCompStyleOptions = this.getCompStyleOptions()
+        //   return
+        // }
+
+        this.curSelCompStyleOptions = (this.curSelCompsType) ? this.getCompStyleOptions() : null
       },
       compStyleOptionsChanged() {
         const newVal = {}
@@ -686,78 +672,18 @@
             comp.removeAnchors()
           }
         })
-      },
-      getCompsCRectHC() {
-        const destX = this.curSelComps[0].x
-        this.curSelComps.forEach((comp) => {
-          comp.x = destX
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-      },
-      getCompsCRectVC() {
-        const destY = this.curSelComps[0].y
-        this.curSelComps.forEach((comp) => {
-          comp.y = destY
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-      },
-      getCompsCRectL() {
-        const destX = this.curSelComps[0].x - this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
-        this.curSelComps.forEach((comp) => {
-          comp.x = destX + comp.offsetX * comp.scaleX
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-      },
-      getCompsCRectR() {
-        const destX = this.curSelComps[0].x + this.curSelComps[0].offsetX * this.curSelComps[0].scaleX
-        this.curSelComps.forEach((comp) => {
-          comp.x = destX - comp.offsetX * comp.scaleX
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-      },
-      getCompsCRectT() {
-        const destY = this.curSelComps[0].y - this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
-        this.curSelComps.forEach((comp) => {
-          comp.y = destY + comp.offsetY * comp.scaleY
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
-      },
-      getCompsCRectB() {
-        const destY = this.curSelComps[0].y + this.curSelComps[0].offsetY * this.curSelComps[0].scaleY
-        this.curSelComps.forEach((comp) => {
-          comp.y = destY - comp.offsetY * comp.scaleY
-          comp.syncKonva()
-          this.syncGroupSel()
-          this.konvaObjs.groupTransformer.forceUpdate()
-          this.konvaObjs.layers[0].draw()
-        })
       }
     },
     computed: {
-      // svgViewbox() {
-      //   const x = (-this.canvasLayout.x / this.canvasLayout.scale).toFixed(2)
-      //   const y = (-this.canvasLayout.y / this.canvasLayout.scale).toFixed(2)
-      //   const w = (this.canvasLayout.width / this.canvasLayout.scale).toFixed(2)
-      //   const h = (this.canvasLayout.height / this.canvasLayout.scale).toFixed(2)
-      //   return `${x} ${y} ${w} ${h}`
-      // },
       curSelComp() {
         if (this.curSelComps.length >= 1) {
+          return this.curSelComps[0]
+        } else {
+          return null
+        }
+      },
+      curSingleSelComp() {
+        if (this.curSelComps.length === 1) {
           return this.curSelComps[0]
         } else {
           return null
@@ -798,6 +724,19 @@
         } else {
           return null
         }
+      },
+      curSelCompsType() {
+        if (this.curSelComps.length >= 1) {
+          const compType = this.curSelComps[0].type
+          let _isSameType = true
+          this.curSelComps.forEach(comp => {
+            _isSameType = (comp.type === compType)
+          })
+          if (_isSameType) {
+            return compType
+          }
+        }
+        return null
       }
     },
     filters: {
@@ -827,7 +766,7 @@
       },
       curSelCompLayout: {
         handler: function () {
-          if (this.curSelComps.length === 1) {
+          if (this.curSingleSelComp) {
             this.curSelComp.syncKonva()
           }
         },

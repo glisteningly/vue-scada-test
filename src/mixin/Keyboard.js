@@ -1,5 +1,8 @@
 import hotkeys from 'hotkeys-js'
 
+const HOTKEYS = 'delete, ctrl+g, ctrl+shift+g, space, ctrl+-, ctrl+=, ctrl+0,' +
+  'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right'
+
 export default {
   data() {
     return {
@@ -8,7 +11,7 @@ export default {
   },
   methods: {
     initHotkeyBinding() {
-      hotkeys('delete,ctrl+g,ctrl+shift+g,space,ctrl+-,ctrl+=,ctrl+0', (e, handler) => {
+      hotkeys(HOTKEYS, (e, handler) => {
         // hotkeys('*', (e, handler) => {
         e.preventDefault()
         // console.log(hotkeys.isPressed("space"))
@@ -34,6 +37,38 @@ export default {
             break;
           case 'ctrl+0':
             this.zoom100()
+            break;
+          case 'up':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutY -= 1
+            break;
+          case 'ctrl+up':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutY -= 10
+            break;
+          case 'down':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutY += 1
+            break;
+          case 'ctrl+down':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutY += 10
+            break;
+          case 'left':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutX -= 1
+            break;
+          case 'ctrl+left':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutX -= 10
+            break;
+          case 'right':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutX += 1
+            break;
+          case 'ctrl+right':
+            if (this.curSingleSelComp)
+              this.curSelCompLayoutX += 10
             break;
         }
       })

@@ -32,7 +32,7 @@ input::-webkit-inner-spin-button {
 }
 
 .el-input-number--mini {
-  width: 100px;
+  width: 80px;
   line-height: 26px;
 }
 
@@ -53,6 +53,15 @@ input::-webkit-inner-spin-button {
 
 .el-input-number__decrease {
   border-right: 1px solid #555;
+}
+
+.el-input-number.is-controls-right .el-input-number__increase {
+  border-bottom: 1px solid #333;
+  border-left: none;
+}
+
+.el-input-number.is-controls-right .el-input-number__decrease {
+  border-left: none;
 }
 
 .el-input-number.is-without-controls .el-input__inner {

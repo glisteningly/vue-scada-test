@@ -7,8 +7,7 @@
     <component v-for="comp in comps"
                :key="comp.name"
                :is="comp.type"
-               :comp="comp"
-    />
+               :comp="comp"/>
   </svg>
 </template>
 

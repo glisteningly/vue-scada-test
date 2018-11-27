@@ -1,5 +1,8 @@
 <template>
   <div id="style_panel">
+    <div v-if="selCompType">
+      <span class="type-hint"><i class="el-icon-info"></i> 已选择多个{{selCompType}}</span>
+    </div>
     <div class="ctrl-item" v-for="(ctrl,key) in styleOptions" :key="key">
       <el-row>
         <el-col :span="8"><label>{{ctrl.label}}</label></el-col>
@@ -8,6 +11,7 @@
               :is="getCtrlTyp(ctrl.type)"
               v-model="ctrl.value"
               @change="compValInputChanged"
+              controls-position="right"
               show-alpha>
           </component>
         </el-col>
@@ -20,7 +24,8 @@
   export default {
     name: 'StylePanel',
     props: {
-      styleOptions: {}
+      styleOptions: {},
+      selCompType: null
     },
     methods: {
       getCtrlTyp(type) {
@@ -51,6 +56,16 @@
 <style lang="scss" scoped>
   #style_panel {
     padding: 12px;
+
+    .type-hint {
+      display: inline-block;
+      color: #CCC;
+      font-size: 13px;
+      margin-bottom: 8px;
+      background: #2A2A2A;
+      padding: 3px 10px 3px 5px;
+      border-radius: 12px;
+    }
 
     .ctrl-item {
       label {
