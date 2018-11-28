@@ -217,8 +217,8 @@
         zoomScaleIndex: 4,
         curFixedPathPoint: null,
         activeLeftTab: 'library',
-        activeRightTab: 'nav',
-        // activeRightTab: 'transform',
+        // activeRightTab: 'nav',
+        activeRightTab: 'transform',
         activeOptionsTab: 'style',
       }
     },

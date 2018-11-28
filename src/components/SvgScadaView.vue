@@ -4,11 +4,13 @@
        :width="canvasLayout.width"
        :height="canvasLayout.height"
        :viewBox="svgViewbox">
-    <SvgColorFilter/>
-    <component v-for="comp in comps"
-               :key="comp.name"
-               :is="comp.type"
-               :comp="comp"/>
+    <svg id="svg_root" overflow="visible">
+      <SvgColorFilter/>
+      <component v-for="comp in comps"
+                 :key="comp.name"
+                 :is="comp.type"
+                 :comp="comp"/>
+    </svg>
   </svg>
 </template>
 
