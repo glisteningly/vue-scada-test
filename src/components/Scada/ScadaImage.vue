@@ -1,24 +1,21 @@
 <template>
-  <CompWrapper :layout="comp">
-    <image :xlink:href="options.url" :width="comp.width" :height="comp.height" class="scada-image"/>
-    <!--<image :xlink:href="options.url" :width="comp.width" :height="comp.height" filter="url(#filter-red-overlay)"/>-->
-  </CompWrapper>
+  <image :xlink:href="options.url"
+         :transform="rectTransformStr"
+         :width="comp.width * comp.scaleX"
+         :height="comp.height * comp.scaleY"/>
 </template>
 
 <script>
   import BaseComp from './BaseComp'
 
   export default {
-    // props: {
-    //   options: Object
-    // },
     extends: BaseComp,
     name: 'ScadaImage'
   }
 </script>
 
 <style lang="scss">
-  .scada-image{
+  .scada-image {
     &.alarm {
       filter: url("#filter-red-overlay");
     }

@@ -11,7 +11,7 @@
           <el-button @click="addRect">rect</el-button>
           <el-button @click="addPath">path</el-button>
           <!--<el-button @click="addIcon">twitter</el-button>-->
-          <!--<el-button @click="addIcon2">google</el-button>-->
+          <el-button @click="addIcon2">google</el-button>
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
           <el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>
