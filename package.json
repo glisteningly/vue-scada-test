@@ -14,6 +14,7 @@
     "lodash": "^4.17.11",
     "vue": "^2.5.16",
     "vue-context-menu": "^2.0.6",
+    "vue-router": "^3.0.2",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

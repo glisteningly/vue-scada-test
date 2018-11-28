@@ -1,12 +1,12 @@
 <template>
-  <Main></Main>
+  <router-view></router-view>
 </template>
 
 <script>
-  import Main from './components/Main'
+  // import Main from './components/Main'
 
   export default {
-    components: { Main },
+    // components: { Main },
     name: 'App',
     data() {
       return {}
@@ -26,4 +26,5 @@
     padding: 0;
     overflow: hidden;
   }
+
 </style>
