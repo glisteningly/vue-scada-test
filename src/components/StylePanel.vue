@@ -1,9 +1,9 @@
 <template>
   <div id="style_panel">
-    <div v-if="curSelCompsCount > 1 && curSelCompStyleOptions">
+    <div v-if="curSelCompsCount > 1 && curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个 {{curSelCompsType}}</span>
     </div>
-    <div v-if="curSelCompsCount > 1 && !curSelCompStyleOptions">
+    <div v-if="curSelCompsCount > 1 && !curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个不同类型对象</span>
     </div>
     <div class="ctrl-item" v-for="(ctrl,key) in styleOptions" :key="key">
@@ -27,8 +27,10 @@
   import _ from 'lodash'
   import styleDefs from '../utils/styleDefs'
   import { ScadaCompsLibrary } from '../components/Scada'
+  import SelCompsUtil from '../mixin/SelCompsUtil'
 
   export default {
+    mixins: [SelCompsUtil],
     name: 'StylePanel',
     data() {
       return {
@@ -36,7 +38,6 @@
       }
     },
     props: {
-      // styleOptions: {},
       selCompType: null,
       selComps: {
         type: Array,
@@ -113,32 +114,6 @@
       }
     },
     computed: {
-      curSelComp() {
-        if (this.selComps.length >= 1) {
-          return this.selComps[0]
-        } else {
-          return null
-        }
-      },
-      curSelCompsCount() {
-        return this.selComps.length
-      },
-      curSelCompsType() {
-        if (this.selComps.length > 1) {
-          const compType = this.selComps[0].type
-          let _isSameType = true
-          for (let i = 0; i < this.selComps.length; i++) {
-            _isSameType = (this.selComps[i].type === compType)
-            if (!_isSameType) {
-              break
-            }
-          }
-          if (_isSameType) {
-            return compType
-          }
-        }
-        return null
-      },
       curSelCompStyleOptions() {
         if (this.selComps.length >= 1) {
           if (this.selComps.length === 1) {

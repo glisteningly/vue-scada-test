@@ -25,7 +25,7 @@
   .img-btn {
     outline: none;
     display: flex;
-    padding: 5px 8px;
+    padding: 6px 8px;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     border: 1px solid #333;
@@ -40,8 +40,8 @@
       cursor: pointer;
     }
     img.btn-icon {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
     }
   }
 

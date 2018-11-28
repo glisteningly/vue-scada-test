@@ -1,5 +1,6 @@
 <template>
-  <svg style="position: absolute; left: 0;top: 0;"
+  <svg id="svg_scada_view"
+       style="position: absolute; left: 0;top: 0;"
        :width="canvasLayout.width"
        :height="canvasLayout.height"
        :viewBox="svgViewbox">

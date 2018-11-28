@@ -61,7 +61,12 @@
         </div>
       </header>
       <main>
-        <div id="left_sidebar"></div>
+        <div id="left_sidebar">
+          <el-tabs v-model="activeLeftTab" type="card">
+            <el-tab-pane label="组件库" name="library"></el-tab-pane>
+            <el-tab-pane label="图层" name="layer"></el-tab-pane>
+          </el-tabs>
+        </div>
         <div id="work_area">
           <div id="work_frame">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout"></SvgScadaView>
@@ -69,36 +74,48 @@
           </div>
         </div>
         <div id="right_sidebar">
-          <div id="layout_panel" v-show="curSelComp && curSelComps.length === 1">
-            <div v-if="curSelCompLayout">
-              <div>
-                <label>位置</label>
-                <span class="layout_panel_label">X:</span>
-                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutX">
-                </el-input-number>
-                <span class="layout_panel_label">Y:</span>
-                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutY">
-                </el-input-number>
+          <el-tabs v-model="activeRightTab" type="card">
+            <el-tab-pane label="变换" name="transform">
+              <div id="layout_panel" v-show="curSelComp && curSelComps.length === 1">
+                <div v-if="curSelCompLayout">
+                  <div>
+                    <label>位置</label>
+                    <span class="layout_panel_label">X:</span>
+                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutX">
+                    </el-input-number>
+                    <span class="layout_panel_label">Y:</span>
+                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutY">
+                    </el-input-number>
+                  </div>
+                  <div>
+                    <label>尺寸</label>
+                    <span class="layout_panel_label">W:</span>
+                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutW">
+                    </el-input-number>
+                    <span class="layout_panel_label">H:</span>
+                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutH">
+                    </el-input-number>
+                  </div>
+                  <div>
+                    <label>旋转</label>
+                    <span class="layout_panel_label">R:</span>
+                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
+                    </el-input-number>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label>尺寸</label>
-                <span class="layout_panel_label">W:</span>
-                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutW">
-                </el-input-number>
-                <span class="layout_panel_label">H:</span>
-                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutH">
-                </el-input-number>
-              </div>
-              <div>
-                <label>旋转</label>
-                <span class="layout_panel_label">R:</span>
-                <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
-                </el-input-number>
-              </div>
-            </div>
-          </div>
-          <StylePanel :selComps="curSelComps"
-                      @compStyleOptionsChanged="compStyleOptionsChanged"/>
+            </el-tab-pane>
+            <el-tab-pane label="导航" name="nav">
+              <CanvasNav></CanvasNav>
+            </el-tab-pane>
+          </el-tabs>
+          <el-tabs v-model="activeOptionsTab" type="card" v-show="curSelComp">
+            <el-tab-pane label="样式" name="style">
+              <StylePanel :selComps="curSelComps" @compStyleOptionsChanged="compStyleOptionsChanged"/>
+            </el-tab-pane>
+            <el-tab-pane label="参数" name="param"></el-tab-pane>
+          </el-tabs>
+
         </div>
       </main>
       <!--<footer>-->
@@ -134,7 +151,7 @@
 <script>
   // for test
   import CompConfig from '../temp/compConfig1'
-  import CompGroup1 from '../temp/compGroup2'
+  // import CompGroup1 from '../temp/compGroup2'
   import CompGroup3 from '../temp/compGroup3'
 
   import Konva from 'konva'
@@ -145,7 +162,7 @@
   import { ScadaCompsLibrary } from '../components/Scada'
 
   import utils from '../utils'
-  import styleDefs from '../utils/styleDefs'
+  // import styleDefs from '../utils/styleDefs'
 
   import CompCtrl from '../class/CompCtrl'
 
@@ -160,13 +177,14 @@
   import StylePanel from '../components/StylePanel'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
+  import CanvasNav from '../components/CanvasNav'
 
   import { TOOL_STATE } from '../utils/CONST'
 
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
   export default {
-    components: { ContextMenu, StylePanel, ImgButton, SvgScadaView },
+    components: { ContextMenu, StylePanel, ImgButton, SvgScadaView, CanvasNav },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove],
     name: 'MainEditor',
     data() {
@@ -197,7 +215,11 @@
         testData: 2,
         curSelCompStyleOptions: {},
         zoomScaleIndex: 4,
-        curFixedPathPoint: null
+        curFixedPathPoint: null,
+        activeLeftTab: 'library',
+        activeRightTab: 'nav',
+        // activeRightTab: 'transform',
+        activeOptionsTab: 'style',
       }
     },
     mounted() {
@@ -757,7 +779,7 @@
       width: 100vw;
       /*height: 100%;*/
       #left_sidebar {
-        flex: 0 0 100px;
+        flex: 0 0 200px;
         background: #3C3F41;
         border-right: 1px solid #000;
       }
