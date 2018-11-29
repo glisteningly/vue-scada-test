@@ -1,0 +1,119 @@
+body {
+    user-select: none;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'exobold';
+    src: url('../fonts/exo-bold-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*#splash {*/
+/*width: 100vw;*/
+/*height: 100vh;*/
+/*!*background-image: linear-gradient(-105deg, #009acc, #363795);*!*/
+/*background-image: linear-gradient(#0b3d63, #20a0ff);*/
+/*}*/
+
+.index-title {
+    font-family: 'exobold';
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    letter-spacing: 1px;
+    font-size: 3rem;
+    color: #FFFFFF;
+    font-weight: bolder;
+    position: absolute;
+    text-align: center;
+    top: 44%;
+    /*text-shadow: 2px 2px 3px rgba(41, 44, 46, 0.71);*/
+
+}
+
+.index-subtitle {
+
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    letter-spacing: 2px;
+    font-size: 1.8rem;
+    color: #FFFFFF;
+    font-weight: bolder;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    /*text-shadow: 2px 2px 3px rgba(41, 44, 46, 0.71);*/
+}
+
+.index-spinner {
+    animation: rotate 2s linear infinite;
+    z-index: 2;
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+    width: 50px;
+    height: 50px;
+
+}
+
+.index-spinner .path {
+    stroke: rgba(255, 255, 255, 0.8);
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 150;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -124;
+    }
+}
+
+.anim-opacity {
+    animation: 0.6s opacity 0s ease-in-out;
+}
+
+@keyframes opacity {
+    0% {
+        opacity: 0
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#splash {
+    width: 100vw;
+    height: 100vh;
+    font: 900 1em/1em Exo;
+    text-transform: uppercase;
+    text-shadow: 0 0 .5rem rgb(0, 75, 125);
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 100, 150);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, .3), transparent), linear-gradient(rgba(255, 255, 255, .6) 1px, transparent 0), linear-gradient(90deg, rgba(255, 255, 255, .5) 1px, transparent 0), linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 0), linear-gradient(90deg, rgba(255, 255, 255, .3) 1px, transparent 0);
+    background-size: cover, 5rem 5rem, 5rem 5rem, 1rem 1rem, 1rem 1rem;
+    background-position: 50% 50%;
+    box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+}
