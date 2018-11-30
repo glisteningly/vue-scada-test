@@ -141,7 +141,7 @@ input::-webkit-inner-spin-button {
   border-bottom: 1.5px solid #555;
   //margin: 0;
   background-color: #333;
-  margin:0 0 0 1px;
+  margin: 0 0 0 1px;
 }
 
 .el-tabs--card > .el-tabs__header .el-tabs__nav {
@@ -154,7 +154,7 @@ input::-webkit-inner-spin-button {
   letter-spacing: 1.5px;
   border: none;
   color: #CCC;
-  padding: 0 10px!important;
+  padding: 0 10px !important;
   min-width: 66px;
   text-align: center;
   height: 30px;
@@ -167,4 +167,35 @@ input::-webkit-inner-spin-button {
   border-bottom: 2px solid rgba(32, 160, 255, 0.71);
   background-color: #434749;
   color: #FFF;
+}
+
+.el-select-dropdown {
+  background: #46494b;
+  border: 1px solid #666;
+  color: #FFF;
+}
+
+.el-select-dropdown__item {
+  background: #46494b;
+  color: #DDD;
+  &:hover {
+    background: rgba(0, 0, 0, .1);
+  }
+  &.hover {
+    background: rgba(0, 0, 0, .1);
+  }
+  &.selected {
+    background: rgba(0, 0, 0, .2);
+    //&:hover {
+    //  background: #333;
+    //}
+  }
+}
+
+.el-switch__core {
+  border: 1px solid #666;
+  background: #333;
+  &:after {
+    background: #DDD;
+  }
 }

@@ -6,6 +6,7 @@
        :viewBox="svgViewbox">
     <svg id="svg_root" overflow="visible">
       <SvgColorFilter/>
+      <!--:value="{isFlow: dataBinding.type1.uid1.field1}"-->
       <component v-for="comp in comps"
                  :key="comp.name"
                  :is="comp.type"
@@ -21,6 +22,12 @@
     components: { SvgColorFilter },
     name: 'SvgScadaView',
     props: {
+      dataBinding: {
+        type: Object,
+        default: function () {
+          return {}
+        }
+      },
       comps: {
         type: Array
       },
@@ -32,7 +39,9 @@
       }
     },
     data() {
-      return {}
+      return {
+        testVal: true
+      }
     },
     computed: {
       svgViewbox() {

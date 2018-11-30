@@ -69,7 +69,7 @@
         </div>
         <div id="work_area">
           <div id="work_frame">
-            <SvgScadaView :comps="comps" :canvasLayout="canvasLayout"></SvgScadaView>
+            <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"></div>
           </div>
         </div>
@@ -111,9 +111,13 @@
           </el-tabs>
           <el-tabs v-model="activeOptionsTab" type="card" v-show="curSelComp">
             <el-tab-pane label="样式" name="style">
-              <StylePanel :selComps="curSelComps" @compStyleOptionsChanged="compStyleOptionsChanged"/>
+              <OptionPanel :optionCategory="'style'" :selComps="curSelComps"
+                           @compOptionsChanged="onCompOptionsChanged"/>
             </el-tab-pane>
-            <el-tab-pane label="参数" name="param"></el-tab-pane>
+            <el-tab-pane label="参数" name="param">
+              <OptionPanel :optionCategory="'param'" :selComps="curSelComps"
+                           @compOptionsChanged="onCompOptionsChanged"/>
+            </el-tab-pane>
           </el-tabs>
 
         </div>
@@ -172,9 +176,11 @@
   import InitKonva from '../mixin/InitKonva'
   import ActionAlign from '../mixin/ActionAlign'
   import ActionMove from '../mixin/ActionMove'
+  import DataBinding from '../mixin/DataBinding'
 
 
-  import StylePanel from '../components/StylePanel'
+  // import StylePanel from '../components/StylePanel'
+  import OptionPanel from '../components/OptionPanel'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
@@ -184,8 +190,8 @@
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
   export default {
-    components: { ContextMenu, StylePanel, ImgButton, SvgScadaView, CanvasNav },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove],
+    components: { ContextMenu, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
     name: 'MainEditor',
     data() {
       return {
@@ -305,18 +311,23 @@
           layout: {
             x: 100,
             y: 200,
-            rotation: 0,
             points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
             // points: [-10, -20, 200, 100]
           },
-          options: {
-            style: {
-              fill: 'rgba(0,0,0,0.5)',
-              stroke: '#CCC',
-              strokeWidth: 10,
-              cornerRadius: 10
-            }
-          }
+          // options: {
+          //   style: {
+          //     // fill: 'rgba(0,0,0,0.5)',
+          //     // stroke: '#CCC',
+          //     // strokeWidth: 10,
+          //     // cornerRadius: 10
+          //     // tubeWidth: 10,
+          //     // tubeColor: '#CCC',
+          //     // flowLineWidth: 6,
+          //     // flowLineColor: 'rgba(0,0,0,0.5)',
+          //     // cornerRadius: 15
+          //   },
+          //   param: {}
+          // }
         })
       },
       addIcon() {
@@ -501,6 +512,15 @@
         })
       },
       addCompToCanvas(comp) {
+        if (!comp.options) {
+          comp.options = {}
+        }
+        if (!comp.options.style) {
+          Object.assign(comp.options, { style: {} })
+        }
+        if (!comp.options.param) {
+          Object.assign(comp.options, { param: {} })
+        }
         const c = new CompCtrl(comp)
         this.addComp(c)
         return c
@@ -525,20 +545,23 @@
           this.addCompToCanvas(comp)
         }))
       },
-      compStyleOptionsChanged(newOptions) {
+      onCompOptionsChanged(changedOptions) {
         const newVal = {}
+        const cate = changedOptions.optionCategory
+        const newOptions = changedOptions.options
         for (const key in newOptions) {
           newVal[key] = newOptions[key].value
         }
         if (this.curSelComp) {
-          const compStyles = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary).style
-          // console.log(newVal)
-          // console.log(compStyles)
+          const compOptions = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary)[cate]
+          console.log(newVal)
+          console.log(compOptions)
           // console.log(utils.diff(newVal, compStyles))
-          const newStyle = utils.diff(newVal, compStyles)
+          const newCateOptions = utils.diff(newVal, compOptions)
+          console.log(newCateOptions)
           // this.curSelComp.options.style = utils.diff(newVal, compStyles)
           this.curSelComps.forEach((comp) => {
-            comp.options.style = newStyle
+            comp.options[cate] = newCateOptions
           })
         }
       },

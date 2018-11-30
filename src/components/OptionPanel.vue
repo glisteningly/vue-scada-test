@@ -1,21 +1,28 @@
 <template>
-  <div id="style_panel">
+  <div class="option_panel">
     <div v-if="curSelCompsCount > 1 && curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个 {{curSelCompsType}}</span>
     </div>
     <div v-if="curSelCompsCount > 1 && !curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个不同类型对象</span>
     </div>
-    <div class="ctrl-item" v-for="(ctrl,key) in styleOptions" :key="key">
+    <div class="ctrl-item" v-for="(ctrl,key) in compOptions" :key="key">
       <el-row>
         <el-col :span="8"><label>{{ctrl.label}}</label></el-col>
-        <el-col :span="16" class="param-input">
+        <el-col :span="14" class="param-input">
           <component
               :is="getCtrlTyp(ctrl.type)"
               v-model="ctrl.value"
               @change="compValInputChanged"
               controls-position="right"
+              :min="0"
               show-alpha>
+            <el-option v-if="ctrl.type === 'Enum'"
+                       v-for="item in ctrl.opts"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value">
+            </el-option>
           </component>
         </el-col>
       </el-row>
@@ -25,7 +32,7 @@
 
 <script>
   import _ from 'lodash'
-  import styleDefs from '../utils/styleDefs'
+  import OptionDefs from '../utils/styleDefs'
   import { ScadaCompsLibrary } from '../components/Scada'
   import SelCompsUtil from '../mixin/SelCompsUtil'
 
@@ -34,10 +41,11 @@
     name: 'StylePanel',
     data() {
       return {
-        styleOptions: {}
+        compOptions: {}
       }
     },
     props: {
+      optionCategory: '',
       selCompType: null,
       selComps: {
         type: Array,
@@ -65,32 +73,41 @@
       },
       compValInputChanged() {
         this.$nextTick(() => {
-          this.$emit('compStyleOptionsChanged', this.styleOptions)
+          this.$emit('compOptionsChanged', {
+            optionCategory: this.optionCategory,
+            options: this.compOptions
+          })
         })
       },
-      getCompStyleOptions() {
+      getCompCateOptions() {
         if (this.getCompOptions(this.curSelComp)) {
-          const compStyles = Object.assign({}, this.getCompOptions(this.curSelComp).style)
-          const compDefine = this.getCompOptionsDefine()
+          const compOpts = Object.assign({}, this.getCompOptions(this.curSelComp)[this.optionCategory] || {})
+          const compDefine = Object.assign({}, this.getCompOptionsDefine()[this.optionCategory] || {})
           // console.log(compStyles)
-          const styleCtrls = {}
-          for (const key in compStyles) {
-            styleCtrls[key] = _.has(compDefine, key) ? {
-              value: compStyles[key],
+          const optionCtrls = {}
+          for (const key in compOpts) {
+            const ctrl = _.has(compDefine, key) ? {
+              value: compOpts[key],
               label: compDefine[key].label,
               type: compDefine[key].type
             } : {
-              value: compStyles[key],
-              label: styleDefs.style[key].label,
-              type: styleDefs.style[key].type
+              value: compOpts[key],
+              label: OptionDefs[this.optionCategory][key].label,
+              type: OptionDefs[this.optionCategory][key].type
+            }
+
+            if (_.has(compDefine, key)) {
+              optionCtrls[key] = Object.assign({}, compDefine[key], ctrl)
+            } else {
+              optionCtrls[key] = Object.assign({}, ctrl)
             }
           }
-          return styleCtrls
+          return optionCtrls
         } else {
           return null
         }
       },
-      // getCompStyleOptions() {
+      // getCompCateOptions() {
       //   if (this.getCompOptions(this.curSelComp)) {
       //     const compStyles = Object.assign({}, this.getCompOptions(this.curSelComp).style)
       //     // console.log(compStyles)
@@ -127,7 +144,7 @@
           const compType = this.curSelComp.type
           if (ScadaCompsLibrary[compType]) {
             if (ScadaCompsLibrary[compType].props) {
-              return ScadaCompsLibrary[compType].props.define
+              return ScadaCompsLibrary[compType].props.define || {}
             }
           }
         }
@@ -139,43 +156,42 @@
         }
         return null
       },
-      getCurSelCompStyleOptions() {
+      getCurSelCompOptions() {
         if (this.selComps.length >= 1) {
           // console.log('-------def-------')
           // console.log(this.getCompOptionsDefine())
 
           if (this.selComps.length === 1) {
-            return this.getCompStyleOptions()
+            return this.getCompCateOptions()
           } else {
-            return (this.curSelCompsType) ? this.getCompStyleOptions() : null
+            return (this.curSelCompsType) ? this.getCompCateOptions() : null
           }
         }
         return null
       }
     },
     computed: {
-      curSelCompStyleOptions() {
-        if (this.selComps.length >= 1) {
-          if (this.selComps.length === 1) {
-            return this.getCompStyleOptions()
-          } else {
-            return (this.curSelCompsType) ? this.getCompStyleOptions() : null
-          }
-        }
-        return null
-      }
+      // curSelCompStyleOptions() {
+      //   if (this.selComps.length >= 1) {
+      //     if (this.selComps.length === 1) {
+      //       return this.getCompCateOptions()
+      //     } else {
+      //       return (this.curSelCompsType) ? this.getCompCateOptions() : null
+      //     }
+      //   }
+      //   return null
+      // }
     },
     watch: {
       selComps() {
-        // console.log('111')
-        this.styleOptions = this.getCurSelCompStyleOptions()
+        this.compOptions = this.getCurSelCompOptions()
       }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  #style_panel {
+  .option_panel {
     padding: 12px;
 
     .type-hint {

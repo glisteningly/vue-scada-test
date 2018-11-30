@@ -1,5 +1,5 @@
 <template>
-  <text fill="#FFF"
+  <text :fill="options.style.fill"
         :x="comp.width * comp.scaleX / 2"
         :y="comp.height * comp.scaleY / 2"
         :transform="rectTransformStr"
@@ -22,6 +22,7 @@
         default: function () {
           return {
             style: {
+              fill: '#FFF',
               fontSize: 16
             }
           }

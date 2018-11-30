@@ -165,6 +165,15 @@ class CompCtrl {
       CompCtrl.konvaContext.transformer.resizeEnabled(false)
       this.reDraw()
     })
+    //
+    // this.konvaCtrl().on('dragmove transform', () => {
+    //   if (this.isPathCtrl) {
+    //     this.addAnchors()
+    //   }
+    //   // if (this.type === 'ScadaLabel') {
+    //   this.syncCompLayout()
+    //   // }
+    // })
 
     this.konvaCtrl().on('dragend transformend', () => {
       // console.log(this.children)
@@ -268,11 +277,6 @@ class CompCtrl {
           this.reCalcPathPoints()
           this.points = _.clone(this.points)
           this.konvaCtrl().points(this.points)
-          // this.konvaCtrl().offsetX(this.konvaCtrl().width() / 2)
-          // this.konvaCtrl().offsetY(this.konvaCtrl().height() / 2)
-
-          // this.syncCompLayout()
-          // this.reCalcPathPoints()
           CompCtrl.konvaContext.transformer.forceUpdate()
           this.showPathCtrl(false)
           this.reDraw()

@@ -67,7 +67,7 @@ export default {
       this.konvaObjs.transformer = new Konva.Transformer({
         keepRatio: false,
         anchorSize: 8,
-        anchorFill: '#27b0ff',
+        anchorFill: '#006bd6',
         anchorStroke: '#FFF',
         anchorStrokeWidth: 1.5,
         // anchorCornerRadius: 4,
@@ -79,7 +79,7 @@ export default {
       this.konvaObjs.groupTransformer = new Konva.Transformer({
         keepRatio: true,
         anchorSize: 8,
-        anchorFill: '#27b0ff',
+        anchorFill: '#006bd6',
         anchorStroke: '#FFF',
         anchorStrokeWidth: 1.5,
         // anchorCornerRadius: 4,
