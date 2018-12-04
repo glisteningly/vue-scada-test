@@ -9,7 +9,9 @@ export default {
         }
       },
       set(v) {
-        this.curSelComp.x = v + this.curSelComp.offsetX * this.curSelComp.scaleX
+        if (v) {
+          this.curSelComp.x = v + this.curSelComp.offsetX * this.curSelComp.scaleX
+        }
       }
     },
     curSelCompLayoutY: {
@@ -21,7 +23,9 @@ export default {
         }
       },
       set(v) {
-        this.curSelComp.y = v + this.curSelComp.offsetY * this.curSelComp.scaleY
+        if (v) {
+          this.curSelComp.y = v + this.curSelComp.offsetY * this.curSelComp.scaleY
+        }
       }
     },
     curSelCompLayoutW: {
@@ -33,10 +37,12 @@ export default {
         }
       },
       set(v) {
-        if (!this.curSelComp.points) {
-          this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
+        if (v) {
+          if (!this.curSelComp.points) {
+            this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
+          }
+          this.curSelComp.scaleX = (v / this.curSelComp.width) || 1
         }
-        this.curSelComp.scaleX = (v / this.curSelComp.width) || 1
       }
     },
     curSelCompLayoutH: {
@@ -48,10 +54,12 @@ export default {
         }
       },
       set(v) {
-        if (!this.curSelComp.points) {
-          this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
+        if (v) {
+          if (!this.curSelComp.points) {
+            this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
+          }
+          this.curSelComp.scaleY = (v / this.curSelComp.height) || 1
         }
-        this.curSelComp.scaleY = (v / this.curSelComp.height) || 1
       }
     },
     curSelCompLayoutR: {
@@ -63,9 +71,9 @@ export default {
         }
       },
       set(v) {
-        this.curSelComp.rotation = v
-        // this.curSelComp.x = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.cos(v * Math.PI / 180) + (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.sin(v * Math.PI / 180) + this.curSelComp.x + this.curSelComp.width * this.curSelComp.scaleX / 2
-        // this.curSelComp.y = -(this.curSelComp.width * this.curSelComp.scaleX / 2) * Math.sin(v * Math.PI / 180) - (this.curSelComp.height * this.curSelComp.scaleY / 2) * Math.cos(v * Math.PI / 180) + this.curSelComp.y + this.curSelComp.height * this.curSelComp.scaleY / 2
+        if (v) {
+          this.curSelComp.rotation = v
+        }
       }
     },
     curSelCompLayout: {

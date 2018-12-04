@@ -8,6 +8,7 @@
       <SvgColorFilter/>
       <!--:value="{isFlow: dataBinding.type1.uid1.field1}"-->
       <component v-for="comp in comps"
+                 :value="{text: dataBinding.type1.uid1.field1}"
                  :key="comp.name"
                  :is="comp.type"
                  :comp="comp"/>

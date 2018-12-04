@@ -64,6 +64,10 @@ export default {
       const layer = new Konva.Layer()
       this.konvaObjs.layers.push(layer)
       this.konvaObjs.stage.add(this.konvaObjs.layers[0])
+
+      this.konvaObjs.dragLayer = new Konva.Layer()
+      this.konvaObjs.stage.add(this.konvaObjs.dragLayer)
+
       this.konvaObjs.transformer = new Konva.Transformer({
         keepRatio: false,
         anchorSize: 8,
@@ -85,7 +89,7 @@ export default {
         // anchorCornerRadius: 4,
         // resizeEnabled: false,
         // rotateEnabled: false,
-        // rotationSnaps: [],
+        rotationSnaps: [0, 90, 180, 270],
         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
       })
 
@@ -144,7 +148,7 @@ export default {
       this.konvaObjs.selCompsGroup.on('dragstart ', () => {
         this.konvaObjs.groupTransformer.resizeEnabled(false)
         this.konvaObjs.groupTransformer.rotateEnabled(false)
-        this.konvaObjs.groupTransformer.borderEnabled(false)
+        // this.konvaObjs.groupTransformer.borderEnabled(false)
         this.konvaObjs.layers[0].draw()
       })
 
@@ -152,7 +156,7 @@ export default {
         // console.log('dragend ')
         this.konvaObjs.groupTransformer.resizeEnabled(true)
         this.konvaObjs.groupTransformer.rotateEnabled(true)
-        this.konvaObjs.groupTransformer.borderEnabled(true)
+        // this.konvaObjs.groupTransformer.borderEnabled(true)
         this.konvaObjs.layers[0].draw()
         this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
@@ -183,7 +187,8 @@ export default {
           console.log('x: ' + x + ', y: ' + y)
           this.konvaObjs.selCompsRect.width(0)
           this.konvaObjs.selCompsRect.height(0)
-          this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
+          // this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])
+          this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.dragLayer)
           this.konvaObjs.selCompsRect.setAbsolutePosition(mousePos)
           // this.konvaObjs.selCompsRect.strokeWidth(1 / this.canvasLayout.scale)
         }
@@ -218,7 +223,9 @@ export default {
           const y = (mousePos.y - this.konvaObjs.stage.y()) / this.konvaObjs.stage.scaleY()
           this.konvaObjs.selCompsRect.width(x - this.konvaObjs.selCompsRect.x())
           this.konvaObjs.selCompsRect.height(y - this.konvaObjs.selCompsRect.y())
-          this.konvaObjs.layers[0].draw()
+          // this.konvaObjs.layers[0].draw()
+          this.konvaObjs.dragLayer.draw()
+          // this.konvaObjs.stage.draw()
         }
       })
 
@@ -270,7 +277,9 @@ export default {
         this.konvaObjs.selCompsRect.remove()
         this.konvaObjs.selCompsRect.width(0)
         this.konvaObjs.selCompsRect.height(0)
-        this.konvaObjs.layers[0].draw()
+        // this.konvaObjs.layers[0].draw()
+        // this.konvaObjs.stage.draw()
+        this.konvaObjs.dragLayer.draw()
         this.isDragSelecting = false
       })
 

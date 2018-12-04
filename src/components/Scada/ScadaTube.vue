@@ -67,6 +67,7 @@
     //     }
     //   }
     // },
+    define: CompOptionsDefine,
     props: {
       value: {
         type: Object
@@ -98,7 +99,6 @@
           }
         }
       },
-      define: CompOptionsDefine
     },
     computed: {
       roundPath() {

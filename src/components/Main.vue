@@ -50,8 +50,8 @@
           <el-button @click="compsDelete">delete</el-button>
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="testImport">import</el-button>
-          <el-button @click="doTest">test</el-button>
-          <el-button @click="loadLocal">load</el-button>
+          <el-button @click="copyCompsTolocalStorage">test</el-button>
+          <el-button @click="loadCompsFromlocalStorage">load</el-button>
           <span style="display: inline-block; width: 40px; color: #EEE; text-align: center; font-size: 12px">{{ curZoomScale | numPercent }}</span>
           <el-button @click="zoomOut"><i class="el-icon-zoom-out"></i></el-button>
           <el-button @click="zoom100">100%</el-button>
@@ -207,6 +207,7 @@
         },
         konvaObjs: {
           stage: null,
+          dragLayer: null,
           layers: [],
           transformer: null,
           groupTransformer: null,
@@ -275,14 +276,14 @@
         this.addCompToCanvas({
           type: 'ScadaLabel',
           layout: {
-            x: 400,
-            y: 400,
-            width: 200,
-            height: 68
+            x: 100,
+            y: 100,
+            width: 150,
+            height: 60
           },
           options: {
             style: {
-              fontSize: 20
+              // fontSize: 20
             }
           },
         })
@@ -376,14 +377,6 @@
             x: relativePt.x,
             y: relativePt.y,
             points: [0, 0]
-          },
-          options: {
-            style: {
-              fill: 'rgba(0,0,0,0.5)',
-              stroke: '#CCC',
-              strokeWidth: 10,
-              cornerRadius: 10
-            }
           }
         })
         const newSels = []
@@ -453,15 +446,19 @@
         this.curSelComps.forEach((comp) => {
           this.konvaObjs.selCompsGroup.add(comp.konvaCtrl())
           comp.konvaCtrl().draggable(false)
-          if (!comp.tempTr) {
-            comp.tempTr = new Konva.Transformer({
-              node: comp.konvaCtrl(),
-              name: 'tempTr',
-              keepRatio: true,
-              resizeEnabled: false,
-              rotateEnabled: false,
-            })
-            this.konvaObjs.selCompsGroup.add(comp.tempTr)
+          // 每个对象加上tr，拖动变形时更直观
+          // 但如果一次选中的对象数量过多，会明显影响性能，因此限制在10个
+          if (this.curSelComps.length <= 10) {
+            if (!comp.tempTr) {
+              comp.tempTr = new Konva.Transformer({
+                node: comp.konvaCtrl(),
+                name: 'tempTr',
+                keepRatio: true,
+                resizeEnabled: false,
+                rotateEnabled: false,
+              })
+              this.konvaObjs.selCompsGroup.add(comp.tempTr)
+            }
           }
         })
         this.konvaObjs.layers[0].add(this.konvaObjs.selCompsGroup)
@@ -530,20 +527,35 @@
           this.addCompToCanvas(comp)
         })
       },
-      doTest() {
+      copyCompsTolocalStorage() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))
         // this.addCompToCanvas(this.curSelComp.toConfig())
         const compConfig = []
-        this.comps.forEach((comp) => {
+        this.curSelComps.forEach((comp) => {
           compConfig.push(comp.toConfig())
         })
-        localStorage.setItem('comps', JSON.stringify(compConfig))
+        localStorage.setItem('copiedComps', JSON.stringify(compConfig))
       },
-      loadLocal() {
-        const compConfig = JSON.parse(localStorage.getItem('comps'))
+      addCompsFromStr(compStr, offset = { x: 0, y: 0 }) {
+        const compConfig = JSON.parse(compStr)
+        const newAddComps = []
         compConfig.forEach((comp => {
-          this.addCompToCanvas(comp)
+          comp.layout.x += offset.x
+          comp.layout.y += offset.y
+          newAddComps.push(this.addCompToCanvas(comp))
         }))
+        if (newAddComps.length > 0) {
+          this.unGroupSelAll()
+          newAddComps.forEach(compCtrl => {
+            this.curSelComps.push(compCtrl)
+          })
+        }
+      },
+      loadCompsFromlocalStorage() {
+        const compStr = localStorage.getItem('copiedComps')
+        if (compStr) {
+          this.addCompsFromStr(compStr)
+        }
       },
       onCompOptionsChanged(changedOptions) {
         const newVal = {}

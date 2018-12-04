@@ -1,7 +1,8 @@
 import hotkeys from 'hotkeys-js'
 
 const HOTKEYS = 'delete, ctrl+g, ctrl+shift+g, space, ctrl+-, ctrl+=, ctrl+0,' +
-  'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right'
+  'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right' +
+  'ctrl+c, ctrl+v, ctrl+d'
 
 export default {
   data() {
@@ -13,6 +14,18 @@ export default {
     initHotkeyBinding() {
       hotkeys(HOTKEYS, (e, handler) => {
         // hotkeys('*', (e, handler) => {
+        console.log(e)
+        if (e.ctrlKey) {
+          switch (e.keyCode) {
+            case 67: // copy
+              this.doCopy()
+              break;
+            case 86: // paste
+              this.doPaste()
+              break;
+          }
+        }
+
         e.preventDefault()
         // console.log(hotkeys.isPressed("space"))
         switch (handler.key) {
@@ -70,6 +83,9 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutX += 10
             break;
+          // case 'ctrl+c':
+          //   console.log('ctrl+c')
+          //   break;
         }
       })
     },
@@ -91,10 +107,18 @@ export default {
           this.zoomIn()
         }
       }
+    },
+    doCopy(e) {
+      this.copyCompsTolocalStorage()
+      // console.log('copy!')
+    },
+    doPaste(e) {
+      this.loadCompsFromlocalStorage()
     }
   },
   created() {
     document.addEventListener('keyup', this.setSpaceKeyState)
+    document.addEventListener('copy', this.doCopy)
     window.addEventListener('wheel', this.preventBrowserZoom)
   },
   destroyed() {

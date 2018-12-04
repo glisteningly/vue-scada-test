@@ -4,7 +4,7 @@ export default {
       dataBinding: {
         type1: {
           uid1: {
-            field1: true
+            field1: 567.234
           }
         }
       }

@@ -3,8 +3,9 @@
     <component v-for="childrenComp in comp.children"
                :key="childrenComp.name"
                :is="childrenComp.type"
+               :value="childrenComp.value"
                :comp="childrenComp"
-               />
+    />
   </g>
 </template>
 
@@ -13,9 +14,12 @@
 
   export default {
     name: 'ScadaGroup',
-    // props: {
-    //   options: Object
-    // },
+    props: {
+      value: {
+        type: Object
+      }
+      // options: Object
+    },
     extends: BaseComp,
   }
 </script>

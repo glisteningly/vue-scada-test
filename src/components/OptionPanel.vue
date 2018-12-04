@@ -132,9 +132,12 @@
         if (this.curSelComp) {
           const compType = this.curSelComp.type
           if (ScadaCompsLibrary[compType]) {
+            // TODO:
             if (ScadaCompsLibrary[compType].props) {
               return ScadaCompsLibrary[compType].props.defaultOptions.default()
             }
+            // console.log(ScadaCompsLibrary[compType].defaultOptions)
+            // return ScadaCompsLibrary[compType].defaultOptions || {}
           }
         }
         return null
@@ -143,9 +146,10 @@
         if (this.curSelComp) {
           const compType = this.curSelComp.type
           if (ScadaCompsLibrary[compType]) {
-            if (ScadaCompsLibrary[compType].props) {
-              return ScadaCompsLibrary[compType].props.define || {}
-            }
+            // if (ScadaCompsLibrary[compType].props) {
+            //   return ScadaCompsLibrary[compType].props.define || {}
+            // }
+            return ScadaCompsLibrary[compType].define || {}
           }
         }
         return null
