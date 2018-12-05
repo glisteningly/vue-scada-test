@@ -127,26 +127,43 @@
     </section>
     <context-menu id="context-menu" ref="ctxMenu">
       <li>
-        <button @click="zoomIn">放大</button>
+        <button :disabled="!canDoSelCompAction" @click="copyCompsTolocalStorage"><label>复制</label><span
+            class="hotkey-hint">Ctrl+C</span></button>
       </li>
       <li>
-        <button @click="zoomOut">缩小</button>
-      </li>
-      <li>
-        <button @click="zoom100">原始尺寸</button>
+        <button @click="loadCompsFromlocalStorage"><label>粘贴</label><span class="hotkey-hint">Ctrl+V</span></button>
       </li>
       <hr>
-      <li v-if="canDoSelCompAction">
-        <button @click="compsMoveTop">置于顶层</button>
+      <li>
+        <button @click="zoomIn"><label>放大</label></button>
       </li>
-      <li v-if="canDoSelCompAction">
-        <button @click="compsMoveBottom">置于底层</button>
+      <li>
+        <button @click="zoomOut"><label>缩小</label></button>
       </li>
-      <li v-if="multiCompsSelected">
-        <button @click="jointCompsToGroup">编组</button>
+      <li>
+        <button @click="zoom100"><label>原始尺寸</label></button>
       </li>
-      <li v-if="canUnGroupComps">
-        <button @click="unGroupToComps">取消编组</button>
+      <hr>
+      <!--<li v-if="canDoSelCompAction">-->
+      <!--<button @click="compsMoveTop"><label>置于顶层</label></button>-->
+      <!--</li>-->
+      <li>
+        <button :disabled="!canDoSelCompAction" @click="compsMoveTop"><label>置于顶层</label></button>
+      </li>
+      <li>
+        <button :disabled="!canDoSelCompAction" @click="compsMoveBottom"><label>置于底层</label></button>
+      </li>
+      <li>
+        <button :disabled="!multiCompsSelected" @click="jointCompsToGroup">
+          <label>编组</label>
+          <span class="hotkey-hint">Ctrl+G</span>
+        </button>
+      </li>
+      <li>
+        <button :disabled="!canUnGroupComps" @click="unGroupToComps">
+          <label>取消编组</label>
+          <span class="hotkey-hint">Ctrl+Shift+G</span>
+        </button>
       </li>
     </context-menu>
   </div>
@@ -283,9 +300,15 @@
           },
           options: {
             style: {
-              // fontSize: 20
+              // fontSize: 30
+            },
+            param: {
+              defaultText: 14.24
             }
           },
+          value: {
+            text: null
+          }
         })
       },
       addRect() {
@@ -509,6 +532,7 @@
         })
       },
       addCompToCanvas(comp) {
+        console.log(comp)
         if (!comp.options) {
           comp.options = {}
         }
@@ -896,7 +920,7 @@
         border-radius: 0;
         background-color: #EEE;
         li {
-          padding: 4px 10px;
+          padding: 4px 8px;
           &:hover {
             /*background: rgba(39, 176, 255, 0.4);*/
             background: #D3D3D3;
@@ -909,11 +933,25 @@
             width: 100%;
             background: none;
             border: none;
+            &:disabled {
+              color: #999;
+            }
+            label {
+              display: inline-block;
+              width: 80px;
+            }
+            .hotkey-hint {
+              margin-left: 5px;
+              font-size: 13px;
+              /*color: #666;*/
+            }
           }
+
         }
         hr {
-          /*background-color: #DDD;*/
-          border: 1px solid #CCC;
+          margin: 2px 0;
+          border-top: 1px solid #BBB;
+          height: 0;
         }
       }
     }

@@ -16,6 +16,7 @@ class CompCtrl {
 
     this.type = options.type
     this.options = options.options
+    this.value = options.value
 
     this.name = guid
 
@@ -610,7 +611,8 @@ class CompCtrl {
     const compConfig = {
       layout: this.getCompLayout(),
       type: this.type,
-      options: this.options
+      options: this.options,
+      value: this.value
     }
     if (this.children && this.children.length > 0) {
       const children = []

@@ -5,27 +5,48 @@
           :y="comp.height * comp.scaleY / 2"
           :transform="rectTransformStr"
           :font-size="options.style.fontSize"
-          text-anchor="end">
-      <tspan class="scada-label-prefix"
-             alignment-baseline="middle" x="0"
-             :fill="options.style.prefixFill"
-             text-anchor="start">
-        {{ options.param.prefixText }}
-      </tspan>
-      <!--<tspan class="scada-label-text" alignment-baseline="middle" :x="comp.width * comp.scaleX / 2"-->
-      <!--text-anchor="middle">-->
-      <!--326.54-->
-      <!--</tspan>-->
-      <tspan
-          :x="comp.width * comp.scaleX"
-          text-anchor="end">
-        <tspan class="scada-label-text" alignment-baseline="middle">{{ labelText }}</tspan>
-        <tspan class="scada-label-suffix"
-               :fill="options.style.suffixFill"
-               alignment-baseline="middle">
-          {{ options.param.suffixText }}
+    >
+      <template v-if="options.style.textAlignH === 'auto'">
+        <tspan v-if="options.param.prefixText"
+               class="scada-label-prefix"
+               alignment-baseline="middle" x="0"
+               :fill="options.style.prefixFill"
+               text-anchor="start">
+          {{ options.param.prefixText }}
         </tspan>
-      </tspan>
+        <tspan v-if="!options.param.suffixText" class="scada-label-text" alignment-baseline="middle"
+               :x="comp.width * comp.scaleX / 2"
+               text-anchor="middle">
+          {{ labelText }}
+        </tspan>
+        <tspan v-else
+               :x="comp.width * comp.scaleX"
+               text-anchor="end">
+          <tspan class="scada-label-text" alignment-baseline="middle">{{ labelText }}</tspan>
+          <tspan class="scada-label-suffix"
+                 :fill="options.style.suffixFill"
+                 alignment-baseline="middle">
+            {{ options.param.suffixText }}
+          </tspan>
+        </tspan>
+      </template>
+      <template v-else>
+        <tspan :text-anchor="options.style.textAlignH" :x="alignPosX">
+          <tspan v-if="options.param.prefixText"
+                 class="scada-label-prefix"
+                 :fill="options.style.prefixFill">
+            {{ options.param.prefixText }}
+          </tspan>
+          <tspan class="scada-label-text">
+            {{ labelText }}
+          </tspan>
+          <tspan v-if="options.param.suffixText"
+                 class="scada-label-suffix"
+                 :fill="options.style.suffixFill">
+            {{ options.param.suffixText }}
+          </tspan>
+        </tspan>
+      </template>
     </text>
   </g>
 </template>
@@ -43,6 +64,16 @@
       fontSize: {
         label: '字体尺寸',
         type: 'Int'
+      },
+      textAlignH: {
+        label: '水平对齐',
+        type: 'Enum',
+        opts: [
+          { label: '自动', value: 'auto' },
+          { label: '左', value: 'start' },
+          { label: '居中', value: 'middle' },
+          { label: '右', value: 'end' },
+        ]
       },
       prefixFill: {
         label: '前缀颜色',
@@ -96,11 +127,12 @@
             style: {
               fill: '#FFF',
               fontSize: 20,
+              textAlignH: 'auto',
               prefixFill: '#FFF',
               suffixFill: '#FFF',
             },
             param: {
-              defaultText: '66.666',
+              defaultText: '',
               prefixText: '',
               suffixText: '',
               decTrim: 0
@@ -119,19 +151,30 @@
             return this.values.text
           }
         } else {
-          if (this.options.param.defaultText === '') {
+          if ((!this.options.param.defaultText) || (this.options.param.defaultText === '')) {
             return '----'
           } else {
             return this.options.param.defaultText
           }
+        }
+      },
+      alignPosX() {
+        switch (this.options.style.textAlignH) {
+          case 'start':
+            return 0
+          case 'end':
+            return this.comp.width * this.comp.scaleX
+          case 'middle':
+            return this.comp.width * this.comp.scaleX / 2
         }
       }
     }
   }
 </script>
 
-<style scoped>
-  s {
-    color: dodgerblue;
+<style>
+  .scada-label-text, .scada-label-prefix, .scada-label-suffix {
+    alignment-baseline: middle;
   }
+
 </style>
