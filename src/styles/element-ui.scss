@@ -33,6 +33,10 @@ input::-webkit-inner-spin-button {
   border: 0;
 }
 
+.el-input__inner {
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, .25) inset;
+}
+
 .el-input-number.is-controls-right .el-input__inner {
   padding-left: 0;
   padding-right: 35px;
@@ -137,6 +141,11 @@ input::-webkit-inner-spin-button {
 }
 
 //el-tabs
+
+.el-tabs.el-tabs--card.el-tabs--top {
+  border-bottom: 1px solid #2B2B2B;
+}
+
 .el-tabs--card > .el-tabs__header {
   border-bottom: 1.5px solid #555;
   //margin: 0;

@@ -18,7 +18,7 @@
   import BaseComp from './BaseComp'
   import roundPathCorners from './utils/rounding'
 
-  const CompOptionsDefine = {
+  const CompDefine = {
     style: {
       tubeWidth: {
         label: '管道线宽',
@@ -54,6 +54,11 @@
         label: '流动速度',
         type: 'Int',
       },
+    },
+    binding: {
+      isFlow: {
+        label: '流动',
+      }
     }
   }
 
@@ -67,7 +72,7 @@
     //     }
     //   }
     // },
-    define: CompOptionsDefine,
+    define: CompDefine,
     props: {
       value: {
         type: Object

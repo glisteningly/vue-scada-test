@@ -20,5 +20,11 @@ export default {
       label: '字体大小',
       type: 'Int'
     }
+  },
+  param: {},
+  binding: {
+    alarm: {
+      label: '告警状态'
+    }
   }
 }

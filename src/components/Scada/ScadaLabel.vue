@@ -1,11 +1,11 @@
 <template>
-  <g class="scada-label">
-    <text :fill="options.style.fill"
+  <g class="scada-label" @click="$emit('labelClicked')">
+    <text :class="alarmClass"
+          :fill="options.style.fill"
           :x="comp.width * comp.scaleX / 2"
           :y="comp.height * comp.scaleY / 2"
           :transform="rectTransformStr"
-          :font-size="options.style.fontSize"
-    >
+          :font-size="options.style.fontSize">
       <template v-if="options.style.textAlignH === 'auto'">
         <tspan v-if="options.param.prefixText"
                class="scada-label-prefix"
@@ -24,6 +24,7 @@
                text-anchor="end">
           <tspan class="scada-label-text" alignment-baseline="middle">{{ labelText }}</tspan>
           <tspan class="scada-label-suffix"
+                 :class="alarmClass"
                  :fill="options.style.suffixFill"
                  alignment-baseline="middle">
             {{ options.param.suffixText }}
@@ -42,6 +43,7 @@
           </tspan>
           <tspan v-if="options.param.suffixText"
                  class="scada-label-suffix"
+                 :class="alarmClass"
                  :fill="options.style.suffixFill">
             {{ options.param.suffixText }}
           </tspan>
@@ -55,7 +57,7 @@
   import BaseComp from './BaseComp'
   import _ from 'lodash'
 
-  const CompOptionsDefine = {
+  const CompDefine = {
     style: {
       fill: {
         label: '字体颜色',
@@ -101,13 +103,21 @@
         label: '小数保留',
         type: 'Int',
       }
+    },
+    binding: {
+      text: {
+        label: '数据显示'
+      },
+      // alarm: {
+      //   label: '告警状态'
+      // }
     }
   }
 
   export default {
     extends: BaseComp,
     name: 'ScadaLabel',
-    define: CompOptionsDefine,
+    define: CompDefine,
     props: {
       value: {
         type: Object
@@ -116,7 +126,8 @@
         type: Object,
         default: function () {
           return {
-            text: '----'
+            text: '----',
+            alarm: 0
           }
         }
       },
@@ -167,14 +178,30 @@
           case 'middle':
             return this.comp.width * this.comp.scaleX / 2
         }
+      },
+      alarmClass() {
+        if (this.values.alarm && this.values.alarm !== 0) {
+          return 'scada-label-alarm'
+        } else
+          return null
       }
     }
   }
 </script>
 
-<style>
+<style lang="scss">
+  .scada-label {
+    /*&:hover {*/
+      /*cursor: pointer;*/
+    /*}*/
+  }
+
   .scada-label-text, .scada-label-prefix, .scada-label-suffix {
     alignment-baseline: middle;
+  }
+
+  .scada-label-alarm {
+    fill: #d00000;
   }
 
 </style>

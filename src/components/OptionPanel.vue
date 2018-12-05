@@ -1,5 +1,5 @@
 <template>
-  <div class="option_panel">
+  <div class="option_panel ctrl-panel">
     <div v-if="curSelCompsCount > 1 && curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个 {{curSelCompsType}}</span>
     </div>
@@ -32,13 +32,13 @@
 
 <script>
   import _ from 'lodash'
-  import OptionDefs from '../utils/styleDefs'
+  import OptionDefs from '../utils/optionDefs'
   import { ScadaCompsLibrary } from '../components/Scada'
   import SelCompsUtil from '../mixin/SelCompsUtil'
 
   export default {
     mixins: [SelCompsUtil],
-    name: 'StylePanel',
+    name: 'OptionPanel',
     data() {
       return {
         compOptions: {}
@@ -107,27 +107,6 @@
           return null
         }
       },
-      // getCompCateOptions() {
-      //   if (this.getCompOptions(this.curSelComp)) {
-      //     const compStyles = Object.assign({}, this.getCompOptions(this.curSelComp).style)
-      //     // console.log(compStyles)
-      //     const styleCtrls = {}
-      //     for (const key in compStyles) {
-      //       styleCtrls[key] = _.has(styleDefs, [this.curSelComp.type, key]) ? {
-      //         value: compStyles[key],
-      //         label: styleDefs[this.curSelComp.type][key].label,
-      //         type: styleDefs[this.curSelComp.type][key].type
-      //       } : {
-      //         value: compStyles[key],
-      //         label: styleDefs.common[key].label,
-      //         type: styleDefs.common[key].type
-      //       }
-      //     }
-      //     return styleCtrls
-      //   } else {
-      //     return null
-      //   }
-      // },
       getCompDefaultOptions() {
         if (this.curSelComp) {
           const compType = this.curSelComp.type
@@ -213,10 +192,10 @@
 
     .ctrl-item {
       label {
-        font-size: 14px;
-        letter-spacing: 1.5px;
-        color: #DDD;
-        display: block;
+        /*font-size: 14px;*/
+        /*letter-spacing: 1.5px;*/
+        /*color: #DDD;*/
+        /*display: block;*/
         margin-top: 4px;
       }
       .el-col {

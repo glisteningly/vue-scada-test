@@ -3,3 +3,14 @@
 .ctx-menu {
   width: 220px;
 }
+
+.ctrl-panel {
+  .ctrl-item{
+    label {
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #DDD;
+      display: block;
+    }
+  }
+}

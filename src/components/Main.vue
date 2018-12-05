@@ -3,14 +3,9 @@
     <section id="scada_editor">
       <header>
         <div class="toolbar" style="">
-          <!--<button @click="btnClicked">add</button>-->
-          <!--<button @click="btnZoomInClicked">zoom+</button>-->
-          <!--<button @click="btnZoomOutClicked">zoom-</button>-->
-          <!--<button @click="btnClicked1">log</button>-->
           <el-button @click="addLabel">label</el-button>
           <el-button @click="addRect">rect</el-button>
           <el-button @click="addPath">path</el-button>
-          <!--<el-button @click="addIcon">twitter</el-button>-->
           <el-button @click="addIcon2">google</el-button>
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
@@ -109,6 +104,14 @@
               <CanvasNav></CanvasNav>
             </el-tab-pane>
           </el-tabs>
+          <el-tabs v-model="activeBindingTab" type="card" v-show="curSelComp">
+            <el-tab-pane label="数据绑定" name="binding">
+              <BindingPanel :selComps="curSelComps" @compBindingChanged="onCompOptionsChanged"/>
+            </el-tab-pane>
+            <el-tab-pane label="事件绑定" name="event">
+
+            </el-tab-pane>
+          </el-tabs>
           <el-tabs v-model="activeOptionsTab" type="card" v-show="curSelComp">
             <el-tab-pane label="样式" name="style">
               <OptionPanel :optionCategory="'style'" :selComps="curSelComps"
@@ -119,7 +122,6 @@
                            @compOptionsChanged="onCompOptionsChanged"/>
             </el-tab-pane>
           </el-tabs>
-
         </div>
       </main>
       <!--<footer>-->
@@ -196,7 +198,7 @@
   import DataBinding from '../mixin/DataBinding'
 
 
-  // import StylePanel from '../components/StylePanel'
+  import BindingPanel from '../components/BindingPanel'
   import OptionPanel from '../components/OptionPanel'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
@@ -207,7 +209,7 @@
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
   export default {
-    components: { ContextMenu, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
+    components: { ContextMenu, BindingPanel, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
     name: 'MainEditor',
     data() {
@@ -244,6 +246,7 @@
         // activeRightTab: 'nav',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
+        activeBindingTab: 'binding'
       }
     },
     mounted() {
@@ -278,7 +281,7 @@
         })
 
         compCtrl.konvaCtrl().on('dragstart', () => {
-          console.log('dragstart')
+          // console.log('dragstart')
           if (!this.isInSelGroup(compCtrl)) {
             this.unGroupSelAll()
             this.curSelComps.push(compCtrl)
@@ -303,11 +306,28 @@
               // fontSize: 30
             },
             param: {
-              defaultText: 14.24
+              defaultText: 14.24,
+              prefixText: '电压',
+              suffixText: 'V',
             }
           },
           value: {
-            text: null
+            text: null,
+            alarm: 0
+          },
+          binding: {
+            text: {
+              type: 'aaaa',
+              uid: '1234',
+              field: 'bbbb',
+              where: '',
+            },
+            alarm: {
+              type: 'cccc',
+              uid: '9876',
+              field: 'dddd',
+              where: '',
+            }
           }
         })
       },
@@ -322,9 +342,9 @@
           },
           options: {
             style: {
-              stroke: '#b90006',
-              strokeWidth: 4,
-              cornerRadius: 5
+              stroke: '#20a0ff',
+              strokeWidth: 2,
+              cornerRadius: 4
             }
           }
         })
@@ -378,7 +398,9 @@
             height: 68
           },
           options: {
-            url: '/images/google.png'
+            param: {
+              imgUrl: '/images/google.png'
+            }
           }
         })
       },
@@ -532,16 +554,7 @@
         })
       },
       addCompToCanvas(comp) {
-        console.log(comp)
-        if (!comp.options) {
-          comp.options = {}
-        }
-        if (!comp.options.style) {
-          Object.assign(comp.options, { style: {} })
-        }
-        if (!comp.options.param) {
-          Object.assign(comp.options, { param: {} })
-        }
+        // console.log(comp)
         const c = new CompCtrl(comp)
         this.addComp(c)
         return c
@@ -866,7 +879,6 @@
         flex: 0 0 260px;
         background: #3C3F41;
         #layout_panel {
-          border-bottom: 1.5px solid #2B2B2B;
           padding: 12px 12px 6px 12px;
           span.layout_panel_label {
             text-align: right;

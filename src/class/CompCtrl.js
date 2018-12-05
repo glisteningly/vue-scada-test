@@ -10,14 +10,7 @@ const _konvaPath = new WeakMap()
 class CompCtrl {
   constructor(options, isInitKonva = true) {
     const guid = Guid()
-    // this.id = guid
-    // this.stroke = 'green'
-    // this.strokeWidtg = 0.5
-
     this.type = options.type
-    this.options = options.options
-    this.value = options.value
-
     this.name = guid
 
     this.width = options.layout.width || 0
@@ -34,8 +27,6 @@ class CompCtrl {
 
     this.offsetX = (options.layout.offsetX || (this.width / 2)) || 0
     this.offsetY = (options.layout.offsetY || (this.height / 2)) || 0
-    // this.offsetX = 0
-    // this.offsetY = 0
 
     this.scaleX = options.layout.scaleX || 1
     this.scaleY = options.layout.scaleY || 1
@@ -44,14 +35,6 @@ class CompCtrl {
 
     this.rotation = options.layout.rotation || 0
 
-    // this.isPathCtrl = false
-
-    // if (options.layout.points) {
-    //   this.points = options.layout.points || []
-    //   this.isPathCtrl = true
-    //   this.ctrlAnchors = []
-    // }
-
     this.initBaseLayout()
 
     if (options.children && options.children.length > 0) {
@@ -59,16 +42,20 @@ class CompCtrl {
       options.children.forEach((comp) => {
         children.push(new CompCtrl(comp, false))
       })
-
-      // Object.assign(CompGroup1, { konvaContext: this.konvaObjs })
-      // const c = new CompCtrl(CompGroup1)
       this.children = children
-      // this.syncChildrenCompLayout()
     }
 
     if (isInitKonva) {
-      // this.konvaContext = options.konvaContext
       this.initKonva()
+    }
+
+    this.value = options.value || {}
+    this.options = options.options || {}
+    if (!_.has(options, 'options.style')) {
+      this.options.style = {}
+    }
+    if (!_.has(options, 'options.param')) {
+      this.options.param = {}
     }
   }
 
