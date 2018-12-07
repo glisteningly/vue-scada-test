@@ -43,7 +43,7 @@
         }
       },
       onCompClicked() {
-        this.$emit('CompClicked', this.getEventPayload())
+        this.$emit('CompClick', this.getEventPayload())
       },
       onCompMouseOver(e) {
         // const rect = e.target.getBoundingClientRect()
@@ -58,7 +58,7 @@
           targetRect: e.target.getBoundingClientRect()
         })
         console.log(payload)
-        this.$emit('CompMouseHover', payload)
+        this.$emit('CompHover', payload)
       }
     }
   }

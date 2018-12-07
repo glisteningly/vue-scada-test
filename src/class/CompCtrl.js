@@ -625,39 +625,11 @@ class CompCtrl {
       eventMsg: this.eventMsg,
       type: this.type,
       options: this.options,
-      // binding: this.binding,
+      binding: this.binding,
     }
     Object.assign(compTpl, this.getCompLayout(true))
     return compTpl
   }
-
-  // setDragBound(flag) {
-  //   if (flag) {
-  //     this.konvaCtrl().dragBoundFunc((pos) => {
-  //       let p = {
-  //         x: pos.x,
-  //         y: pos.y
-  //       }
-  //       if (hotkeys.shift) {
-  //         if (this._hMove) {
-  //           p = {
-  //             x: pos.x,
-  //             y: this._dragstartPos.y
-  //           }
-  //         } else {
-  //           p = {
-  //             x: this._dragstartPos.x,
-  //             y: pos.y
-  //           }
-  //         }
-  //       }
-  //       return p
-  //     })
-  //   } else {
-  //     this.konvaCtrl().dragBoundFunc(null)
-  //   }
-  //
-  // }
 }
 
 export default CompCtrl

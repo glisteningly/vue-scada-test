@@ -612,7 +612,7 @@
         const previewCanvasConfig = {
           w: 1000,
           h: 600,
-          bgColor: '#0b3d63'
+          bgColor: '#0f3963'
         }
         const t = ScadaVueTpl.getTplStr(this.comps, previewCanvasConfig)
         this.previewTplStr = t

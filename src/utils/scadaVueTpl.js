@@ -27,7 +27,7 @@ export default {
     const compStr = this.getCompStr(components)
     return `<svg version="1.1" 
 xmlns="http://www.w3.org/2000/svg" 
-viewBox="0 0 ${svgConfig.w} ${svgConfig.h}"  
+viewBox="0 0 ${svgConfig.w} ${svgConfig.h}"
 preserveAspectRatio="xMidYMid meet">
 <rect width="100%" height="100%" fill="${svgConfig.bgColor}"></rect>${compStr}</svg>`
   }
