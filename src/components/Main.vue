@@ -45,16 +45,19 @@
           <el-button @click="compsDelete">delete</el-button>
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="testImport">import</el-button>
-          <el-button @click="copyCompsTolocalStorage">test</el-button>
-          <el-button @click="loadCompsFromlocalStorage">load</el-button>
+          <el-button @click="testExport">export</el-button>
+          <!--<el-button @click="copyCompsTolocalStorage">test</el-button>-->
+          <!--<el-button @click="loadCompsFromlocalStorage">load</el-button>-->
           <span style="display: inline-block; width: 40px; color: #EEE; text-align: center; font-size: 12px">{{ curZoomScale | numPercent }}</span>
           <el-button @click="zoomOut"><i class="el-icon-zoom-out"></i></el-button>
           <el-button @click="zoom100">100%</el-button>
           <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
+          <el-button @click="doPreview">预览</el-button>
           <span style="display: inline-block; width: 20px"/>
           <el-switch v-model="debug_hideCanvas"></el-switch>
+
         </div>
       </header>
       <main>
@@ -177,6 +180,10 @@
       </li>
     </context-menu>
     <!--<div id="dianji">点击查看</div>-->
+    <div id="scada_preview" v-if="showPreview">
+      <el-button class="close" type="danger" @click="showPreview = false"><i class="el-icon-close"></i></el-button>
+      <ScadaPreview :tplStr="previewTplStr"/>
+    </div>
   </div>
 </template>
 
@@ -194,6 +201,7 @@
   import { ScadaCompsLibrary } from '../components/Scada'
 
   import utils from '../utils'
+  import ScadaVueTpl from '../utils/scadaVueTpl'
   // import styleDefs from '../utils/styleDefs'
 
   import CompCtrl from '../class/CompCtrl'
@@ -214,12 +222,23 @@
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
 
+  import ScadaPreview from '../components/ScadaPreview'
+
   import { TOOL_STATE } from '../utils/CONST'
 
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
   export default {
-    components: { ContextMenu, BindingPanel, EventPanel, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
+    components: {
+      ContextMenu,
+      BindingPanel,
+      EventPanel,
+      OptionPanel,
+      ImgButton,
+      SvgScadaView,
+      CanvasNav,
+      ScadaPreview
+    },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
     name: 'MainEditor',
     data() {
@@ -257,7 +276,9 @@
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
         activeBindingTab: 'binding',
-        debug_hideCanvas: false
+        debug_hideCanvas: false,
+        showPreview: false,
+        previewTplStr: ''
       }
     },
     mounted() {
@@ -586,6 +607,17 @@
           this.addCompToCanvas(comp)
         })
       },
+      testExport() {
+        // const t = ScadaVueTpl.getCompStr(this.comps)
+        const previewCanvasConfig = {
+          w: 1000,
+          h: 600,
+          bgColor: '#0b3d63'
+        }
+        const t = ScadaVueTpl.getTplStr(this.comps, previewCanvasConfig)
+        this.previewTplStr = t
+        // console.log(t)
+      },
       copyCompsTolocalStorage() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))
         // this.addCompToCanvas(this.curSelComp.toConfig())
@@ -699,6 +731,10 @@
         this.konvaObjs.stage.width(width)
         this.konvaObjs.stage.height(height)
         this.konvaObjs.stage.batchDraw()
+      },
+      doPreview() {
+        this.testExport()
+        this.showPreview = true
       },
       //移除组件的tr
       detchCompTransformer() {
@@ -1030,6 +1066,25 @@
     color: #20a0ff;
     &:hover {
       cursor: pointer;
+    }
+  }
+
+  #scada_preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #2B2B2B;
+    .close {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      padding: 3px;
     }
   }
 

@@ -553,10 +553,10 @@ class CompCtrl {
     return _.round(num, 3)
   }
 
-  getCompLayout() {
+  getCompLayout(isAbs = false) {
     const layout = {
-      x: this._roundNum(this.x - this.offsetX * this.scaleX),
-      y: this._roundNum(this.y - this.offsetY * this.scaleY),
+      x: isAbs ? this._roundNum(this.x) : this._roundNum(this.x - this.offsetX * this.scaleX),
+      y: isAbs ? this._roundNum(this.y) : this._roundNum(this.y - this.offsetY * this.scaleY),
       width: this._roundNum(this.width),
       height: this._roundNum(this.height),
       scaleX: this._roundNum(this.scaleX),
@@ -617,6 +617,18 @@ class CompCtrl {
       compConfig.children = children
     }
     return compConfig
+  }
+
+  toVueTpl() {
+    const compTpl = {
+      bid: this.bid,
+      eventMsg: this.eventMsg,
+      type: this.type,
+      options: this.options,
+      // binding: this.binding,
+    }
+    Object.assign(compTpl, this.getCompLayout(true))
+    return compTpl
   }
 
   // setDragBound(flag) {

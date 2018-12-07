@@ -69,7 +69,8 @@
     data() {
       return {
         activeTab: '',
-        compBindings: {}
+        compBindings: {},
+        lastSelTab: ''
       }
     },
     props: {
@@ -179,7 +180,15 @@
     watch: {
       selComps() {
         this.compBindings = this.getCurSelCompBinding()
-        this.activeTab = _.keys(this.compBindings)[0]
+        if (_.keys(this.compBindings).includes(this.lastSelTab)) {
+          this.activeTab = this.lastSelTab
+        } else {
+          this.activeTab = _.keys(this.compBindings)[0]
+          this.lastSelTab = this.activeTab
+        }
+      },
+      activeTab(val) {
+        this.lastSelTab = val
       }
     }
   }

@@ -96,6 +96,7 @@ export default {
 
       if (e.code === 'Escape') {
         this.toolState = ''
+        this.showPreview = false
       }
     },
     preventBrowserZoom(e) {

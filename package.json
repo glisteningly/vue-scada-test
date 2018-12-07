@@ -10,6 +10,7 @@
   "dependencies": {
     "element-ui": "^2.4.9",
     "hotkeys-js": "^3.3.8",
+    "jstoxml": "^1.4.3",
     "konva": "^2.5.0",
     "lodash": "^4.17.11",
     "vue": "^2.5.16",
