@@ -5,7 +5,7 @@
        :height="canvasLayout.height"
        :viewBox="svgViewbox">
     <svg id="svg_root" overflow="visible">
-      <SvgColorFilter/>
+      <SvgColorFilter :blink="true"/>
       <!--:value="{isFlow: dataBinding.type1.uid1.field1}"-->
       <component v-for="comp in comps"
                  :value="comp.value"

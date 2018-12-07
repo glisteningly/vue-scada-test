@@ -4,8 +4,7 @@
                :key="childrenComp.name"
                :is="childrenComp.type"
                :value="childrenComp.value"
-               :comp="childrenComp"
-    />
+               :comp="childrenComp"/>
   </g>
 </template>
 

@@ -56,7 +56,7 @@
       },
     },
     binding: {
-      isFlow: {
+      val: {
         label: '流动',
       }
     }
@@ -81,7 +81,7 @@
         type: Object,
         default: function () {
           return {
-            isFlow: false
+            val: false
           }
         }
       },
@@ -134,7 +134,7 @@
         }
       },
       dashLineStyle() {
-        if (this.options.param.showFlow || this.values.isFlow) {
+        if (this.options.param.showFlow || (this.values.val && this.values.val !== '0')) {
           const s = { 'animation-duration': this.velocity }
 
           if (this.options.param.direction === 'forward') {

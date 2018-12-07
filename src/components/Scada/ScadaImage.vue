@@ -1,8 +1,12 @@
 <template>
-  <image :xlink:href="options.param.imgUrl"
+  <image class="scada-image"
+         :class="alarmClass"
+         :xlink:href="options.param.imgUrl"
          :transform="rectTransformStr"
          :width="comp.width * comp.scaleX"
-         :height="comp.height * comp.scaleY"/>
+         :height="comp.height * comp.scaleY"
+         @click="onCompClicked"
+         @mouseover="onCompMouseOver"/>
 </template>
 
 <script>
@@ -22,6 +26,14 @@
     name: 'ScadaImage',
     define: CompDefine,
     props: {
+      defaultValue: {
+        type: Object,
+        default: function () {
+          return {
+            alarm: 0
+          }
+        }
+      },
       defaultOptions: {
         type: Object,
         default: function () {
@@ -43,7 +55,7 @@
     }
   }
 
-  .scada-image.alarm1 {
-    filter: url("#filter-orange-overlay");
-  }
+  /*.scada-image.alarm1 {*/
+  /*filter: url("#filter-orange-overlay");*/
+  /*}*/
 </style>

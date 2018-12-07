@@ -1,12 +1,16 @@
 <template>
-  <rect :fill="options.style.fill"
+  <rect class="scada-rect"
+        :class="alarmClass"
+        :fill="options.style.fill"
         :stroke="options.style.stroke"
         :stroke-width="options.style.strokeWidth"
         :transform="rectTransformStr"
         :width="comp.width * comp.scaleX"
         :height="comp.height * comp.scaleY"
         :rx="options.style.cornerRadius"
-        :ry="options.style.cornerRadius"/>
+        :ry="options.style.cornerRadius"
+        @click="onCompClicked"
+        @mouseover="onCompMouseOver"/>
 </template>
 
 <script>
@@ -16,6 +20,14 @@
     extends: BaseComp,
     name: 'ScadaRect',
     props: {
+      defaultValue: {
+        type: Object,
+        default: function () {
+          return {
+            alarm: 0
+          }
+        }
+      },
       defaultOptions: {
         type: Object,
         default: function () {
@@ -33,6 +45,11 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+  .scada-rect {
+    &.alarm {
+      /*filter: url("#filter-red-overlay");*/
+      stroke: rgba(255, 0, 0, 1);
+    }
+  }
 </style>

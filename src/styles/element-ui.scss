@@ -13,6 +13,20 @@ input::-webkit-inner-spin-button {
   margin-left: 4px;
 }
 
+.el-button.is-plain {
+  color: #DDD;
+  background: #666;
+  border-color: #222;
+  &:hover {
+    background: #777;
+    color: #DDD;
+  }
+  &:focus {
+    background: #777;
+    color: #DDD;
+  }
+}
+
 .el-input__inner {
   background-color: #333;
   color: #EEE;
@@ -82,6 +96,26 @@ input::-webkit-inner-spin-button {
 
 }
 
+.el-input__inner ,.el-textarea__inner {
+  &::-webkit-input-placeholder {
+    color: #888;
+  }
+}
+
+.el-textarea__inner {
+  font-size: 13px;
+  padding: 4px 6px;
+  color: #DDD;
+  background: #333;
+  border: 1px solid #666;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, .25) inset;
+  &:focus {
+    color: #333;
+    background-color: #EEE;
+    border: 1px solid $prime_color;
+  }
+}
+
 .el-color-picker__panel {
   position: absolute;
   z-index: 10;
@@ -100,12 +134,6 @@ input::-webkit-inner-spin-button {
   color: #EEE;
   background-color: #555;
 
-}
-
-.el-button.is-plain:focus, .el-button.is-plain:hover {
-  background-color: #666;
-  border-color: $prime_color;
-  color: #DDD;
 }
 
 .el-input-group__append, .el-input-group__prepend {
@@ -177,6 +205,50 @@ input::-webkit-inner-spin-button {
   background-color: #434749;
   color: #FFF;
 }
+
+//.el-tabs__item .is-top .el-tabs__item:nth-child(2) {
+//  padding-left: 0;
+//}
+.el-tabs--border-card {
+  background: #46494b;
+  border: 1px solid #666;
+}
+
+.el-tabs--top.el-tabs--border-card .el-tabs__item {
+  padding: 0 8px;
+  height: 26px;
+  line-height: 26px;
+  color: #BBB;
+  letter-spacing: 1px;
+  font-weight: normal;
+  text-align: center;
+  min-width: 66px;
+  border-right-color: transparent;
+  border-left-color: transparent;
+}
+
+.el-tabs--border-card > .el-tabs__header {
+  background-color: #333;
+  border-bottom: 1px solid #666;
+  margin: 0;
+}
+
+.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  color: #EEE;
+  background: #46494b;
+  border-right-color: #666;
+  border-left-color: #666;
+}
+
+.el-tabs--top.el-tabs--border-card .el-tabs__item:last-child, .el-tabs--top.el-tabs--card .el-tabs__item:last-child {
+  padding: 0 8px;
+}
+
+.el-tabs--border-card > .el-tabs__content {
+  padding: 6px;
+}
+
+//el-select
 
 .el-select-dropdown {
   background: #46494b;

@@ -1,5 +1,5 @@
 <template>
-  <g class="scada-label" @click="$emit('labelClicked')">
+  <g class="scada-label" @click="onCompClicked" @mouseover="onCompMouseOver">
     <text :class="alarmClass"
           :fill="options.style.fill"
           :x="comp.width * comp.scaleX / 2"
@@ -105,8 +105,8 @@
       }
     },
     binding: {
-      text: {
-        label: '数据显示'
+      val: {
+        label: '数值显示'
       },
       // alarm: {
       //   label: '告警状态'
@@ -119,14 +119,11 @@
     name: 'ScadaLabel',
     define: CompDefine,
     props: {
-      value: {
-        type: Object
-      },
       defaultValue: {
         type: Object,
         default: function () {
           return {
-            text: '----',
+            val: '----',
             alarm: 0
           }
         }
@@ -154,12 +151,12 @@
     },
     computed: {
       labelText() {
-        if (!_.isNil(this.values.text) && this.values.text !== '') {
+        if (!_.isNil(this.values.val) && this.values.val !== '') {
           // 小数点保留
-          if (!isNaN(parseFloat(this.values.text))) {
-            return _.round(this.values.text, parseInt(this.options.param.decTrim))
+          if (!isNaN(parseFloat(this.values.val))) {
+            return _.round(this.values.val, parseInt(this.options.param.decTrim))
           } else {
-            return this.values.text
+            return this.values.val
           }
         } else {
           if ((!this.options.param.defaultText) || (this.options.param.defaultText === '')) {
@@ -178,12 +175,6 @@
           case 'middle':
             return this.comp.width * this.comp.scaleX / 2
         }
-      },
-      alarmClass() {
-        if (this.values.alarm && this.values.alarm !== 0) {
-          return 'scada-label-alarm'
-        } else
-          return null
       }
     }
   }
@@ -192,16 +183,15 @@
 <style lang="scss">
   .scada-label {
     /*&:hover {*/
-      /*cursor: pointer;*/
+    /*cursor: pointer;*/
     /*}*/
+    .alarm {
+      fill: #d00000;
+    }
   }
 
   .scada-label-text, .scada-label-prefix, .scada-label-suffix {
     alignment-baseline: middle;
-  }
-
-  .scada-label-alarm {
-    fill: #d00000;
   }
 
 </style>

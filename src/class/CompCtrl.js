@@ -49,7 +49,10 @@ class CompCtrl {
       this.initKonva()
     }
 
+    this.bid = options.bid || ''
     this.value = options.value || {}
+    this.binding = options.binding || {}
+    this.eventMsg = options.eventMsg || ''
     this.options = options.options || {}
     if (!_.has(options, 'options.style')) {
       this.options.style = {}
@@ -597,8 +600,11 @@ class CompCtrl {
   toConfig() {
     const compConfig = {
       layout: this.getCompLayout(),
+      bid: this.bid,
+      eventMsg: this.eventMsg,
       type: this.type,
       options: this.options,
+      binding: this.binding,
       value: this.value
     }
     if (this.children && this.children.length > 0) {

@@ -15,9 +15,15 @@
 
   export default {
     name: 'SvgColorFilter',
+    props: {
+      blink: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
-        isAlarmShow: false
+        isAlarmShow: true
       }
     },
     computed: {
@@ -29,9 +35,11 @@
       }
     },
     mounted() {
-      setInterval(() => {
-        this.isAlarmShow = !this.isAlarmShow
-      }, 1000)
+      if (this.blink) {
+        setInterval(() => {
+          this.isAlarmShow = !this.isAlarmShow
+        }, 1000)
+      }
     }
   }
 </script>

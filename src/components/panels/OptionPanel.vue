@@ -32,9 +32,9 @@
 
 <script>
   import _ from 'lodash'
-  import OptionDefs from '../utils/optionDefs'
-  import { ScadaCompsLibrary } from '../components/Scada'
-  import SelCompsUtil from '../mixin/SelCompsUtil'
+  import OptionDefs from '../../utils/optionDefs'
+  import { ScadaCompsLibrary } from '../Scada/index'
+  import SelCompsUtil from '../../mixin/SelCompsUtil'
 
   export default {
     mixins: [SelCompsUtil],
@@ -72,11 +72,9 @@
         }
       },
       compValInputChanged() {
-        this.$nextTick(() => {
-          this.$emit('compOptionsChanged', {
-            optionCategory: this.optionCategory,
-            options: this.compOptions
-          })
+        this.$emit('compOptionsChanged', {
+          optionCategory: this.optionCategory,
+          options: this.compOptions
         })
       },
       getCompCateOptions() {
@@ -178,28 +176,12 @@
 
 <style lang="scss" scoped>
   .option_panel {
-    padding: 12px;
-
-    .type-hint {
-      display: inline-block;
-      color: #CCC;
-      font-size: 13px;
-      margin-bottom: 8px;
-      background: #2A2A2A;
-      padding: 3px 10px 3px 6px;
-      border-radius: 12px;
-    }
+    padding: 8px 8px 2px 12px;
 
     .ctrl-item {
+      margin-bottom: 6px;
       label {
-        /*font-size: 14px;*/
-        /*letter-spacing: 1.5px;*/
-        /*color: #DDD;*/
-        /*display: block;*/
-        margin-top: 4px;
-      }
-      .el-col {
-        margin-bottom: 8px;
+        margin-top: 3px;
       }
     }
   }

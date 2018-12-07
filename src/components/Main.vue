@@ -53,6 +53,8 @@
           <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
+          <span style="display: inline-block; width: 20px"/>
+          <el-switch v-model="debug_hideCanvas"></el-switch>
         </div>
       </header>
       <main>
@@ -65,7 +67,8 @@
         <div id="work_area">
           <div id="work_frame">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
-            <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"></div>
+            <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
+                 v-show="!debug_hideCanvas"></div>
           </div>
         </div>
         <div id="right_sidebar">
@@ -106,10 +109,15 @@
           </el-tabs>
           <el-tabs v-model="activeBindingTab" type="card" v-show="curSelComp">
             <el-tab-pane label="数据绑定" name="binding">
-              <BindingPanel :selComps="curSelComps" @compBindingChanged="onCompOptionsChanged"/>
+              <BindingPanel :selComps="curSelComps"
+                            @compBindingChanged="onCompBindingChanged"
+                            @compValChanged="onCompValChanged"/>
             </el-tab-pane>
             <el-tab-pane label="事件绑定" name="event">
-
+              <EventPanel :selComps="curSelComps"
+                          :optionCategory="'param'"
+                          @compBidChanged="onCompBidChanged"
+                          @compEventMsgChanged="onCompEventMsgChanged"/>
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="activeOptionsTab" type="card" v-show="curSelComp">
@@ -168,6 +176,7 @@
         </button>
       </li>
     </context-menu>
+    <!--<div id="dianji">点击查看</div>-->
   </div>
 </template>
 
@@ -198,8 +207,9 @@
   import DataBinding from '../mixin/DataBinding'
 
 
-  import BindingPanel from '../components/BindingPanel'
-  import OptionPanel from '../components/OptionPanel'
+  import BindingPanel from './panels/BindingPanel'
+  import EventPanel from './panels/EventPanel'
+  import OptionPanel from './panels/OptionPanel'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
@@ -209,7 +219,7 @@
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
   export default {
-    components: { ContextMenu, BindingPanel, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
+    components: { ContextMenu, BindingPanel, EventPanel, OptionPanel, ImgButton, SvgScadaView, CanvasNav },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
     name: 'MainEditor',
     data() {
@@ -246,7 +256,8 @@
         // activeRightTab: 'nav',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
-        activeBindingTab: 'binding'
+        activeBindingTab: 'binding',
+        debug_hideCanvas: false
       }
     },
     mounted() {
@@ -295,6 +306,7 @@
       addLabel() {
         this.addCompToCanvas({
           type: 'ScadaLabel',
+          bid: 'label1',
           layout: {
             x: 100,
             y: 100,
@@ -312,11 +324,11 @@
             }
           },
           value: {
-            text: null,
+            val: null,
             alarm: 0
           },
           binding: {
-            text: {
+            val: {
               type: 'aaaa',
               uid: '1234',
               field: 'bbbb',
@@ -328,7 +340,8 @@
               field: 'dddd',
               where: '',
             }
-          }
+          },
+          eventMsg: 'xzxcdsfsetf1234'
         })
       },
       addRect() {
@@ -346,6 +359,9 @@
               strokeWidth: 2,
               cornerRadius: 4
             }
+          },
+          value: {
+            alarm: 0
           }
         })
       },
@@ -358,6 +374,9 @@
             points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
             // points: [-10, -20, 200, 100]
           },
+          value: {
+            val: 0
+          }
           // options: {
           //   style: {
           //     // fill: 'rgba(0,0,0,0.5)',
@@ -401,7 +420,10 @@
             param: {
               imgUrl: '/images/google.png'
             }
-          }
+          },
+          value: {
+            alarm: 0
+          },
         })
       },
       addAll() {
@@ -613,6 +635,24 @@
             comp.options[cate] = newCateOptions
           })
         }
+      },
+      onCompBindingChanged(changedBinding) {
+        this.curSelComps.forEach((comp) => {
+          _.merge(comp.binding, changedBinding)
+        })
+      },
+      onCompValChanged(newValue) {
+        this.curSelComps.forEach((comp) => {
+          _.merge(comp.value, newValue)
+        })
+      },
+      onCompBidChanged(v) {
+        this.curSelComp.bid = v.bid
+      },
+      onCompEventMsgChanged(v) {
+        this.curSelComps.forEach((comp) => {
+          comp.eventMsg = v.eventMsg
+        })
       },
       zoomIn() {
         if (this.zoomScaleIndex < ZoomScaleSettings.length - 1) {
@@ -879,7 +919,7 @@
         flex: 0 0 260px;
         background: #3C3F41;
         #layout_panel {
-          padding: 12px 12px 6px 12px;
+          padding: 8px 12px 2px 12px;
           span.layout_panel_label {
             text-align: right;
             letter-spacing: 1px;
@@ -899,7 +939,7 @@
           .layout-input {
             width: 70px;
             margin-left: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: right;
             padding: 0 2px;
           }
@@ -980,6 +1020,16 @@
       &:first-of-type {
         margin-bottom: 10px;
       }
+    }
+  }
+
+  #dianji {
+    position: absolute;
+    top: 9999px;
+    left: 9999px;
+    color: #20a0ff;
+    &:hover {
+      cursor: pointer;
     }
   }
 
