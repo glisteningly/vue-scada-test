@@ -74,7 +74,7 @@
           <div id="work_frame">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
-                  v-show="!debug_hideCanvas" @drop="handleCompDrop"></div>
+                 v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"></div>
           </div>
         </div>
         <div id="right_sidebar">
@@ -456,8 +456,8 @@
           },
         })
       },
-      handleCompDrop(data, e) {
-        console.log(data)
+      handleCompDrop(e) {
+        console.log(e)
       },
 
       addAll() {

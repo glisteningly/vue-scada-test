@@ -1,9 +1,14 @@
 <template>
   <div class="comps-list">
-    <Drag class="comps-item"
-          :transferData="{ aaa:123 }">
-      <img src="/cdn/scada/ic-basic-comp/ScadaLabel.png">
-    </Drag>
+    <div class="comps-item"
+    draggable="true"
+    @dragstart="drag($event)">
+    <img src="/cdn/scada/ic-basic-comp/ScadaLabel.png">
+    </div>
+    <!--<drag class="comps-item"-->
+          <!--:transferData="{aaa:111 }">-->
+      <!--<img src="/cdn/scada/ic-basic-comp/ScadaLabel.png">-->
+    <!--</drag>-->
     <div class="comps-item"><img src="/cdn/scada/ic-basic-comp/ScadaLabel.png" alt=""></div>
     <div class="comps-item"><img src="/cdn/scada/ic-basic-comp/ScadaLabel.png" alt=""></div>
   </div>
@@ -14,7 +19,13 @@
 
   export default {
     name: 'BasicCompLib',
-    components: { Drag }
+    components: { Drag },
+    methods: {
+      drag(e) {
+        console.log(e)
+        e.dataTransfer.setData("aaa", 111);
+      }
+    }
   }
 </script>
 
