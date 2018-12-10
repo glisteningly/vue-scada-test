@@ -457,7 +457,8 @@
         })
       },
       handleCompDrop(e) {
-        console.log(e)
+        const data = e.dataTransfer.getData("data")
+        console.log(JSON.parse(data))
       },
 
       addAll() {
