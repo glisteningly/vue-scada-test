@@ -23,6 +23,9 @@ export default {
   },
   param: {},
   binding: {
+    val: {
+      label: '绑定'
+    },
     alarm: {
       label: '告警状态'
     }

@@ -119,7 +119,7 @@
             label: OptionDefs.binding[key].label,
           }
 
-          const _v = (_.has(this.curSelComp, ['value', key])) ? this.curSelComp.value[key] : null
+          const _v = (_.has(this.curSelComp, ['bindingValue', key])) ? this.curSelComp.bindingValue[key] : null
 
           Object.assign(ctrl, {
             binding: _b,

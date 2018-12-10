@@ -50,7 +50,7 @@ class CompCtrl {
     }
 
     this.bid = options.bid || ''
-    this.value = options.value || {}
+    this.bindingValue = options.bindingValue || {}
     this.binding = options.binding || {}
     this.eventMsg = options.eventMsg || ''
     this.options = options.options || {}
@@ -605,7 +605,7 @@ class CompCtrl {
       type: this.type,
       options: this.options,
       binding: this.binding,
-      value: this.value
+      bindingValue: this.bindingValue
     }
     if (this.children && this.children.length > 0) {
       const children = []
@@ -623,7 +623,7 @@ class CompCtrl {
     const compTpl = {
       bid: this.bid,
       eventMsg: this.eventMsg,
-      type: this.type,
+      type: (this.type === 'ScadaGroupWrap') ? 'ScadaGroup' : this.type,
       options: this.options,
       binding: this.binding,
     }

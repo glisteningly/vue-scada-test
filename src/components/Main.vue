@@ -344,7 +344,7 @@
               suffixText: 'V',
             }
           },
-          value: {
+          bindingValue: {
             val: null,
             alarm: 0
           },
@@ -395,7 +395,7 @@
             points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
             // points: [-10, -20, 200, 100]
           },
-          value: {
+          bindingValue: {
             val: 0
           }
           // options: {
@@ -477,7 +477,7 @@
         this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
       },
       unGroupToComps() {
-        if (this.curSelComp && this.curSelComp.type === 'ScadaGroup') {
+        if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap') {
           const childComps = []
           if (this.curSelComp.children) {
             this.curSelComp.children.forEach((childrenComp) => {
@@ -497,7 +497,7 @@
           // const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
           const groupRect = this.konvaObjs.selCompsGroup.getClientRect({ relativeTo: this.konvaObjs.stage })
           const g = {
-            type: 'ScadaGroup',
+            type: 'ScadaGroupWrap',
             layout: {
               x: groupRect.x + 1,
               y: groupRect.y + 1,
@@ -675,7 +675,7 @@
       },
       onCompValChanged(newValue) {
         this.curSelComps.forEach((comp) => {
-          _.merge(comp.value, newValue)
+          _.merge(comp.bindingValue, newValue)
         })
       },
       onCompBidChanged(v) {
@@ -768,7 +768,7 @@
         return this.curSelComps.length > 0
       },
       canUnGroupComps() {
-        return (this.curSelComps.length === 1 && this.curSelComps[0].type === 'ScadaGroup')
+        return (this.curSelComps.length === 1 && this.curSelComps[0].type === 'ScadaGroupWrap')
       },
       canvasZoom() {
         return this.canvasLayout.scale

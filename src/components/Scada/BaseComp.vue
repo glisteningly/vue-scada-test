@@ -4,7 +4,7 @@
   export default {
     name: 'BaseComp',
     props: {
-      value: {
+      bindingValue: {
         type: Object
       },
       comp: Object,
@@ -20,7 +20,7 @@
         return _.defaultsDeep({}, this.comp.options, this.defaultOptions)
       },
       values() {
-        return _.defaultsDeep({}, this.value, this.defaultValue)
+        return _.defaultsDeep({}, this.bindingValue, this.defaultValue)
       },
       rectTransformStr() {
         return `translate(${this.comp.x - this.comp.offsetX * this.comp.scaleX} ${this.comp.y - this.comp.offsetY * this.comp.scaleY})
@@ -64,6 +64,6 @@
   }
 </script>
 
-<style scoped>
+<style>
 
 </style>

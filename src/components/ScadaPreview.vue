@@ -25,6 +25,7 @@
     methods: {
       initScadaView(template) {
         this.scadaView = {
+          name: 'scadaSvg',
           // extends: BaseScadaView,
           template: template,
           // props: {
@@ -45,6 +46,6 @@
   }
 </script>
 
-<style scoped>
+<style>
 
 </style>
