@@ -3,10 +3,10 @@
     <section id="scada_editor">
       <header>
         <div class="toolbar" style="">
-          <el-button @click="addLabel">label</el-button>
-          <el-button @click="addRect">rect</el-button>
-          <el-button @click="addPath">path</el-button>
-          <el-button @click="addIcon2">google</el-button>
+          <!--<el-button @click="addLabel">label</el-button>-->
+          <!--<el-button @click="addRect">rect</el-button>-->
+          <!--<el-button @click="addPath">path</el-button>-->
+          <!--<el-button @click="addIcon2">google</el-button>-->
           <el-button @click="addAll">add all</el-button>
           <el-button @click="addCompGroup">add group</el-button>
           <el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>
@@ -63,7 +63,10 @@
       <main>
         <div id="left_sidebar">
           <el-tabs v-model="activeLeftTab" type="card">
-            <el-tab-pane label="组件库" name="library"></el-tab-pane>
+            <el-tab-pane label="组件" name="library"></el-tab-pane>
+            <el-tab-pane label="元件" name="basicComp">
+              <BasicCompLib/>
+            </el-tab-pane>
             <el-tab-pane label="图层" name="layer"></el-tab-pane>
           </el-tabs>
         </div>
@@ -71,7 +74,7 @@
           <div id="work_frame">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
-                 v-show="!debug_hideCanvas"></div>
+                  v-show="!debug_hideCanvas" @drop="handleCompDrop"></div>
           </div>
         </div>
         <div id="right_sidebar">
@@ -206,6 +209,8 @@
 
   import CompCtrl from '../class/CompCtrl'
 
+  import { Drop } from 'vue-drag-drop'
+
   import CommonUtils from '../mixin/CommonUtils'
   import ComputeLayout from '../mixin/ComputeLayout'
   import Keyboard from '../mixin/Keyboard'
@@ -218,6 +223,8 @@
   import BindingPanel from './panels/BindingPanel'
   import EventPanel from './panels/EventPanel'
   import OptionPanel from './panels/OptionPanel'
+
+  import BasicCompLib from '../components/BasicCompLib'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
@@ -230,6 +237,7 @@
 
   export default {
     components: {
+      Drop,
       ContextMenu,
       BindingPanel,
       EventPanel,
@@ -237,7 +245,8 @@
       ImgButton,
       SvgScadaView,
       CanvasNav,
-      ScadaPreview
+      ScadaPreview,
+      BasicCompLib
     },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
     name: 'MainEditor',
@@ -271,7 +280,7 @@
         curSelCompStyleOptions: {},
         zoomScaleIndex: 4,
         curFixedPathPoint: null,
-        activeLeftTab: 'library',
+        activeLeftTab: 'basicComp',
         // activeRightTab: 'nav',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
@@ -434,12 +443,12 @@
           layout: {
             x: 300,
             y: 300,
-            width: 200,
-            height: 68
+            width: 150,
+            height: 150
           },
           options: {
             param: {
-              imgUrl: '/images/google.png'
+              imgUrl: '/images/holder.jpg'
             }
           },
           value: {
@@ -447,6 +456,10 @@
           },
         })
       },
+      handleCompDrop(data, e) {
+        console.log(data)
+      },
+
       addAll() {
         this.addLabel()
         this.addIcon()
@@ -465,6 +478,9 @@
             x: relativePt.x,
             y: relativePt.y,
             points: [0, 0]
+          },
+          bindingValue: {
+            val: 0
           }
         })
         const newSels = []
