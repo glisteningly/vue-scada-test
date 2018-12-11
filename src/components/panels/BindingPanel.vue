@@ -59,7 +59,7 @@
 
 <script>
   import _ from 'lodash'
-  import OptionDefs from '../../utils/optionDefs'
+  import OptionDefs from '../../const/optionDefs'
   import { ScadaCompsLibrary } from '../Scada/index'
   import SelCompsUtil from '../../mixin/SelCompsUtil'
 

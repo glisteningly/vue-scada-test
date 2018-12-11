@@ -7,12 +7,12 @@
           <!--<el-button @click="addRect">rect</el-button>-->
           <!--<el-button @click="addPath">path</el-button>-->
           <!--<el-button @click="addIcon2">google</el-button>-->
-          <el-button @click="addAll">add all</el-button>
-          <el-button @click="addCompGroup">add group</el-button>
-          <el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>
+          <!--<el-button @click="addAll">add all</el-button>-->
+          <!--<el-button @click="addCompGroup">add group</el-button>-->
+          <!--<el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>-->
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
           <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
-          <span style="display: inline-block; width: 20px"/>
+          <!--<span style="display: inline-block; width: 20px"/>-->
           <el-button @click="showNodeZIndex">z index</el-button>
           <span class="toolbar-gutter-h"/>
           <div class="img-btn-group">
@@ -217,6 +217,9 @@
   import InitKonva from '../mixin/InitKonva'
   import ActionAlign from '../mixin/ActionAlign'
   import ActionMove from '../mixin/ActionMove'
+  import StateStore from '../mixin/StateStore'
+
+
   import DataBinding from '../mixin/DataBinding'
 
 
@@ -224,14 +227,14 @@
   import EventPanel from './panels/EventPanel'
   import OptionPanel from './panels/OptionPanel'
 
-  import BasicCompLib from '../components/BasicCompLib'
+  import BasicCompLib from './panels/BasicCompLib'
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
 
   import ScadaPreview from '../components/ScadaPreview'
 
-  import { TOOL_STATE } from '../utils/CONST'
+  import { TOOL_STATE } from '../const'
 
   const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
 
@@ -248,11 +251,11 @@
       ScadaPreview,
       BasicCompLib
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding],
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding, StateStore],
     name: 'MainEditor',
     data() {
       return {
-        toolState: '',
+        // toolState: '',
         inited: false,
         comps: [],
         canvasLayout: {
@@ -333,143 +336,39 @@
         this.addCompEvent(compCtrl)
         this.comps.push(compCtrl)
       },
-      addLabel() {
-        this.addCompToCanvas({
-          type: 'ScadaLabel',
-          bid: 'label1',
-          layout: {
-            x: 100,
-            y: 100,
-            width: 150,
-            height: 60
-          },
-          options: {
-            style: {
-              // fontSize: 30
-            },
-            param: {
-              defaultText: 14.24,
-              prefixText: '电压',
-              suffixText: 'V',
-            }
-          },
-          bindingValue: {
-            val: null,
-            alarm: 0
-          },
-          binding: {
-            val: {
-              type: 'aaaa',
-              uid: '1234',
-              field: 'bbbb',
-              where: '',
-            },
-            alarm: {
-              type: 'cccc',
-              uid: '9876',
-              field: 'dddd',
-              where: '',
-            }
-          },
-          eventMsg: 'xzxcdsfsetf1234'
-        })
-      },
-      addRect() {
-        this.addCompToCanvas({
-          type: 'ScadaRect',
-          layout: {
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100
-          },
-          options: {
-            style: {
-              stroke: '#20a0ff',
-              strokeWidth: 2,
-              cornerRadius: 4
-            }
-          },
-          value: {
-            alarm: 0
-          }
-        })
-      },
-      addPath() {
-        this.addCompToCanvas({
-          type: 'ScadaTube',
-          layout: {
-            x: 100,
-            y: 200,
-            points: [0, 0, 100, 0, 100, 100, 180, 100, 180, 30, 240, 30]
-            // points: [-10, -20, 200, 100]
-          },
-          bindingValue: {
-            val: 0
-          }
-          // options: {
-          //   style: {
-          //     // fill: 'rgba(0,0,0,0.5)',
-          //     // stroke: '#CCC',
-          //     // strokeWidth: 10,
-          //     // cornerRadius: 10
-          //     // tubeWidth: 10,
-          //     // tubeColor: '#CCC',
-          //     // flowLineWidth: 6,
-          //     // flowLineColor: 'rgba(0,0,0,0.5)',
-          //     // cornerRadius: 15
-          //   },
-          //   param: {}
-          // }
-        })
-      },
-      addIcon() {
-        this.addCompToCanvas({
-          type: 'ScadaImage',
-          layout: {
-            x: 100,
-            y: 100,
-            width: 100,
-            height: 100
-          },
-          options: {
-            url: '/images/twitter.svg'
-          }
-        })
-      },
-      addIcon2() {
-        this.addCompToCanvas({
-          type: 'ScadaImage',
-          layout: {
-            x: 300,
-            y: 300,
-            width: 150,
-            height: 150
-          },
-          options: {
-            param: {
-              imgUrl: '/images/holder.jpg'
-            }
-          },
-          value: {
-            alarm: 0
-          },
-        })
-      },
+
       handleCompDrop(e) {
         const data = e.dataTransfer.getData("data")
-        console.log(JSON.parse(data))
+        // console.log(data)
+
+        if (data) {
+          const newCompOptions = JSON.parse(data)
+          if (!newCompOptions) {
+            return
+          }
+
+          const dropPos = { x: e.offsetX, y: e.offsetY }
+          const transform = this.konvaObjs.stage.getTransform().copy().invert()
+          const absPos = transform.point(dropPos)
+
+          // newCompOptions.layout.x = absPos.x - newCompOptions.layout.width / 2
+          // newCompOptions.layout.y = absPos.y - newCompOptions.layout.height / 2
+          newCompOptions.layout.x = absPos.x
+          newCompOptions.layout.y = absPos.y
+
+          const compCtrl = this.addCompToCanvas(newCompOptions)
+
+          if (compCtrl) {
+            this.unGroupSelAll()
+            this.curSelComps.push(compCtrl)
+          }
+
+          if (compCtrl.type === 'ScadaTube') {
+            this.toolState = TOOL_STATE.addPathPoint
+          }
+        }
       },
 
-      addAll() {
-        this.addLabel()
-        this.addIcon()
-        this.addRect()
-        this.addIcon2()
-      },
-      addCompGroup() {
-        this.addCompToCanvas(CompGroup3)
-      },
       addPathStartPoint(pos = { x: 300, y: 300 }) {
         const stageTf = this.konvaObjs.stage.getTransform().copy().invert()
         const relativePt = stageTf.point(pos)
@@ -490,9 +389,7 @@
         this.unGroupSelAll()
         this.curSelComps = newSels
       },
-      toolPathPoint() {
-        this.toolState = (this.toolState) ? '' : TOOL_STATE.addPathPoint
-      },
+
       unGroupToComps() {
         if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap') {
           const childComps = []
@@ -794,6 +691,7 @@
         return ZoomScaleSettings[this.zoomScaleIndex]
       },
       isToolStatePath() {
+        // return (this.toolState === TOOL_STATE.addPathPoint) ? 'primary' : 'default'
         return (this.toolState === TOOL_STATE.addPathPoint) ? 'primary' : 'default'
       },
       canvasCursorStyle() {
@@ -826,11 +724,23 @@
           }
         }
         return null
-      }
+      },
+      // toolState: {
+      //   get() {
+      //     return this.$store.state.toolState
+      //   },
+      //   set(v) {
+      //     const tool = this.$store.state.toolState ? '' : v
+      //     // console.log(tool)
+      //     this.$store.dispatch('SetToolState', tool).then(() => {
+      //       // console.log(this.$store.state.toolState)
+      //     })
+      //   }
+      // }
     },
     watch: {
       curSelComps(val) {
-        console.log('curSelComps:' + this.curSelComps.length)
+        // console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
             // this.initCompCtrlPanel()

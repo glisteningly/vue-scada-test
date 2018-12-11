@@ -1,5 +1,14 @@
 @import "element-ui";
 
+ul,li {
+  margin: 0;
+  padding: 0;
+}
+
+li{
+  list-style: none;
+}
+
 .ctx-menu {
   width: 220px;
 }

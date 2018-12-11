@@ -13,7 +13,7 @@ const CanvasDefaultSettings = {
 //   addPathPoint: 'ADD_PATH_POINT'
 // }
 
-import { TOOL_STATE } from '../utils/CONST'
+import { TOOL_STATE } from '../const'
 
 export default {
   methods: {
@@ -178,13 +178,13 @@ export default {
 
         if (e.target === this.konvaObjs.stage && e.evt.button === 0) {
           // console.log(e)
-          console.log('stage mousedown')
+          // console.log('stage mousedown')
 
           this.isDragSelecting = true
           const mousePos = this.konvaObjs.stage.getPointerPosition()
-          const x = mousePos.x
-          const y = mousePos.y
-          console.log('x: ' + x + ', y: ' + y)
+          // const x = mousePos.x
+          // const y = mousePos.y
+          // console.log('x: ' + x + ', y: ' + y)
           this.konvaObjs.selCompsRect.width(0)
           this.konvaObjs.selCompsRect.height(0)
           // this.konvaObjs.selCompsRect.moveTo(this.konvaObjs.layers[0])

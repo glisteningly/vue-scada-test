@@ -123,7 +123,7 @@
         type: Object,
         default: function () {
           return {
-            val: '----',
+            val: null,
             alarm: 0
           }
         }
