@@ -2,8 +2,8 @@ export default [
   {
     type: 'ScadaLabel',
     layout: {
-      width: 100,
-      height: 40
+      width: 140,
+      height: 30
     },
     options: {
       style: {

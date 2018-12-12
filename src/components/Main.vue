@@ -194,7 +194,7 @@
   // for test
   import CompConfig from '../temp/compConfig1'
   // import CompGroup1 from '../temp/compGroup2'
-  import CompGroup3 from '../temp/compGroup3'
+  // import CompGroup3 from '../temp/compGroup3'
 
   import Konva from 'konva'
   import _ from 'lodash'
@@ -218,6 +218,7 @@
   import ActionAlign from '../mixin/ActionAlign'
   import ActionMove from '../mixin/ActionMove'
   import StateStore from '../mixin/StateStore'
+  import InitConfig from '../mixin/InitConfig'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -251,7 +252,7 @@
       ScadaPreview,
       BasicCompLib
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding, StateStore],
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding, StateStore, InitConfig],
     name: 'MainEditor',
     data() {
       return {
@@ -295,6 +296,7 @@
     },
     mounted() {
       this.initKonvaWorkArea()
+      this.initDeviceType()
     },
     methods: {
       addCompEvent(compCtrl) {

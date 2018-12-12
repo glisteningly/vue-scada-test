@@ -11,6 +11,16 @@ export default {
           // console.log(this.$store.state.toolState)
         })
       }
+    },
+    deviceTypeTree: {
+      get() {
+        return this.$store.state.deviceTypeList
+      },
+      set(v) {
+        this.$store.dispatch('SetDeviceType', v).then(() => {
+          // console.log(this.$store.state.deviceTypeList)
+        })
+      }
     }
-  },
+  }
 }

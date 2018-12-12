@@ -9,7 +9,7 @@
     <el-tabs v-if="compValueBindingCount > 0" v-model="activeTab" type="border-card">
       <el-tab-pane v-for="(ctrl,key) in compBindings" :key="key" :label="ctrl.label" :name="key">
         <div class="action-list">
-          <el-button plain size="mini">对象选择</el-button>
+          <el-button plain size="mini" @click="openSelDialog">对象选择</el-button>
           <el-button plain size="mini" v-show="key === 'alarm'">关联</el-button>
           <el-input-number class="value-preview" @change="compValChanged(ctrl.value)"
                            placeholder="预览值" controls-position="right"
@@ -54,6 +54,8 @@
         </el-row>
       </el-tab-pane>
     </el-tabs>
+    <DeviceSelector ref="deviceSelector" v-model="deviceBinding" :visible.sync="selectorVisible"
+                    @change="onBindingChange" @clear="onBindingClear"></DeviceSelector>
   </div>
 </template>
 
@@ -63,14 +65,24 @@
   import { ScadaCompsLibrary } from '../Scada/index'
   import SelCompsUtil from '../../mixin/SelCompsUtil'
 
+  import DeviceSelector from '../../components/DeviceSelector'
+
+
   export default {
     mixins: [SelCompsUtil],
+    components: { DeviceSelector },
     name: 'BindingPanel',
     data() {
       return {
         activeTab: '',
         compBindings: {},
-        lastSelTab: ''
+        lastSelTab: '',
+        selectorVisible: false,
+        deviceBinding: {
+          type: '',
+          field: '',
+          uid: ''
+        }
       }
     },
     props: {
@@ -158,18 +170,27 @@
       },
       getCurSelCompBinding() {
         if (this.selComps.length >= 1) {
-          // console.log('-------def-------')
-          // console.log(this.getCompOptionsDefine())
-
-          // if (this.selComps.length === 1) {
-          //   return this.getCompCateBinding()
-          // } else {
-          //   return (this.curSelCompsType) ? this.getCompCateBinding() : null
-          // }
-
           return this.getCompCateBinding()
         }
         return null
+      },
+      openSelDialog() {
+         this.deviceBinding = this.compBindings[this.activeTab].binding
+
+        this.selectorVisible = true
+      },
+      onBindingChange(device) {
+        console.log(device)
+        const keys = ['type', 'uid', 'field']
+        keys.forEach(key => {
+          if (device[key]) {
+            this.compBindings[this.activeTab].binding[key] = device[key]
+          }
+        })
+        this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
+      },
+      onBindingClear() {
+
       }
     },
     computed: {
