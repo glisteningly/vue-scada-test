@@ -13,7 +13,7 @@
           <component
               :is="getCtrlTyp(ctrl.type)"
               v-model="ctrl.value"
-              @change="compValInputChanged"
+              @change="compValInputChanged(ctrl.value, key)"
               controls-position="right"
               :min="0"
               show-alpha>
@@ -71,10 +71,13 @@
             return 'el-input'
         }
       },
-      compValInputChanged() {
+      compValInputChanged(val, key) {
+        // this.$emit('compOptionsChanged', {
+        //   optionCategory: this.optionCategory,
+        //   options: this.compOptions
+        // })
         this.$emit('compOptionsChanged', {
-          optionCategory: this.optionCategory,
-          options: this.compOptions
+          [this.optionCategory]: { [key]: val }
         })
       },
       getCompCateOptions() {

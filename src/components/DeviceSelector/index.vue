@@ -106,12 +106,13 @@
       },
       close() {
         this.dialogVisible = false
+
         this.$emit('change', {
           type: this.type,
           field: this.attr,
           uid: this.uid,
-          unit: this.unit,
-          fieldLabel: this.fieldLabel
+          unit: this.autoUnit ? this.unit : '',
+          fieldLabel: this.autoLabel ? this.fieldLabel : ''
         })
       },
       clearBinding() {

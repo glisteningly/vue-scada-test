@@ -117,6 +117,7 @@
             <el-tab-pane label="数据绑定" name="binding">
               <BindingPanel :selComps="curSelComps"
                             @compBindingChanged="onCompBindingChanged"
+                            @compOptionsChanged="onCompOptionsChanged"
                             @compValChanged="onCompValChanged"/>
             </el-tab-pane>
             <el-tab-pane label="事件绑定" name="event">
@@ -565,22 +566,28 @@
         }
       },
       onCompOptionsChanged(changedOptions) {
-        const newVal = {}
-        const cate = changedOptions.optionCategory
-        const newOptions = changedOptions.options
-        for (const key in newOptions) {
-          newVal[key] = newOptions[key].value
-        }
+        console.log(changedOptions)
+
+        // const newVal = {}
+        // const cate = changedOptions.optionCategory
+        // const newOptions = changedOptions.options
+        // for (const key in newOptions) {
+        //   newVal[key] = newOptions[key].value
+        // }
+        // if (this.curSelComp) {
+        //   const compOptions = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary)[cate]
+        //
+        //   const newCateOptions = utils.diff(newVal, compOptions)
+        //
+        //   this.curSelComps.forEach((comp) => {
+        //     comp.options[cate] = newCateOptions
+        //   })
+        // }
+        const cate = _.keys(changedOptions)[0]
+
         if (this.curSelComp) {
-          const compOptions = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary)[cate]
-          console.log(newVal)
-          console.log(compOptions)
-          // console.log(utils.diff(newVal, compStyles))
-          const newCateOptions = utils.diff(newVal, compOptions)
-          console.log(newCateOptions)
-          // this.curSelComp.options.style = utils.diff(newVal, compStyles)
           this.curSelComps.forEach((comp) => {
-            comp.options[cate] = newCateOptions
+            comp.options[cate] = Object.assign({}, comp.options[cate], changedOptions[cate])
           })
         }
       },

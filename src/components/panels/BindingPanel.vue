@@ -175,12 +175,12 @@
         return null
       },
       openSelDialog() {
-         this.deviceBinding = this.compBindings[this.activeTab].binding
+        this.deviceBinding = this.compBindings[this.activeTab].binding
 
         this.selectorVisible = true
       },
       onBindingChange(device) {
-        console.log(device)
+        // console.log(device)
         const keys = ['type', 'uid', 'field']
         keys.forEach(key => {
           if (device[key]) {
@@ -188,6 +188,20 @@
           }
         })
         this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
+
+        const o = {}
+
+        if (device.unit) {
+          _.merge(o, { param: { suffixText: device.unit } })
+        }
+        if (device.fieldLabel) {
+          _.merge(o, { param: { prefixText: device.fieldLabel } })
+        }
+
+        if (!_.isEmpty(o)) {
+          console.log(o)
+          this.$emit('compOptionsChanged', o)
+        }
       },
       onBindingClear() {
 

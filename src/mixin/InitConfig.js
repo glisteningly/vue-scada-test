@@ -9,13 +9,9 @@ export default {
   methods: {
     initDeviceType() {
       DeviceType.getDeviceTypes().then(rootType => {
-        // console.log(rootType.children)
+        this.deviceTypeTree = TreeFormatUtil.treeFormat(rootType.children)
+      }).catch(() => {
 
-        const treeData = TreeFormatUtil.treeFormat(rootType.children)
-        // this.$store.dispatch('SetDeviceType', treeData).then(() => {
-        //   // console.log(this.$store.state.deviceTypeList)
-        // })
-        this.deviceTypeTree = treeData
       })
     }
   }

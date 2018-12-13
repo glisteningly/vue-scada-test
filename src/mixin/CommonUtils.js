@@ -6,8 +6,8 @@ export default {
       return _.round(num, 2)
     },
     getCompDefaultOptions(comp, library) {
-      console.log(comp)
-      console.log(library)
+      // console.log(comp)
+      // console.log(library)
       if (comp) {
         const compType = comp.type
         if (library[compType]) {
