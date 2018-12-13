@@ -172,6 +172,15 @@ input::-webkit-inner-spin-button {
 
 .el-tabs.el-tabs--card.el-tabs--top {
   border-bottom: 1px solid #2B2B2B;
+  //display: flex;
+  //flex-direction: column;
+  //height: 100%;
+  //.el-tabs__content {
+  //  height: 100%;
+  //  .el-tab-pane {
+  //    height: 100%;
+  //  }
+  //}
 }
 
 .el-tabs--card > .el-tabs__header {

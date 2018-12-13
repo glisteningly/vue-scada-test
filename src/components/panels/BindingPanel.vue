@@ -6,7 +6,7 @@
     <div v-if="curSelCompsCount > 1 && !curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个不同类型对象</span>
     </div>
-    <el-tabs v-if="compValueBindingCount > 0" v-model="activeTab" type="border-card">
+    <el-tabs v-if="compValueBindingCount > 0" v-model="activeTab" type="border-card" >
       <el-tab-pane v-for="(ctrl,key) in compBindings" :key="key" :label="ctrl.label" :name="key">
         <div class="action-list">
           <el-button plain size="mini" @click="openSelDialog">对象选择</el-button>
@@ -205,7 +205,10 @@
       },
       onBindingClear() {
 
-      }
+      },
+      // onTabClick() {
+      //   this.lastSelTab = this.activeTab
+      // }
     },
     computed: {
       compValueBindingCount() {
@@ -219,11 +222,15 @@
           this.activeTab = this.lastSelTab
         } else {
           this.activeTab = _.keys(this.compBindings)[0]
-          this.lastSelTab = this.activeTab
+          if (this.activeTab) {
+            this.lastSelTab = this.activeTab
+          }
         }
       },
       activeTab(val) {
-        this.lastSelTab = val
+        if (val) {
+          this.lastSelTab = val
+        }
       }
     }
   }

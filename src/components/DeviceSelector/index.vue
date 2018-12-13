@@ -5,7 +5,7 @@
         :visible.sync="dialogVisible"
         width="1000px">
       <div class="device-selector-container">
-        <device-type-tree class="child-panel" @change="changeType" :type="type"></device-type-tree>
+        <device-type-tree class="child-panel" @change="changeType" :type="type" :treedata="deviceTypeTree"></device-type-tree>
         <device-ins :type="type" class="child-panel" :uid="uid" @change="changeIns"></device-ins>
         <device-attrs :type="type" class="child-panel" @change="changeAttr" :attr="attr"></device-attrs>
       </div>
@@ -18,7 +18,7 @@
           <span>填入单位至后缀</span>
           <el-switch v-model="autoUnit"/>
         </div>
-        <el-button @click="clearBinding" size="small">清除绑定</el-button>
+        <!--<el-button @click="clearBinding" size="small">清除绑定</el-button>-->
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
         <el-button type="primary" @click="close" size="small">确 定</el-button>
       </span>
@@ -30,9 +30,12 @@
   import DeviceAttrs from './DeviceAttrList'
   import DeviceIns from './DeviceInsList'
 
+  import StateStore from '../../mixin/StateStore'
+
   export default {
     name: 'DeviceSelector',
     components: { DeviceTypeTree, DeviceAttrs, DeviceIns },
+    mixins: [StateStore],
     model: {
       prop: 'device',
       event: 'modelChange'

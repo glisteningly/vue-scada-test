@@ -51,3 +51,17 @@
 @mixin al-title-hint {
   border-left: 3px solid $prime_color;
 }
+
+@mixin el-tab-flex {
+  .el-tabs.el-tabs--card.el-tabs--top {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .el-tabs__content {
+      height: 100%;
+      .el-tab-pane {
+        height: 100%;
+      }
+    }
+  }
+}

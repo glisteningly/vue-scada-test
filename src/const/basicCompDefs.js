@@ -7,7 +7,8 @@ export default [
     },
     options: {
       style: {
-        fontSize: 20
+        fontSize: 20,
+        fontFamily: 'lcdmono'
       }
     }
   },

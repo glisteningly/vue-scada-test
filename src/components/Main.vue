@@ -48,10 +48,18 @@
           <el-button @click="testExport">export</el-button>
           <!--<el-button @click="copyCompsTolocalStorage">test</el-button>-->
           <!--<el-button @click="loadCompsFromlocalStorage">load</el-button>-->
-          <span style="display: inline-block; width: 40px; color: #EEE; text-align: center; font-size: 12px">{{ curZoomScale | numPercent }}</span>
+          <span class="toolbar-gutter-h"/>
+
+          <label>{{ curZoomScale | numPercent }}</label>
           <el-button @click="zoomOut"><i class="el-icon-zoom-out"></i></el-button>
           <el-button @click="zoom100">100%</el-button>
           <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
+
+          <span class="toolbar-gutter-h"/>
+          <label class="ctrl-canvas-bg-label">背景色</label>
+          <el-color-picker class="ctrl-canvas-bg" v-model="editorConfig.canvasBgColor"></el-color-picker>
+
+          <span class="toolbar-gutter-h"/>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="doPreview">预览</el-button>
@@ -63,15 +71,17 @@
       <main>
         <div id="left_sidebar">
           <el-tabs v-model="activeLeftTab" type="card">
-            <el-tab-pane label="组件" name="library"></el-tab-pane>
             <el-tab-pane label="元件" name="basicComp">
               <BasicCompLib/>
+            </el-tab-pane>
+            <el-tab-pane label="组件" name="deviceComp">
+              <DeviceCompLib/>
             </el-tab-pane>
             <el-tab-pane label="图层" name="layer"></el-tab-pane>
           </el-tabs>
         </div>
         <div id="work_area">
-          <div id="work_frame">
+          <div id="work_frame" :style="workFrameBgColor">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
                  v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"></div>
@@ -202,9 +212,9 @@
   import hotkeys from 'hotkeys-js'
 
   import ContextMenu from 'vue-context-menu'
-  import { ScadaCompsLibrary } from '../components/Scada'
+  // import { ScadaCompsLibrary } from '../components/Scada'
 
-  import utils from '../utils'
+  // import utils from '../utils'
   import ScadaVueTpl from '../utils/scadaVueTpl'
   // import styleDefs from '../utils/styleDefs'
 
@@ -228,8 +238,9 @@
   import BindingPanel from './panels/BindingPanel'
   import EventPanel from './panels/EventPanel'
   import OptionPanel from './panels/OptionPanel'
-
   import BasicCompLib from './panels/BasicCompLib'
+  import DeviceCompLib from './panels/DeviceCompLib'
+
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
@@ -251,7 +262,8 @@
       SvgScadaView,
       CanvasNav,
       ScadaPreview,
-      BasicCompLib
+      BasicCompLib,
+      DeviceCompLib
     },
     mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding, StateStore, InitConfig],
     name: 'MainEditor',
@@ -285,14 +297,17 @@
         curSelCompStyleOptions: {},
         zoomScaleIndex: 4,
         curFixedPathPoint: null,
-        activeLeftTab: 'basicComp',
+        activeLeftTab: 'deviceComp',
         // activeRightTab: 'nav',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
         activeBindingTab: 'binding',
         debug_hideCanvas: false,
         showPreview: false,
-        previewTplStr: ''
+        previewTplStr: '',
+        editorConfig: {
+          canvasBgColor: 'rgb(13, 51, 73)'
+        }
       }
     },
     mounted() {
@@ -529,7 +544,7 @@
         const previewCanvasConfig = {
           w: 1000,
           h: 600,
-          bgColor: '#0f3963'
+          bgColor: this.editorConfig.canvasBgColor
         }
         const t = ScadaVueTpl.getTplStr(this.comps, previewCanvasConfig)
         this.previewTplStr = t
@@ -734,18 +749,11 @@
         }
         return null
       },
-      // toolState: {
-      //   get() {
-      //     return this.$store.state.toolState
-      //   },
-      //   set(v) {
-      //     const tool = this.$store.state.toolState ? '' : v
-      //     // console.log(tool)
-      //     this.$store.dispatch('SetToolState', tool).then(() => {
-      //       // console.log(this.$store.state.toolState)
-      //     })
-      //   }
-      // }
+      workFrameBgColor() {
+        return {
+          backgroundColor: this.editorConfig.canvasBgColor
+        }
+      }
     },
     watch: {
       curSelComps(val) {
@@ -828,7 +836,7 @@
 
 </script>
 <style lang="scss">
-  /*@import "styles/index";*/
+  @import "../styles/mixin";
 
   body {
     user-select: none;
@@ -863,6 +871,7 @@
       width: 100vw;
       /*height: 100%;*/
       #left_sidebar {
+        @include el-tab-flex;
         flex: 0 0 200px;
         background: #3C3F41;
         border-right: 1px solid #000;
@@ -876,7 +885,7 @@
           width: 100%;
           height: 100%;
           position: relative;
-          background: #2B2B2B;
+          /*background: #2B2B2B;*/
           overflow: hidden;
           #work_canvas {
             width: 100%;
@@ -925,13 +934,25 @@
     }
 
     .toolbar {
+      color: #EEE;
+      font-size: 13px;
       display: flex;
       align-items: center;
       padding: 10px;
       white-space: nowrap;
+      label {
+        margin-right: 4px;
+      }
       .toolbar-gutter-h {
         display: inline-block;
         width: 20px;
+      }
+
+      .ctrl-canvas-bg {
+        &.el-color-picker--mini .el-color-picker__trigger {
+          width: 28px;
+          height: 28px;
+        }
       }
     }
   }

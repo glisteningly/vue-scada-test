@@ -14,15 +14,24 @@
                text-anchor="start">
           {{ options.param.prefixText }}
         </tspan>
-        <tspan v-if="!options.param.suffixText" class="scada-label-text" alignment-baseline="middle"
+        <tspan v-if="!options.param.suffixText"
+               class="scada-label-text"
+               alignment-baseline="middle"
                :x="comp.width * comp.scaleX / 2"
+               :font-family="fontFamily"
+               :font-size="labelFontSize"
                text-anchor="middle">
           {{ labelText }}
         </tspan>
         <tspan v-else
                :x="comp.width * comp.scaleX"
                text-anchor="end">
-          <tspan class="scada-label-text" alignment-baseline="middle">{{ labelText }}</tspan>
+          <tspan class="scada-label-text"
+                 :font-family="fontFamily"
+                 :font-size="labelFontSize"
+                 alignment-baseline="middle">
+            {{ labelText }}
+          </tspan>
           <tspan class="scada-label-suffix"
                  :class="alarmClass"
                  :fill="options.style.suffixFill"
@@ -38,7 +47,9 @@
                  :fill="options.style.prefixFill">
             {{ options.param.prefixText }}
           </tspan>
-          <tspan class="scada-label-text">
+          <tspan class="scada-label-text"
+                 :font-family="fontFamily"
+                 :font-size="labelFontSize">
             {{ labelText }}
           </tspan>
           <tspan v-if="options.param.suffixText"
@@ -75,6 +86,14 @@
           { label: '左', value: 'start' },
           { label: '居中', value: 'middle' },
           { label: '右', value: 'end' },
+        ]
+      },
+      fontFamily: {
+        label: '字体',
+        type: 'Enum',
+        opts: [
+          { label: '默认', value: 'default' },
+          { label: 'LCD', value: 'lcdmono' }
         ]
       },
       prefixFill: {
@@ -136,6 +155,7 @@
               fill: '#FFF',
               fontSize: 20,
               textAlignH: 'auto',
+              fontFamily: 'default',
               prefixFill: '#FFF',
               suffixFill: '#FFF',
             },
@@ -175,7 +195,22 @@
           case 'middle':
             return this.comp.width * this.comp.scaleX / 2
         }
-      }
+      },
+      fontFamily() {
+        switch (this.options.style.fontFamily) {
+          case 'lcdmono':
+            return 'lcdmono'
+          default:
+            return ''
+        }
+      },
+      labelFontSize() {
+        if (this.fontFamily === 'lcdmono') {
+          return this.options.style.fontSize * 1.2
+        } else {
+          return this.options.style.fontSize
+        }
+      },
     }
   }
 </script>

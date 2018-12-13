@@ -14,7 +14,7 @@
     </div>
     <el-tree
         class="device-type-tree"
-        :data="deviceTypeTree"
+        :data="treedata"
         node-key="name"
         :highlight-current="true"
         :props="defaultProps"
@@ -26,27 +26,33 @@
                   :title="`${node.label} ${data.name}`"
                   :class="{ active: data.name === activeNode.name }">
                 <span>{{ node.label}}</span>
-                <label v-if="node.label !== data.name">{{ data.name }}</label>
+                <label v-if="(showTypeName && (node.label !== data.name))">{{ data.name }}</label>
             </span>
     </el-tree>
   </div>
 </template>
 <script>
-  import { ModuleCommonUtil } from 'service-module-utils'
-  import { DeviceTypeService } from 'service-module-api'
-  import StateStore from '../../mixin/StateStore'
-
-  const DeviceType = DeviceTypeService.DeviceType
-
-  const TreeFormatUtil = ModuleCommonUtil.TreeDataFormat
-
   export default {
-    props: ['type'],
-    mixins: [StateStore],
+    name: 'DeviceTypeList',
+    props: {
+      type: {
+        type: String,
+        default: ''
+      },
+      treedata: {
+        type: Array,
+        default: function () {
+          return []
+        }
+      },
+      showTypeName: {
+        type: Boolean,
+        default: true
+      }
+    },
     data() {
       return {
         filterStr: '',
-        // treeData: [],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -66,10 +72,6 @@
       }
     },
     mounted() {
-      // DeviceType.getDeviceTypes().then(rootType => {
-      //   console.log(rootType.children)
-      //   this.treeData = TreeFormatUtil.treeFormat(rootType.children)
-      // })
     },
     watch: {
       filterStr(val) {
@@ -82,13 +84,14 @@
     }
   }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
   @import "../../styles/mixin";
 
   .device-type-list-root {
     border: 1px solid #666;
     border-right: none;
     display: flex;
+    font-size: 14px;
     flex-flow: column;
     .header {
       .search {
@@ -118,7 +121,7 @@
       }
 
       /*.active {*/
-        /*background-color: rgba(39, 176, 255, 0.2);*/
+      /*background-color: rgba(39, 176, 255, 0.2);*/
       /*}*/
     }
   }
