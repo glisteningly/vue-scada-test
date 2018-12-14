@@ -92,7 +92,7 @@
         if (_.has(this.typeInfo, 'label')) {
           return this.imageError ? '/images/holder.png' : `/cdn/scada/device_tpl/${this.typeInfo.label}.png`
         } else {
-          return ''
+          return '/images/holder.png'
         }
       }
     }
@@ -117,10 +117,12 @@
         height: 58px;
         border: 1px solid #222;
         img {
-          width: 90%;
-          height: 90%;
+          max-width: 90%;
+          max-height: 90%;
           padding: 5%;
-          object-fit: contain
+          /*object-fit: contain;*/
+          /*justify-content: center;*/
+          /*align-content: center;*/
         }
         &.using {
           border: 1px solid #20a0ff;

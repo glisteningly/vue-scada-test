@@ -1,7 +1,7 @@
 <template>
   <div class="svg-wrapper">
-    <svg viewBox="0 0 1000 600" class="svg-container" @click="onClicked" ref="svgThumb">
-      <rect width="100%" height="100%" fill="#2B2B2B"></rect>
+    <svg :viewBox="svgViewBox" class="svg-container" @click="onClicked" ref="svgThumb">
+      <rect width="100%" height="100%" :fill="docSettings.bgColor"></rect>
       <use x="0" y="0" xlink:href="#svg_root"></use>
     </svg>
   </div>
@@ -10,6 +10,7 @@
 <script>
   export default {
     name: 'CanvasNav',
+    props: ['docSettings'],
     methods: {
       onClicked(e) {
         const el = this.$refs.svgThumb
@@ -18,6 +19,11 @@
           y: e.offsetY / el.clientHeight
         }
         console.log(pos)
+      }
+    },
+    computed: {
+      svgViewBox() {
+        return `0 0 ${this.docSettings.width} ${this.docSettings.height}`
       }
     }
   }

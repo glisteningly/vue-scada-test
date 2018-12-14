@@ -7,6 +7,13 @@ const TreeFormatUtil = ModuleCommonUtil.TreeDataFormat
 
 export default {
   methods: {
+    initDoc() {
+      this.docSettings = {
+        bgColor: 'rgb(13, 51, 73)',
+        width: 1000,
+        height: 600
+      }
+    },
     initDeviceType() {
       DeviceType.getDeviceTypes().then(rootType => {
         this.deviceTypeTree = TreeFormatUtil.treeFormat(rootType.children)

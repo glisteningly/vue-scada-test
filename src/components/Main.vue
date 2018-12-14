@@ -2,7 +2,7 @@
   <div id="main_frame">
     <section id="scada_editor">
       <header>
-        <div class="toolbar" style="">
+        <div class="toolbar">
           <!--<el-button @click="addLabel">label</el-button>-->
           <!--<el-button @click="addRect">rect</el-button>-->
           <!--<el-button @click="addPath">path</el-button>-->
@@ -11,8 +11,6 @@
           <!--<el-button @click="addCompGroup">add group</el-button>-->
           <!--<el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>-->
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
-          <!--<el-button @click="jointCompsToGroup">to group</el-button>-->
-          <!--<span style="display: inline-block; width: 20px"/>-->
           <el-button @click="showNodeZIndex">z index</el-button>
           <span class="toolbar-gutter-h"/>
           <div class="img-btn-group">
@@ -41,8 +39,8 @@
             </div>
             <ImgButton title="对齐" slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
           </el-popover>
-          <span class="toolbar-gutter-h"/>
-          <el-button @click="compsDelete">delete</el-button>
+          <!--<span class="toolbar-gutter-h"/>-->
+          <!--<el-button @click="compsDelete">delete</el-button>-->
           <span style="display: inline-block; width: 20px"/>
           <el-button @click="testImport">import</el-button>
           <el-button @click="testExport">export</el-button>
@@ -57,12 +55,13 @@
 
           <span class="toolbar-gutter-h"/>
           <label class="ctrl-canvas-bg-label">背景色</label>
-          <el-color-picker class="ctrl-canvas-bg" v-model="editorConfig.canvasBgColor"></el-color-picker>
-
+          <el-color-picker class="ctrl-canvas-bg" v-model="docSettings.bgColor"></el-color-picker>
+          <span class="toolbar-gutter-h"/>
+          <el-button @click="setDocSize(1200,600)">size</el-button>
           <span class="toolbar-gutter-h"/>
           <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
           <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
-          <el-button @click="doPreview">预览</el-button>
+          <el-button @click="doPreview" type="primary">预览</el-button>
           <span style="display: inline-block; width: 20px"/>
           <el-switch v-model="debug_hideCanvas"></el-switch>
 
@@ -71,10 +70,10 @@
       <main>
         <div id="left_sidebar">
           <el-tabs v-model="activeLeftTab" type="card">
-            <el-tab-pane label="元件" name="basicComp">
+            <el-tab-pane label="组件" name="basicComp">
               <BasicCompLib/>
             </el-tab-pane>
-            <el-tab-pane label="组件" name="deviceComp">
+            <el-tab-pane label="设备" name="deviceComp">
               <DeviceCompLib/>
             </el-tab-pane>
             <el-tab-pane label="图层" name="layer"></el-tab-pane>
@@ -120,7 +119,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="导航" name="nav">
-              <CanvasNav></CanvasNav>
+              <CanvasNav :docSettings="docSettings"/>
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="activeBindingTab" type="card" v-show="curSelComp">
@@ -230,6 +229,7 @@
   import ActionMove from '../mixin/ActionMove'
   import StateStore from '../mixin/StateStore'
   import InitConfig from '../mixin/InitConfig'
+  import DocSettings from '../mixin/DocSettings'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -265,7 +265,8 @@
       BasicCompLib,
       DeviceCompLib
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionAlign, ActionMove, DataBinding, StateStore, InitConfig],
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard,
+      ActionAlign, ActionMove, DataBinding, StateStore, InitConfig, DocSettings],
     name: 'MainEditor',
     data() {
       return {
@@ -297,7 +298,7 @@
         curSelCompStyleOptions: {},
         zoomScaleIndex: 4,
         curFixedPathPoint: null,
-        activeLeftTab: 'deviceComp',
+        activeLeftTab: 'basicComp',
         // activeRightTab: 'nav',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
@@ -305,12 +306,15 @@
         debug_hideCanvas: false,
         showPreview: false,
         previewTplStr: '',
-        editorConfig: {
-          canvasBgColor: 'rgb(13, 51, 73)'
-        }
+        docSettings: {
+          bgColor: 'rgb(13, 51, 73)',
+          width: 1000,
+          height: 600
+        },
       }
     },
     mounted() {
+      this.initDoc()
       this.initKonvaWorkArea()
       this.initDeviceType()
     },
@@ -541,12 +545,12 @@
       },
       testExport() {
         // const t = ScadaVueTpl.getCompStr(this.comps)
-        const previewCanvasConfig = {
-          w: 1000,
-          h: 600,
-          bgColor: this.editorConfig.canvasBgColor
-        }
-        const t = ScadaVueTpl.getTplStr(this.comps, previewCanvasConfig)
+        // const previewCanvasConfig = {
+        //   w: 1000,
+        //   h: 400,
+        //   bgColor: this.docSettings.bgColor
+        // }
+        const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
         this.previewTplStr = t
         // console.log(t)
       },
@@ -751,7 +755,7 @@
       },
       workFrameBgColor() {
         return {
-          backgroundColor: this.editorConfig.canvasBgColor
+          backgroundColor: this.docSettings.bgColor
         }
       }
     },
@@ -820,12 +824,19 @@
         switch (this.toolState) {
           case TOOL_STATE.addPathPoint : {
             this.konvaObjs.layers[0].add(this.konvaObjs.pathAuxLine)
+            this.comps.forEach((comp) => {
+              comp.konvaCtrl().listening(false)
+            })
             this.konvaObjs.stage.draw()
             return 'crosshair'
           }
           default: {
             this.konvaObjs.pathAuxLine.remove()
             this.konvaObjs.pathAuxLine.points([0, 0])
+            this.comps.forEach((comp) => {
+              // TODO: 判断组件是否锁定
+              comp.konvaCtrl().listening(true)
+            })
             this.konvaObjs.stage.draw()
             return 'default'
           }
@@ -953,6 +964,10 @@
           width: 28px;
           height: 28px;
         }
+      }
+      .el-button {
+        padding: 8px 12px;
+        font-size: 13px;
       }
     }
   }

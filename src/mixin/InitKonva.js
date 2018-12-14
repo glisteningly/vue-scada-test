@@ -4,13 +4,9 @@ import utils from '../utils'
 // import _ from 'lodash'
 import CompCtrl from '../class/CompCtrl'
 
-const CanvasDefaultSettings = {
-  width: 1000,
-  height: 600
-}
-
-// const TOOL_STATE = {
-//   addPathPoint: 'ADD_PATH_POINT'
+// const CanvasDefaultSettings = {
+//   width: 1000,
+//   height: 400
 // }
 
 import { TOOL_STATE } from '../const'
@@ -50,8 +46,8 @@ export default {
 
       const layerPaper = new Konva.Layer()
       this.konvaObjs.paperRect = new Konva.Rect({
-        width: CanvasDefaultSettings.width,
-        height: CanvasDefaultSettings.height,
+        width: this.docSettings.width,
+        height: this.docSettings.height,
         stroke: '#888',
         strokeWidth: 1,
         listening: false

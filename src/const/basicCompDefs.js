@@ -20,6 +20,7 @@ export default [
     },
     options: {
       style: {
+        fill: 'rgba(0, 21, 68, 0.5)',
         stroke: '#20a0ff',
         strokeWidth: 2,
         cornerRadius: 4

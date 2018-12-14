@@ -2,6 +2,11 @@ const jstoxml = require('jstoxml')
 
 export default {
   getCompStr(components) {
+
+    function bindingToValString(bindingObj) {
+
+    }
+
     function compToXmlObj(components) {
       const comps = []
 
@@ -34,6 +39,6 @@ export default {
   },
   getTplStr(components, svgConfig) {
     const compStr = this.getCompStr(components)
-    return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgConfig.w} ${svgConfig.h}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${svgConfig.bgColor}"></rect>${compStr}</svg>`
+    return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgConfig.width} ${svgConfig.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${svgConfig.bgColor}"></rect>${compStr}</svg>`
   }
 }
