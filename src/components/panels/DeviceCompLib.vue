@@ -112,6 +112,7 @@
       padding: 6px;
 
       .comps-item {
+        display: flex;
         width: 58px;
         background-color: #DDD;
         height: 58px;
@@ -120,6 +121,7 @@
           max-width: 90%;
           max-height: 90%;
           padding: 5%;
+          margin: auto auto;
           /*object-fit: contain;*/
           /*justify-content: center;*/
           /*align-content: center;*/

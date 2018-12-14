@@ -544,15 +544,8 @@
         })
       },
       testExport() {
-        // const t = ScadaVueTpl.getCompStr(this.comps)
-        // const previewCanvasConfig = {
-        //   w: 1000,
-        //   h: 400,
-        //   bgColor: this.docSettings.bgColor
-        // }
         const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
         this.previewTplStr = t
-        // console.log(t)
       },
       copyCompsTolocalStorage() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))

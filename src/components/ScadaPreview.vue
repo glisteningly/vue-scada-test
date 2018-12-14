@@ -1,5 +1,5 @@
 <template>
-  <component id="scada_view" :is="scadaView"></component>
+  <component id="scada_view" :is="scadaView" :value="value"></component>
 </template>
 
 <script>
@@ -19,7 +19,14 @@
     },
     data() {
       return {
-        scadaView: null
+        scadaView: null,
+        value: {
+          aaa: {
+            ccc1: {
+              bbbb: 666
+            }
+          }
+        }
       }
     },
     methods: {
@@ -28,11 +35,11 @@
           name: 'scadaSvg',
           // extends: BaseScadaView,
           template: template,
-          // props: {
-          //   value: {
-          //     type: Object
-          //   }
-          // }
+          props: {
+            value: {
+              type: Object
+            }
+          }
         }
       }
     },
