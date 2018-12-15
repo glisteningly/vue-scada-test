@@ -3,7 +3,7 @@
     <section id="scada_editor">
       <header>
         <div class="toolbar">
-          <!--<el-button @click="addLabel">label</el-button>-->
+          <el-button @click="testmerge">testmerge</el-button>
           <!--<el-button @click="addRect">rect</el-button>-->
           <!--<el-button @click="addPath">path</el-button>-->
           <!--<el-button @click="addIcon2">google</el-button>-->
@@ -195,7 +195,8 @@
     <!--<div id="dianji">点击查看</div>-->
     <div id="scada_preview" v-if="showPreview">
       <el-button class="close" type="danger" @click="showPreview = false"><i class="el-icon-close"></i></el-button>
-      <ScadaPreview :tplStr="previewTplStr"/>
+      <!--<ScadaPreview :tplStr="previewTplStr"/>-->
+      <ScadaPreview :scadaDoc="scadaDoc"/>
     </div>
   </div>
 </template>
@@ -214,7 +215,6 @@
   // import { ScadaCompsLibrary } from '../components/Scada'
 
   // import utils from '../utils'
-  import ScadaVueTpl from '../utils/scadaVueTpl'
   // import styleDefs from '../utils/styleDefs'
 
   import CompCtrl from '../class/CompCtrl'
@@ -311,6 +311,7 @@
           width: 1000,
           height: 600
         },
+        scadaDoc: null
       }
     },
     mounted() {
@@ -544,8 +545,10 @@
         })
       },
       testExport() {
-        const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
-        this.previewTplStr = t
+        // const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
+        // this.previewTplStr = t
+
+        this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
       },
       copyCompsTolocalStorage() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))
@@ -578,23 +581,8 @@
         }
       },
       onCompOptionsChanged(changedOptions) {
-        console.log(changedOptions)
+        // console.log(changedOptions)
 
-        // const newVal = {}
-        // const cate = changedOptions.optionCategory
-        // const newOptions = changedOptions.options
-        // for (const key in newOptions) {
-        //   newVal[key] = newOptions[key].value
-        // }
-        // if (this.curSelComp) {
-        //   const compOptions = this.getCompDefaultOptions(this.curSelComp, ScadaCompsLibrary)[cate]
-        //
-        //   const newCateOptions = utils.diff(newVal, compOptions)
-        //
-        //   this.curSelComps.forEach((comp) => {
-        //     comp.options[cate] = newCateOptions
-        //   })
-        // }
         const cate = _.keys(changedOptions)[0]
 
         if (this.curSelComp) {
@@ -668,7 +656,9 @@
         this.konvaObjs.stage.batchDraw()
       },
       doPreview() {
-        this.testExport()
+        // this.testExport()
+        this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
+
         this.showPreview = true
       },
       //移除组件的tr
@@ -679,6 +669,18 @@
             comp.removeAnchors()
           }
         })
+      },
+      testmerge() {
+        function customizer(objValue, srcValue) {
+          if (_.isArray(objValue)) {
+            return objValue.concat(srcValue)
+          }
+        }
+
+        const a = { type: '111', field: ['f1'] }
+        const b = { type: '113', field: ['f2'] }
+        // console.log(_.merge(a.aaa.field, b.aaa.field))
+        console.log(_.mergeWith(a, b, customizer))
       }
     },
     computed: {

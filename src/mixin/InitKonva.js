@@ -90,7 +90,7 @@ export default {
       })
 
       this.konvaObjs.groupTransformer.on('transformend', () => {
-        console.log('transformend ')
+        // console.log('transformend ')
         // this.syncGroupSel()
         this.curSelComps.forEach((comp) => {
           // console.log(compScale)

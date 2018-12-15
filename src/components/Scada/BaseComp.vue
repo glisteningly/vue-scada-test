@@ -57,7 +57,7 @@
         Object.assign(payload, {
           targetRect: e.target.getBoundingClientRect()
         })
-        console.log(payload)
+        // console.log(payload)
         this.$emit('CompHover', payload)
       }
     }

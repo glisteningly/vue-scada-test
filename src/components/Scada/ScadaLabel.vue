@@ -9,6 +9,7 @@
       <template v-if="options.style.textAlignH === 'auto'">
         <tspan v-if="options.param.prefixText"
                class="scada-label-prefix"
+               :class="alarmClass"
                alignment-baseline="middle" x="0"
                :fill="options.style.prefixFill"
                text-anchor="start">
@@ -44,6 +45,7 @@
         <tspan :text-anchor="options.style.textAlignH" :x="alignPosX">
           <tspan v-if="options.param.prefixText"
                  class="scada-label-prefix"
+                 :class="alarmClass"
                  :fill="options.style.prefixFill">
             {{ options.param.prefixText }}
           </tspan>

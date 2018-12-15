@@ -65,6 +65,7 @@
             }
           }
         }
+        comp.bindingValue = this.getCompDefaultOptions(comp.type)
         e.dataTransfer.setData('data', JSON.stringify(comp))
       },
       getCompDefaultOptions(compType) {
