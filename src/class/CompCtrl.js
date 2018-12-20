@@ -9,6 +9,7 @@ const _konvaPath = new WeakMap()
 
 class CompCtrl {
   constructor(options, isInitKonva = true) {
+    console.log(options)
     const guid = Guid()
     this.type = options.type
     this.name = guid
@@ -35,6 +36,8 @@ class CompCtrl {
 
     this.rotation = options.layout.rotation || 0
 
+    this._locked = options.locked || false
+
     this.initBaseLayout()
 
     if (options.children && options.children.length > 0) {
@@ -60,6 +63,22 @@ class CompCtrl {
     if (!_.has(options, 'options.param')) {
       this.options.param = {}
     }
+  }
+
+  set locked(val) {
+    console.log(val)
+    this._locked = val
+    if (this.konvaCtrl()) {
+      this.konvaCtrl().draggable(!val)
+      this.konvaCtrl().listening(!val)
+      this.reDraw()
+      // CompCtrl.konvaContext.transformer.resizeEnabled(!val)
+      // CompCtrl.konvaContext.transformer.rotateEnabled(!val)
+    }
+  }
+
+  get locked() {
+    return this._locked
   }
 
   reDraw() {
@@ -135,7 +154,7 @@ class CompCtrl {
   }
 
   initKonva() {
-    this.draggable = true
+    this.draggable = !this.locked
 
     if (this.isPathCtrl) {
       this.initKonvaPath()
@@ -405,7 +424,6 @@ class CompCtrl {
     // this.stroke = 'rgba(0,210,255,0.1)'
     this.stroke = 'rgba(0,0,0,0)'
     this.strokeWidth = 10
-    this.draggable = true
     this.lineJoin = 'round'
     this.strokeScaleEnabled = false
     _konvaPath.set(this, new Konva.Line(this))
@@ -504,7 +522,9 @@ class CompCtrl {
         y: this.konvaCtrl().getAbsoluteScale().y / CompCtrl.konvaContext.stage.scaleY()
       })
       this.konvaCtrl().rotation(this.konvaCtrl().rotation() + CompCtrl.konvaContext.selCompsGroup.rotation())
-      this.konvaCtrl().draggable(true)
+      if (!this.locked) {
+        this.konvaCtrl().draggable(true)
+      }
     }
   }
 
@@ -516,12 +536,6 @@ class CompCtrl {
   }
 
   addTransformer() {
-    //TODO:
-    // if (this.isPathCtrl) {
-    //   CompCtrl.konvaContext.transformer.padding(-3)
-    // } else {
-    //   CompCtrl.konvaContext.transformer.padding(0)
-    // }
     this.removeCompfromGroupSel()
     this.konvaCtrl().getLayer().add(CompCtrl.konvaContext.transformer)
     //判断是否是添加到组上
@@ -536,6 +550,9 @@ class CompCtrl {
     }
 
     CompCtrl.konvaContext.transformer.attachTo(this.konvaCtrl())
+    // TODO: lock state
+    // CompCtrl.konvaContext.transformer.resizeEnabled(!this.locked)
+    // CompCtrl.konvaContext.transformer.rotateEnabled(!this.locked)
     // this.setDragBound(true)
 
     if (this.isPathCtrl) {
@@ -605,7 +622,8 @@ class CompCtrl {
       type: this.type,
       options: this.options,
       binding: this.binding,
-      bindingValue: this.bindingValue
+      bindingValue: this.bindingValue,
+      locked: this.locked
     }
     if (this.children && this.children.length > 0) {
       const children = []

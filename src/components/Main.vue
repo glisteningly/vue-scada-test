@@ -27,6 +27,9 @@
           <el-button @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
           <el-button @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
 
+          <span class="toolbar-gutter-h"/>
+          <ImgButton title="刷新" :icon="'ic-action-refresh'" @click="initKonvaWorkArea"/>
+
           <div class="toolbar-center">
 
             <div class="img-btn-group">
@@ -56,14 +59,15 @@
               <ImgButton title="对齐" slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
             </el-popover>
 
-            <!--<span class="toolbar-gutter-h"/>-->
+            <span class="toolbar-gutter-h"/>
+            <ImgButton title="全部解锁" :icon="'ic-action-unlock-all'" @click="doUnlockAll"/>
             <!--<label class="ctrl-canvas-bg-label">背景色</label>-->
             <!--<el-color-picker class="ctrl-canvas-bg" v-model="docSettings.bgColor"></el-color-picker>-->
-            <span class="toolbar-gutter-h"/>
-            <el-button @click="setDocSize(1200,600)">size</el-button>
-            <span class="toolbar-gutter-h"/>
-            <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
-            <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
+            <!--<span class="toolbar-gutter-h"/>-->
+            <!--<el-button @click="setDocSize(1200,600)">size</el-button>-->
+            <!--<el-button @click="doLockComp">lock</el-button>-->
+            <!--<el-button @click="initKonvaWorkArea"><i class="el-icon-refresh"></i></el-button>-->
+            <!--<el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>-->
             <span class="toolbar-gutter-h"/>
             <!--<el-switch v-model="debug_hideCanvas"></el-switch>-->
           </div>
@@ -122,6 +126,7 @@
                     <span class="layout_panel_label">R:</span>
                     <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
                     </el-input-number>
+                    <span style="margin-left: 24px;"><el-checkbox v-model="curSelComp.locked">锁定</el-checkbox></span>
                   </div>
                 </div>
               </div>
@@ -293,8 +298,9 @@
           height: 0,
           x: 30,
           y: 30,
-          scale: 1,
+          scale: ZoomScaleSettings[5],
         },
+        zoomScaleIndex: 5,
         konvaObjs: {
           stage: null,
           dragLayer: null,
@@ -311,7 +317,6 @@
         isDragSelecting: false,
         testData: 2,
         curSelCompStyleOptions: {},
-        zoomScaleIndex: 8,
         curFixedPathPoint: null,
         activeLeftTab: 'basicComp',
         // activeRightTab: 'nav',
@@ -693,6 +698,16 @@
           }
         })
       },
+      doLockComp() {
+        if (this.curSelComp) {
+          this.curSelComp.locked = !this.curSelComp.locked
+        }
+      },
+      doUnlockAll() {
+        this.comps.forEach(comp => {
+          comp.locked = false
+        })
+      }
     },
     computed: {
       curSelComp() {
@@ -803,10 +818,9 @@
       canvasZoom() {
         this.setCanvasZoom(this.canvasLayout.scale)
       },
-      isKeySpacepressing() {
-
-        console.log(this.isKeySpacepressing)
-        if (this.isKeySpacepressing) {
+      isKeySpacepressing(val) {
+        // console.log(this.isKeySpacepressing)
+        if (val) {
           this.comps.forEach((comp) => {
             comp.konvaCtrl().draggable(false)
           })
@@ -815,7 +829,9 @@
         } else {
           this.comps.forEach((comp) => {
             // TODO: 判断组件是否锁定
-            comp.konvaCtrl().draggable(true)
+            if (!comp.locked) {
+              comp.konvaCtrl().draggable(true)
+            }
           })
           this.curSelComps.forEach((comp) => {
             comp.konvaCtrl().draggable(false)
@@ -961,6 +977,7 @@
       .app-logo {
         width: 36px;
         height: 36px;
+        margin-right: 50px;
       }
       .toolbar-center {
         flex-grow: 2;
@@ -976,7 +993,7 @@
         align-items: center;
         justify-content: flex-end;
         .publish {
-          padding: 8px 10px;
+          padding: 8px 12px;
           .el-icon-upload {
             font-size: 16px;
           }

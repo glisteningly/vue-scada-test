@@ -2,18 +2,14 @@ import { ModuleCommonUtil } from 'service-module-utils'
 import { DeviceTypeService } from 'service-module-api'
 
 const DeviceType = DeviceTypeService.DeviceType
-
 const TreeFormatUtil = ModuleCommonUtil.TreeDataFormat
+
+import { DOC_DEFAULT_SETTING } from '../const'
 
 export default {
   methods: {
     initDocSettings() {
-      this.docSettings = {
-        // bgColor: 'rgb(13, 51, 73)',
-        bgColor: '#030A3E',
-        width: 1000,
-        height: 600
-      }
+      this.docSettings = DOC_DEFAULT_SETTING
     },
     initDeviceType() {
       DeviceType.getDeviceTypes().then(rootType => {

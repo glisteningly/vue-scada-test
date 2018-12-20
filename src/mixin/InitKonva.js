@@ -72,7 +72,7 @@ export default {
         anchorStrokeWidth: 1.5,
         // anchorCornerRadius: 4,
         rotationSnaps: [0, 90, 180, 270],
-        // padding: -3
+        rotateAnchorOffset: 30
       })
 
 

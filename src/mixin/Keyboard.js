@@ -2,7 +2,7 @@ import hotkeys from 'hotkeys-js'
 
 const HOTKEYS = 'delete, ctrl+g, ctrl+shift+g, space, ctrl+-, ctrl+=, ctrl+0,' +
   'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right' +
-  'ctrl+c, ctrl+v, ctrl+d'
+  'ctrl+c, ctrl+v, ctrl+d, ctrl+l'
 
 export default {
   data() {
@@ -83,9 +83,9 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutX += 10
             break;
-          // case 'ctrl+c':
-          //   console.log('ctrl+c')
-          //   break;
+          case 'ctrl+l':
+            this.doLockComp()
+            break;
         }
       })
     },

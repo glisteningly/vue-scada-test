@@ -25,10 +25,10 @@
   import basicCompDefs from '../../const/basicCompDefs'
   import { ScadaCompsLibrary } from '../Scada/index'
   import _ from 'lodash'
-
   import DeviceTypeList from '../DeviceSelector/DeviceTypeList'
-
   import StateStore from '../../mixin/StateStore'
+
+  const holderImagePath = './images/holder.png'
 
   export default {
     name: 'DeviceCompLib',
@@ -91,9 +91,9 @@
     computed: {
       defaultImageUrl() {
         if (_.has(this.typeInfo, 'label')) {
-          return this.imageError ? '/images/holder.png' : `/cdn/scada/device_tpl/${this.typeInfo.label}.png`
+          return this.imageError ? holderImagePath : `/cdn/scada/device_tpl/${this.typeInfo.label}.png`
         } else {
-          return '/images/holder.png'
+          return holderImagePath
         }
       }
     }

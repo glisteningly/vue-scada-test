@@ -22,16 +22,6 @@ export default {
       }
       return JSON.stringify(saveSlot)
     },
-    getDocSaveSlot() {
-      const compConfig = []
-      this.comps.forEach((comp) => {
-        compConfig.push(comp.toConfig())
-      })
-      return {
-        comps: compConfig,
-        docSettings: this.docSettings
-      }
-    },
     loadDocFromTplStr(str) {
       const saveSlot = JSON.parse(str)
       if (saveSlot) {
