@@ -7,9 +7,10 @@ const TreeFormatUtil = ModuleCommonUtil.TreeDataFormat
 
 export default {
   methods: {
-    initDoc() {
+    initDocSettings() {
       this.docSettings = {
-        bgColor: 'rgb(13, 51, 73)',
+        // bgColor: 'rgb(13, 51, 73)',
+        bgColor: '#030A3E',
         width: 1000,
         height: 600
       }

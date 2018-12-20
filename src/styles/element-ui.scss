@@ -9,8 +9,22 @@ input::-webkit-inner-spin-button {
   position: absolute !important;
 }
 
+.el-button {
+  border: 1px solid #333;
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+}
+
 .el-button + .el-button {
   margin-left: 4px;
+}
+
+.el-button.el-button--default {
+  color: #EEE;
+  background: #555;
+  &:hover {
+    background: #666;
+    border-color: #666;
+  }
 }
 
 .el-button.is-plain {

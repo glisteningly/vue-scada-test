@@ -14,7 +14,7 @@
     methods: {},
     computed: {
       imagePath() {
-        return `/images/icons/${this.icon}.png`
+        return `./images/icons/${this.icon}.png`
         // return `/images/icons-svg/${this.icon}.svg`
       }
     }

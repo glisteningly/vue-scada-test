@@ -1,5 +1,14 @@
 <template>
   <g class="scada-label" @click="onCompClicked" @mouseover="onCompMouseOver">
+    <rect class="scada-label-bg"
+          rx="5"
+          ry="5"
+          fill="transparent"
+          :transform="rectTransformStr"
+          :width="comp.width * comp.scaleX"
+          :height="comp.height * comp.scaleY">
+
+    </rect>
     <text :class="alarmClass"
           :fill="options.style.fill"
           :x="comp.width * comp.scaleX / 2"
@@ -10,7 +19,8 @@
         <tspan v-if="options.param.prefixText"
                class="scada-label-prefix"
                :class="alarmClass"
-               alignment-baseline="middle" x="0"
+               alignment-baseline="middle"
+               :x="options.style.fontSize / 2"
                :fill="options.style.prefixFill"
                text-anchor="start">
           {{ options.param.prefixText }}
@@ -25,7 +35,7 @@
           {{ labelText }}
         </tspan>
         <tspan v-else
-               :x="comp.width * comp.scaleX"
+               :x="comp.width * comp.scaleX - options.style.fontSize / 2"
                text-anchor="end">
           <tspan class="scada-label-text"
                  :font-family="fontFamily"
@@ -219,9 +229,16 @@
 
 <style lang="scss">
   .scada-label {
-    /*&:hover {*/
-    /*cursor: pointer;*/
-    /*}*/
+    letter-spacing: 0.6px;
+    .scada-label-text {
+      letter-spacing: 1px;
+    }
+    &:hover {
+      cursor: pointer;
+      .scada-label-bg {
+        fill: rgba(255, 255, 255, 0.1);
+      }
+    }
     .alarm {
       fill: #d00000;
     }

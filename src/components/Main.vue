@@ -3,7 +3,16 @@
     <section id="scada_editor">
       <header>
         <div class="toolbar">
-          <el-button @click="testmerge">testmerge</el-button>
+          <img class="app-logo" :src="'./images/icons/ic-main-logo.png'"/>
+          <span class="toolbar-gutter-h"/>
+          <ImgButton title="文档设置" :icon="'ic-action-settings'" @click="isShowSettingsDialog=true"/>
+          <span class="toolbar-gutter-h"/>
+          <div class="img-btn-group">
+            <ImgButton title="暂存" :icon="'ic-action-save-local'" @click="onActionSaveDocLocal"/>
+            <ImgButton title="读取暂存" :icon="'ic-action-load-local'" @click="onActionLoadDocLocal"/>
+          </div>
+          <span class="toolbar-gutter-h"/>
+          <ImgButton title="帮助" :icon="'ic-action-help'"/>
           <!--<el-button @click="addRect">rect</el-button>-->
           <!--<el-button @click="addPath">path</el-button>-->
           <!--<el-button @click="addIcon2">google</el-button>-->
@@ -11,59 +20,58 @@
           <!--<el-button @click="addCompGroup">add group</el-button>-->
           <!--<el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>-->
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
-          <el-button @click="showNodeZIndex">z index</el-button>
+          <!--<el-button @click="showNodeZIndex">z index</el-button>-->
           <span class="toolbar-gutter-h"/>
-          <div class="img-btn-group">
-            <ImgButton title="移至顶层" :icon="'ic-move-top'" @click="compsMoveTop"/>
-            <ImgButton title="移至底层" :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
-          </div>
-          <span class="toolbar-gutter-h"/>
-          <el-popover>
-            <div id="align_panel">
-              <div class="align-panel-direct">
-                <label>水平对齐:</label>
-                <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-left'" @click="compsAlignL"/>
-                  <ImgButton :icon="'ic-align-h-center'" @click="compsAlignHC"/>
-                  <ImgButton :icon="'ic-align-right'" @click="compsAlignR"/>
-                </div>
-              </div>
-              <div class="align-panel-direct">
-                <label>垂直对齐:</label>
-                <div class="img-btn-group">
-                  <ImgButton :icon="'ic-align-top'" @click="compsAlignT"/>
-                  <ImgButton :icon="'ic-align-v-center'" @click="compsAlignVC"/>
-                  <ImgButton :icon="'ic-align-bottom'" @click="compsAlignB"/>
-                </div>
-              </div>
+          <label class="zoom-label">{{ curZoomScale | numPercent }}</label>
+          <el-button @click="zoomOut" class="zoom-btn"><i class="el-icon-minus"></i></el-button>
+          <el-button @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
+          <el-button @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
+
+          <div class="toolbar-center">
+
+            <div class="img-btn-group">
+              <ImgButton title="移至顶层" :icon="'ic-move-top'" @click="compsMoveTop"/>
+              <ImgButton title="移至底层" :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
             </div>
-            <ImgButton title="对齐" slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
-          </el-popover>
-          <!--<span class="toolbar-gutter-h"/>-->
-          <!--<el-button @click="compsDelete">delete</el-button>-->
-          <span style="display: inline-block; width: 20px"/>
-          <el-button @click="testImport">import</el-button>
-          <el-button @click="testExport">export</el-button>
-          <!--<el-button @click="copyCompsTolocalStorage">test</el-button>-->
-          <!--<el-button @click="loadCompsFromlocalStorage">load</el-button>-->
-          <span class="toolbar-gutter-h"/>
+            <span class="toolbar-gutter-h"/>
+            <el-popover>
+              <div id="align_panel">
+                <div class="align-panel-direct">
+                  <label>水平对齐:</label>
+                  <div class="img-btn-group">
+                    <ImgButton :icon="'ic-align-left'" @click="compsAlignL"/>
+                    <ImgButton :icon="'ic-align-h-center'" @click="compsAlignHC"/>
+                    <ImgButton :icon="'ic-align-right'" @click="compsAlignR"/>
+                  </div>
+                </div>
+                <div class="align-panel-direct">
+                  <label>垂直对齐:</label>
+                  <div class="img-btn-group">
+                    <ImgButton :icon="'ic-align-top'" @click="compsAlignT"/>
+                    <ImgButton :icon="'ic-align-v-center'" @click="compsAlignVC"/>
+                    <ImgButton :icon="'ic-align-bottom'" @click="compsAlignB"/>
+                  </div>
+                </div>
+              </div>
+              <ImgButton title="对齐" slot="reference" :icon="'ic-align'" :disabled="!multiCompsSelected"/>
+            </el-popover>
 
-          <label>{{ curZoomScale | numPercent }}</label>
-          <el-button @click="zoomOut"><i class="el-icon-zoom-out"></i></el-button>
-          <el-button @click="zoom100">100%</el-button>
-          <el-button @click="zoomIn"><i class="el-icon-zoom-in"></i></el-button>
-
-          <span class="toolbar-gutter-h"/>
-          <label class="ctrl-canvas-bg-label">背景色</label>
-          <el-color-picker class="ctrl-canvas-bg" v-model="docSettings.bgColor"></el-color-picker>
-          <span class="toolbar-gutter-h"/>
-          <el-button @click="setDocSize(1200,600)">size</el-button>
-          <span class="toolbar-gutter-h"/>
-          <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
-          <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
-          <el-button @click="doPreview" type="primary">预览</el-button>
-          <span style="display: inline-block; width: 20px"/>
-          <el-switch v-model="debug_hideCanvas"></el-switch>
+            <!--<span class="toolbar-gutter-h"/>-->
+            <!--<label class="ctrl-canvas-bg-label">背景色</label>-->
+            <!--<el-color-picker class="ctrl-canvas-bg" v-model="docSettings.bgColor"></el-color-picker>-->
+            <span class="toolbar-gutter-h"/>
+            <el-button @click="setDocSize(1200,600)">size</el-button>
+            <span class="toolbar-gutter-h"/>
+            <el-button @click="initKonvaWorkArea" type="primary"><i class="el-icon-refresh"></i></el-button>
+            <el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>
+            <span class="toolbar-gutter-h"/>
+            <!--<el-switch v-model="debug_hideCanvas"></el-switch>-->
+          </div>
+          <div class="toolbar-right">
+            <ImgButton title="预览" :icon="'ic-action-preview'" @click="doPreview"/>
+            <ImgButton title="保存" :icon="'ic-action-save'" @click="onActionSaveDraft"/>
+            <el-button @click="onPublishDoc" class="publish" type="primary" icon="el-icon-upload">发布</el-button>
+          </div>
 
         </div>
       </header>
@@ -196,14 +204,18 @@
     <div id="scada_preview" v-if="showPreview">
       <el-button class="close" type="danger" @click="showPreview = false"><i class="el-icon-close"></i></el-button>
       <!--<ScadaPreview :tplStr="previewTplStr"/>-->
-      <ScadaPreview :scadaDoc="scadaDoc"/>
+      <VisScadaAdapter :config="scadaDoc" :isPreviewMode="true"/>
     </div>
+    <SettingsDialog :isShowDialog.sync="isShowSettingsDialog"
+                    @dialogClose="isShowSettingsDialog=false"
+                    @settingsChanged="onSettingsChanged"
+                    :config="docSettings"/>
   </div>
 </template>
 
 <script>
   // for test
-  import CompConfig from '../temp/compConfig1'
+  // import CompConfig from '../temp/compConfig1'
   // import CompGroup1 from '../temp/compGroup2'
   // import CompGroup3 from '../temp/compGroup3'
 
@@ -230,6 +242,7 @@
   import StateStore from '../mixin/StateStore'
   import InitConfig from '../mixin/InitConfig'
   import DocSettings from '../mixin/DocSettings'
+  import ActionDocument from '../mixin/ActionDocument'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -244,12 +257,13 @@
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
+  import SettingsDialog from '../components/SettingsDialog'
 
-  import ScadaPreview from '../components/ScadaPreview'
+  import VisScadaAdapter from '../components/VisScadaAdapter'
 
   import { TOOL_STATE } from '../const'
 
-  const ZoomScaleSettings = [0.25, 0.33, 0.5, 0.667, 1, 1.5, 2, 3, 4]
+  const ZoomScaleSettings = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5, 2, 3, 4]
 
   export default {
     components: {
@@ -261,11 +275,12 @@
       ImgButton,
       SvgScadaView,
       CanvasNav,
-      ScadaPreview,
+      VisScadaAdapter,
       BasicCompLib,
-      DeviceCompLib
+      DeviceCompLib,
+      SettingsDialog
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard,
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionDocument,
       ActionAlign, ActionMove, DataBinding, StateStore, InitConfig, DocSettings],
     name: 'MainEditor',
     data() {
@@ -296,7 +311,7 @@
         isDragSelecting: false,
         testData: 2,
         curSelCompStyleOptions: {},
-        zoomScaleIndex: 4,
+        zoomScaleIndex: 8,
         curFixedPathPoint: null,
         activeLeftTab: 'basicComp',
         // activeRightTab: 'nav',
@@ -309,14 +324,22 @@
         docSettings: {
           bgColor: 'rgb(13, 51, 73)',
           width: 1000,
-          height: 600
+          height: 600,
         },
-        scadaDoc: null
+        docInfo: {
+          name: '',
+          draftId: null,
+          editorId: 1,
+          visGroupId: 1
+        },
+        scadaDoc: null,
+        isShowSettingsDialog: false
       }
     },
     mounted() {
-      this.initDoc()
+      this.initDocSettings()
       this.initKonvaWorkArea()
+      this.initDocFromParam()
       this.initDeviceType()
     },
     methods: {
@@ -540,15 +563,17 @@
         return c
       },
       testImport() {
-        CompConfig.comps.forEach((comp) => {
-          this.addCompToCanvas(comp)
-        })
+        // CompConfig.comps.forEach((comp) => {
+        //   this.addCompToCanvas(comp)
+        // })
+        this.onActionLoadDocLocal()
       },
       testExport() {
         // const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
         // this.previewTplStr = t
 
-        this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
+        // this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
+        this.onActionSaveDocLocal()
       },
       copyCompsTolocalStorage() {
         // console.log(JSON.stringify(this.curSelComp.toConfig()))
@@ -622,8 +647,8 @@
         }
       },
       zoom100() {
-        if (this.zoomScaleIndex !== 4) {
-          this.zoomScaleIndex = 4
+        if (this.zoomScaleIndex !== 8) {
+          this.zoomScaleIndex = 8
           this.canvasLayout.scale = this.curZoomScale
         }
       },
@@ -642,8 +667,6 @@
       },
       canvasRedraw() {
         const container = this.$refs['workCanvas']
-        // console.log(container)
-        // this.konvaObjs.stage.container(container)
 
         const width = container.clientWidth
         const height = container.clientHeight
@@ -670,18 +693,6 @@
           }
         })
       },
-      testmerge() {
-        function customizer(objValue, srcValue) {
-          if (_.isArray(objValue)) {
-            return objValue.concat(srcValue)
-          }
-        }
-
-        const a = { type: '111', field: ['f1'] }
-        const b = { type: '113', field: ['f2'] }
-        // console.log(_.merge(a.aaa.field, b.aaa.field))
-        console.log(_.mergeWith(a, b, customizer))
-      }
     },
     computed: {
       curSelComp() {
@@ -940,12 +951,41 @@
     }
 
     .toolbar {
+      width: 100%;
       color: #EEE;
       font-size: 13px;
       display: flex;
       align-items: center;
       padding: 10px;
       white-space: nowrap;
+      .app-logo {
+        width: 36px;
+        height: 36px;
+      }
+      .toolbar-center {
+        flex-grow: 2;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      }
+      .toolbar-right {
+        /*flex-grow: 1;*/
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        .publish {
+          padding: 8px 10px;
+          .el-icon-upload {
+            font-size: 16px;
+          }
+        }
+        .img-btn {
+          margin-right: 8px;
+        }
+      }
+
       label {
         margin-right: 4px;
       }
@@ -961,8 +1001,13 @@
         }
       }
       .el-button {
-        padding: 8px 12px;
+        padding: 9px 12px;
         font-size: 13px;
+      }
+
+      .zoom-btn {
+        padding: 6px;
+        font-size: 12px;
       }
     }
   }
@@ -1053,6 +1098,17 @@
       right: 4px;
       padding: 3px;
     }
+  }
+
+  .zoom-label {
+    width: 30px;
+    text-align: right;
+    margin-right: 4px;
+    display: inline-block;
+    background: #333;
+    padding: 2px 6px 3px 4px;
+    border: 1px solid #222;
+    border-radius: 3px;
   }
 
 </style>

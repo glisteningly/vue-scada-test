@@ -31,6 +31,51 @@ export default {
     return data
   },
 
+  generateQuerySqlList(queryConfig) {
+    const queryList = []
+    const bindList = []
+    for (const dataSource in queryConfig) {
+      queryConfig[dataSource].forEach(ds => {
+        let wqStr = ''
+
+        if (ds.where !== '') {
+          wqStr = `where ${ds.where}`
+        } else {
+          if (ds.uid) {
+            wqStr = `where uid = "${ds.uid}"`
+          }
+        }
+
+        const sql = `select ${ds.field.join(',')} from ${dataSource} ${wqStr}`
+        const queryItem = { query: sql }
+
+        // if (this.queryType !== 'realtime') {
+        //   const args = {
+        //     arguments: {
+        //       engine: this.queryType
+        //     }
+        //   }
+        //   Object.assign(queryItem, args)
+        // }
+        queryList.push(queryItem)
+
+        // const whereKey = this.whereObjPrco(ds.where)
+        // bindList.push({ dataSource: dataSource, dataWhere: whereKey })
+      })
+    }
+    return queryList
+  },
+
+  generateBindingList(queryConfig) {
+    const bindList = []
+    for (const type in queryConfig) {
+      queryConfig[type].forEach(ds => {
+        bindList.push({ dataSource: type, dataWhere: ds.uid })
+      })
+    }
+    return bindList
+  },
+
   getQueryConfig(components) {
     // const dataConfig = []
 
@@ -161,9 +206,18 @@ export default {
     // console.log(comps)
     return jstoxml.toXML(comps)
   },
-  getTplStr(components, docSettings) {
-    const compStr = this.getCompStr(components)
+  // getTplStr(components, docSettings) {
+  //   const compStr = this.getCompStr(components)
+  //   // console.log(compStr)
+  //   return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docSettings.width} ${docSettings.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${docSettings.bgColor}"></rect>${compStr}</svg>`
+  // }
+
+  getTplStr(docConfig, isShowBg = true) {
+    const compStr = this.getCompStr(docConfig.comps)
+    const filterStr = `<SvgColorFilter :blink="true"/>`
+    const bgRectStr = isShowBg ? `<rect width="100%" height="100%" fill="${docConfig.docSettings.bgColor}"></rect>` : ''
     // console.log(compStr)
-    return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docSettings.width} ${docSettings.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${docSettings.bgColor}"></rect>${compStr}</svg>`
+    // return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docConfig.docSettings.width} ${docConfig.docSettings.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${docConfig.docSettings.bgColor}"></rect>${compStr}</svg>`
+    return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docConfig.docSettings.width} ${docConfig.docSettings.height}" preserveAspectRatio="xMidYMid meet">${filterStr}${bgRectStr}${compStr}</svg>`
   }
 }

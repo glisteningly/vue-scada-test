@@ -43,7 +43,7 @@
         // console.log(e)
       },
       getImagePath(type) {
-        return `/images/ic-basic-comp/${type}.png`
+        return `./images/ic-basic-comp/${type}.png`
       },
       getCompDefaultOptions(compType) {
         if (ScadaCompsLibrary[compType]) {

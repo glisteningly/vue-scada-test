@@ -3,11 +3,11 @@ export default [
     type: 'ScadaLabel',
     layout: {
       width: 140,
-      height: 30
+      height: 28
     },
     options: {
       style: {
-        fontSize: 20,
+        fontSize: 16,
         fontFamily: 'lcdmono'
       }
     }
@@ -35,7 +35,7 @@ export default [
     },
     options: {
       param: {
-        imgUrl: '/images/holder.png'
+        imgUrl: './images/holder.png'
       }
     }
   }

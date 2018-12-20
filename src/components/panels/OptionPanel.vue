@@ -158,20 +158,19 @@
       }
     },
     computed: {
-      // curSelCompStyleOptions() {
-      //   if (this.selComps.length >= 1) {
-      //     if (this.selComps.length === 1) {
-      //       return this.getCompCateOptions()
-      //     } else {
-      //       return (this.curSelCompsType) ? this.getCompCateOptions() : null
-      //     }
-      //   }
-      //   return null
-      // }
+      curSelCompOptions() {
+        return this.curSelComp ? this.curSelComp.options : null
+      }
     },
     watch: {
       selComps() {
         this.compOptions = this.getCurSelCompOptions()
+      },
+      curSelCompOptions: {
+        handler() {
+          this.compOptions = this.getCurSelCompOptions()
+        },
+        deep: true
       }
     }
   }
