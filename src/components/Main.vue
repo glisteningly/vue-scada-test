@@ -126,7 +126,7 @@
                     <span class="layout_panel_label">R:</span>
                     <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
                     </el-input-number>
-                    <span style="margin-left: 24px;"><el-checkbox v-model="curSelComp.locked">锁定</el-checkbox></span>
+                    <span style="margin-left: 26px;"><el-checkbox v-model="curSelComp.locked">锁定</el-checkbox></span>
                   </div>
                 </div>
               </div>
@@ -172,25 +172,47 @@
       <li>
         <button @click="loadCompsFromlocalStorage"><label>粘贴</label><span class="hotkey-hint">Ctrl+V</span></button>
       </li>
+      <li>
+        <button :disabled="!canDoSelCompAction" @click="doLockComp">
+          <label>锁定</label><span class="hotkey-hint">Ctrl+L</span>
+        </button>
+      </li>
+      <li>
+        <button :disabled="!canDoSelCompAction" @click="doUnlockComp">
+          <label>解除锁定</label><span class="hotkey-hint">Ctrl+Shift+L</span>
+        </button>
+      </li>
       <hr>
       <li>
-        <button @click="zoomIn"><label>放大</label></button>
+        <button @click="zoomIn">
+          <label>放大</label><span class="hotkey-hint">Ctrl+=</span>
+        </button>
       </li>
       <li>
-        <button @click="zoomOut"><label>缩小</label></button>
+        <button @click="zoomOut">
+          <label>缩小</label><span class="hotkey-hint">Ctrl+-</span>
+        </button>
       </li>
       <li>
-        <button @click="zoom100"><label>原始尺寸</label></button>
+        <button @click="zoom100">
+          <label>原始尺寸</label><span class="hotkey-hint">Ctrl+0</span>
+        </button>
       </li>
       <hr>
       <!--<li v-if="canDoSelCompAction">-->
       <!--<button @click="compsMoveTop"><label>置于顶层</label></button>-->
       <!--</li>-->
       <li>
-        <button :disabled="!canDoSelCompAction" @click="compsMoveTop"><label>置于顶层</label></button>
+        <button :disabled="!canDoSelCompAction" @click="compsMoveTop">
+          <label>置于顶层</label>
+          <span class="hotkey-hint">Ctrl+Shift+]</span>
+        </button>
       </li>
       <li>
-        <button :disabled="!canDoSelCompAction" @click="compsMoveBottom"><label>置于底层</label></button>
+        <button :disabled="!canDoSelCompAction" @click="compsMoveBottom">
+          <label>置于底层</label>
+          <span class="hotkey-hint">Ctrl+Shift+[</span>
+        </button>
       </li>
       <li>
         <button :disabled="!multiCompsSelected" @click="jointCompsToGroup">
@@ -699,9 +721,14 @@
         })
       },
       doLockComp() {
-        if (this.curSelComp) {
-          this.curSelComp.locked = !this.curSelComp.locked
-        }
+        this.curSelComps.forEach(comp => {
+          comp.locked = true
+        })
+      },
+      doUnlockComp() {
+        this.curSelComps.forEach(comp => {
+          comp.locked = false
+        })
       },
       doUnlockAll() {
         this.comps.forEach(comp => {
@@ -856,8 +883,9 @@
             this.konvaObjs.pathAuxLine.remove()
             this.konvaObjs.pathAuxLine.points([0, 0])
             this.comps.forEach((comp) => {
-              // TODO: 判断组件是否锁定
-              comp.konvaCtrl().listening(true)
+              if (!comp.locked) {
+                comp.konvaCtrl().listening(true)
+              }
             })
             this.konvaObjs.stage.draw()
             return 'default'

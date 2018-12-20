@@ -9,7 +9,7 @@ const _konvaPath = new WeakMap()
 
 class CompCtrl {
   constructor(options, isInitKonva = true) {
-    console.log(options)
+    // console.log(options)
     const guid = Guid()
     this.type = options.type
     this.name = guid
@@ -66,7 +66,6 @@ class CompCtrl {
   }
 
   set locked(val) {
-    console.log(val)
     this._locked = val
     if (this.konvaCtrl()) {
       this.konvaCtrl().draggable(!val)
@@ -155,6 +154,7 @@ class CompCtrl {
 
   initKonva() {
     this.draggable = !this.locked
+    this.listening = !this.locked
 
     if (this.isPathCtrl) {
       this.initKonvaPath()
