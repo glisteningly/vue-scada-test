@@ -185,6 +185,9 @@
       label {
         margin-top: 3px;
       }
+      .param-input {
+        min-height: 28px;
+      }
     }
   }
 </style>

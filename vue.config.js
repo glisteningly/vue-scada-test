@@ -4,11 +4,11 @@ module.exports = {
     port: 8080,
     proxy: {
       '/api/*': {
-        target: 'http://10.0.0.11',
+        target: 'http://10.0.0.83',
         changeOrigin: true
       },
       '/cdn': {
-        target: 'http://10.0.0.11/cdn',
+        target: 'http://10.0.0.83/cdn',
         changeOrigin: true,
         pathRewrite: {
           '^/cdn': '/'

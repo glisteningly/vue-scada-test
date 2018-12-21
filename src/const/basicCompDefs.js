@@ -38,5 +38,14 @@ export default [
         imgUrl: './images/holder.png'
       }
     }
+  },
+  {
+    type: 'ScadaStates',
+    layout: {
+      width: 24,
+      height: 24
+    },
+    options: {
+    }
   }
 ]

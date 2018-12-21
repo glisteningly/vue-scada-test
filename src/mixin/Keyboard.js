@@ -2,7 +2,7 @@ import hotkeys from 'hotkeys-js'
 
 const HOTKEYS = 'delete, ctrl+g, ctrl+shift+g, space, ctrl+-, ctrl+=, ctrl+0,' +
   'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right' +
-  'ctrl+c, ctrl+v, ctrl+d, ctrl+l, ctrl+shift+]'
+  'ctrl+c, ctrl+v, ctrl+d, ctrl+l, ctrl+shift+[, ctrl+shift+]'
 
 export default {
   data() {

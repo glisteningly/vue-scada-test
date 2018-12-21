@@ -118,6 +118,10 @@
       },
     },
     param: {
+      dataBinding: {
+        label: '数据绑定',
+        type: 'Boolean',
+      },
       defaultText: {
         label: '默认文本',
         type: 'String',
@@ -172,6 +176,7 @@
               suffixFill: '#FFF',
             },
             param: {
+              dataBinding: true,
               defaultText: '',
               prefixText: '',
               suffixText: '',
@@ -183,7 +188,7 @@
     },
     computed: {
       labelText() {
-        if (!_.isNil(this.values.val) && this.values.val !== '') {
+        if (!_.isNil(this.values.val) && this.values.val !== '' && this.options.param.dataBinding) {
           // 小数点保留
           if (!isNaN(parseFloat(this.values.val))) {
             return _.round(this.values.val, parseInt(this.options.param.decTrim))
