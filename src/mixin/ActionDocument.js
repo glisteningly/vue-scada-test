@@ -120,7 +120,7 @@ export default {
     },
     openDraft(id) {
       VizResourceService.getDraftById(id).then((config) => {
-        console.log(config)
+        // console.log(config)
         this.loadDocFromTplStr(config.config)
         this.docInfo.name = config.label
         this.docInfo.editorId = config.modifierId || this.$route.query.uid

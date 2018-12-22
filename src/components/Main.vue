@@ -121,7 +121,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="导航" name="nav">
-              <CanvasNav :docSettings="docSettings"/>
+              <CanvasNav :docSettings="docSettings" @canvasPosNav="onCanvasPosNav"/>
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="activeBindingTab" type="card" v-show="curSelComp">
@@ -718,6 +718,27 @@
         }
         this.konvaObjs.selCompsRect.strokeWidth(1 / zoomParam.scale)
         this.konvaObjs.paperRect.strokeWidth(1 / zoomParam.scale)
+        this.canvasRedraw()
+      },
+      onCanvasPosNav(pos) {
+        const container = this.$refs['workCanvas']
+        // const width = container.clientWidth
+        // const height = container.clientHeight
+
+        const centerPos = {
+          x: container.clientWidth / 2,
+          y: container.clientHeight / 2
+        }
+        const hitPos = {
+          x: this.docSettings.width * this.canvasLayout.scale * pos.x,
+          y: this.docSettings.height * this.canvasLayout.scale * pos.y,
+        }
+        const offsetPos = {
+          x: centerPos.x - hitPos.x,
+          y: centerPos.y - hitPos.y,
+        }
+        console.log(pos)
+        this.setCanvasPos(offsetPos)
         this.canvasRedraw()
       },
       canvasRedraw() {

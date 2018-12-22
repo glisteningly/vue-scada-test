@@ -18,7 +18,8 @@
           x: e.offsetX / el.clientWidth,
           y: e.offsetY / el.clientHeight
         }
-        console.log(pos)
+        // console.log(pos)
+        this.$emit('canvasPosNav', pos)
       }
     },
     computed: {
