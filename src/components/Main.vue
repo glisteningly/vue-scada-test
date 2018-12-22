@@ -665,7 +665,7 @@
       zoomOut() {
         if (_.indexOf(ZoomScaleSettings, this.canvasLayout.scale) === -1) {
           const scale = _.round(this.canvasLayout.scale, 1)
-          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale) + 1
+          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale)
         }
 
         if (this.zoomScaleIndex > 0) {
