@@ -124,6 +124,7 @@ export default {
         this.loadDocFromTplStr(config.config)
         this.docInfo.name = config.label
         this.docInfo.editorId = config.modifierId || this.$route.query.uid
+        this.zoomFit()
       }).catch(error => {
         this.$message.error(`打开可视化资源失败 - ${error}`)
       })

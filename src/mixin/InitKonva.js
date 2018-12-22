@@ -163,7 +163,7 @@ export default {
         this.konvaObjs.layers[0].draw()
       })
 
-      this.konvaObjs.selCompsGroup.on('dragend ', () => {
+      this.konvaObjs.selCompsGroup.on('dragend ', (e) => {
         // console.log('dragend ')
         this.konvaObjs.groupTransformer.resizeEnabled(true)
         this.konvaObjs.groupTransformer.rotateEnabled(true)
@@ -173,6 +173,13 @@ export default {
         this.curSelComps.forEach((comp) => {
           comp.syncCompLayout()
         })
+
+        //alt 拖拽复制
+        if (e.evt.altKey && this.curSelCompsCopied.length > 0) {
+          this.addCompsFromConfig(this.curSelCompsCopied)
+        }
+        //更新选中的comps config记录
+        this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
       })
 
       //click
@@ -205,7 +212,7 @@ export default {
         }
       })
 
-      this.konvaObjs.stage.on('mousemove', (e) => {
+      this.konvaObjs.stage.on('mousemove', () => {
         // console.log('mousemove')
         if (this.toolState) {
           if (this.curSelComp && this.curSelComp.points) {
@@ -294,7 +301,7 @@ export default {
         this.isDragSelecting = false
       })
 
-      this.konvaObjs.stage.on('dragmove', (e) => {
+      this.konvaObjs.stage.on('dragmove', () => {
         this.canvasLayout.x = this.konvaObjs.stage.x()
         this.canvasLayout.y = this.konvaObjs.stage.y()
       })

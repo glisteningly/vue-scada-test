@@ -13,19 +13,15 @@
           </div>
           <span class="toolbar-gutter-h"/>
           <ImgButton title="帮助" :icon="'ic-action-help'"/>
-          <!--<el-button @click="addRect">rect</el-button>-->
-          <!--<el-button @click="addPath">path</el-button>-->
-          <!--<el-button @click="addIcon2">google</el-button>-->
-          <!--<el-button @click="addAll">add all</el-button>-->
           <!--<el-button @click="addCompGroup">add group</el-button>-->
-          <!--<el-button @click="toolPathPoint" :type="isToolStatePath">add point</el-button>-->
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
           <!--<el-button @click="showNodeZIndex">z index</el-button>-->
           <span class="toolbar-gutter-h"/>
-          <label class="zoom-label">{{ curZoomScale | numPercent }}</label>
+          <label class="zoom-label">{{ canvasZoom | numPercent }}</label>
           <el-button @click="zoomOut" class="zoom-btn"><i class="el-icon-minus"></i></el-button>
           <el-button @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
           <el-button @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
+          <el-button @click="zoomFit" class="zoom-btn"><i class="el-icon-rank"></i></el-button>
 
           <span class="toolbar-gutter-h"/>
           <ImgButton title="刷新" :icon="'ic-action-refresh'" @click="initKonvaWorkArea"/>
@@ -61,13 +57,6 @@
 
             <span class="toolbar-gutter-h"/>
             <ImgButton title="全部解锁" :icon="'ic-action-unlock-all'" @click="doUnlockAll"/>
-            <!--<label class="ctrl-canvas-bg-label">背景色</label>-->
-            <!--<el-color-picker class="ctrl-canvas-bg" v-model="docSettings.bgColor"></el-color-picker>-->
-            <!--<span class="toolbar-gutter-h"/>-->
-            <!--<el-button @click="setDocSize(1200,600)">size</el-button>-->
-            <!--<el-button @click="doLockComp">lock</el-button>-->
-            <!--<el-button @click="initKonvaWorkArea"><i class="el-icon-refresh"></i></el-button>-->
-            <!--<el-button @click="canvasRedraw"><i class="el-icon-refresh"></i></el-button>-->
             <span class="toolbar-gutter-h"/>
             <!--<el-switch v-model="debug_hideCanvas"></el-switch>-->
           </div>
@@ -195,7 +184,12 @@
       </li>
       <li>
         <button @click="zoom100">
-          <label>原始尺寸</label><span class="hotkey-hint">Ctrl+0</span>
+          <label>原始尺寸</label><span class="hotkey-hint">Ctrl+9</span>
+        </button>
+      </li>
+      <li>
+        <button @click="zoomFit">
+          <label>适合画布</label><span class="hotkey-hint">Ctrl+0</span>
         </button>
       </li>
       <hr>
@@ -310,8 +304,8 @@
         canvasLayout: {
           width: 0,
           height: 0,
-          x: 30,
-          y: 30,
+          x: 20,
+          y: 20,
           scale: ZoomScaleSettings[5],
         },
         zoomScaleIndex: 5,
@@ -604,9 +598,10 @@
       },
 
       addCompsFromConfig(compConfig, offset = { x: 0, y: 0 }, selAfterAdd = false) {
+        const configs = _.cloneDeep(compConfig)
         offset = offset || { x: 0, y: 0 }
         const newAddComps = []
-        compConfig.forEach((comp => {
+        configs.forEach((comp => {
           comp.layout.x += offset.x
           comp.layout.y += offset.y
           newAddComps.push(this.addCompToCanvas(comp))
@@ -657,12 +652,22 @@
         })
       },
       zoomIn() {
+        if (_.indexOf(ZoomScaleSettings, this.canvasLayout.scale) === -1) {
+          const scale = _.round(this.canvasLayout.scale, 1)
+          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale)
+        }
+
         if (this.zoomScaleIndex < ZoomScaleSettings.length - 1) {
           this.zoomScaleIndex += 1
           this.canvasLayout.scale = this.curZoomScale
         }
       },
       zoomOut() {
+        if (_.indexOf(ZoomScaleSettings, this.canvasLayout.scale) === -1) {
+          const scale = _.round(this.canvasLayout.scale, 1)
+          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale) + 1
+        }
+
         if (this.zoomScaleIndex > 0) {
           this.zoomScaleIndex -= 1
           this.canvasLayout.scale = this.curZoomScale
@@ -674,17 +679,45 @@
           this.canvasLayout.scale = this.curZoomScale
         }
       },
-      setCanvasZoom(scale) {
-        this.konvaObjs.stage.scaleX(scale)
-        this.konvaObjs.stage.scaleY(scale)
+      zoomFit() {
+        const width = this.$refs['workCanvas'].clientWidth
+        const height = this.$refs['workCanvas'].clientHeight
+
+        const scale = (width - 40) / this.docSettings.width
+        // console.log(scale)
+
+        this.zoomPointPos = null
+        this.setCanvasPos({ x: 20, y: 20 })
+        this.canvasLayout.scale = scale
+        this.setCanvasZoom({ scale: scale })
+        // console.log(scale)
+      },
+      setCanvasPos(pos = { x: 0, y: 0 }) {
+        this.konvaObjs.stage.position(pos)
+        this.canvasLayout.x = this.konvaObjs.stage.x()
+        this.canvasLayout.y = this.konvaObjs.stage.y()
+      },
+      setCanvasZoom(zoomParam = { scale: 1, px: 0, py: 0 }) {
+        // console.log(zoomParam)
+        this.konvaObjs.stage.scaleX(zoomParam.scale)
+        this.konvaObjs.stage.scaleY(zoomParam.scale)
+
+        if (zoomParam.px && zoomParam.py && this.konvaObjs.stage.getPointerPosition()) {
+          const newPos = {
+            x: -(zoomParam.px - this.konvaObjs.stage.getPointerPosition().x / zoomParam.scale) * zoomParam.scale,
+            y: -(zoomParam.py - this.konvaObjs.stage.getPointerPosition().y / zoomParam.scale) * zoomParam.scale
+          }
+          this.setCanvasPos(newPos)
+        }
+
         if (this.curSelComp) {
           this.konvaObjs.transformer.forceUpdate()
         }
         if (this.multiCompsSelected) {
           this.konvaObjs.groupTransformer.forceUpdate()
         }
-        this.konvaObjs.selCompsRect.strokeWidth(1 / scale)
-        this.konvaObjs.paperRect.strokeWidth(1 / scale)
+        this.konvaObjs.selCompsRect.strokeWidth(1 / zoomParam.scale)
+        this.konvaObjs.paperRect.strokeWidth(1 / zoomParam.scale)
         this.canvasRedraw()
       },
       canvasRedraw() {
@@ -840,7 +873,19 @@
       //   // deep: true
       // }
       canvasZoom() {
-        this.setCanvasZoom(this.canvasLayout.scale)
+        const param = {
+          scale: this.canvasLayout.scale
+
+        }
+
+        if (this.zoomPointPos) {
+          Object.assign(param, {
+            px: this.zoomPointPos.x,
+            py: this.zoomPointPos.y
+          })
+        }
+
+        this.setCanvasZoom(param)
       },
       isKeySpacepressing(val) {
         // console.log(this.isKeySpacepressing)
