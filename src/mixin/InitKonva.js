@@ -75,6 +75,13 @@ export default {
         rotateAnchorOffset: 30
       })
 
+      this.konvaObjs.transformer.boundBoxFunc((oldBox, newBox) => {
+        if (newBox.width < 10 || newBox.height < 10) {
+          return oldBox
+        }
+        return newBox
+      })
+
 
       this.konvaObjs.groupTransformer = new Konva.Transformer({
         keepRatio: true,
@@ -88,6 +95,13 @@ export default {
         rotationSnaps: [0, 90, 180, 270],
         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
         rotateAnchorOffset: 30
+      })
+
+      this.konvaObjs.groupTransformer.boundBoxFunc((oldBox, newBox) => {
+        if (newBox.width < 10 || newBox.height < 10) {
+          return oldBox
+        }
+        return newBox
       })
 
       this.konvaObjs.groupTransformer.on('transformend', () => {

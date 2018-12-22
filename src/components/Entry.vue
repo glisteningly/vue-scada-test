@@ -26,7 +26,7 @@
     data() {
       return {
         visName: '新组态图',
-        visId: '',
+        visId: '0',
         userId: 0,
         groupId: 1
       }

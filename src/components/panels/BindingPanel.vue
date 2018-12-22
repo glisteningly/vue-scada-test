@@ -10,6 +10,8 @@
       <el-tab-pane v-for="(ctrl,key) in compBindings" :key="key" :label="ctrl.label" :name="key">
         <div class="action-list">
           <el-button plain size="mini" @click="openSelDialog">对象选择</el-button>
+          <!--<el-button plain size="mini" class="btn-unbinding" icon="el-icon-close" @click="onBindingClear"/>-->
+          <el-button title="清除绑定" plain size="mini" class="btn-unbinding" @click="onBindingClear">✕</el-button>
           <el-button plain size="mini" v-show="key === 'alarm'">关联</el-button>
           <el-input-number class="value-preview" @change="compValChanged(ctrl.value)"
                            placeholder="预览值" controls-position="right"
@@ -204,7 +206,11 @@
         }
       },
       onBindingClear() {
-
+        const keys = ['type', 'uid', 'field']
+        keys.forEach(key => {
+          this.compBindings[this.activeTab].binding[key] = ''
+        })
+        this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
       },
       // onTabClick() {
       //   this.lastSelTab = this.activeTab
@@ -252,6 +258,11 @@
         float: right;
         display: inline-block;
         width: 80px
+      }
+      .btn-unbinding {
+        padding: 6px 3px 6px 4px;
+        /*font-size: 11px;*/
+        /*min-height: 25px;*/
       }
     }
     .ctrl-item {

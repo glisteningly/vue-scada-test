@@ -45,6 +45,14 @@ export default [
       width: 24,
       height: 24
     },
+    options: {}
+  },
+  {
+    type: 'ScadaProgress',
+    layout: {
+      width: 60,
+      height: 15
+    },
     options: {
     }
   }

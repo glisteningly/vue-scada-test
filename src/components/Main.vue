@@ -241,20 +241,12 @@
 </template>
 
 <script>
-  // for test
-  // import CompConfig from '../temp/compConfig1'
-  // import CompGroup1 from '../temp/compGroup2'
-  // import CompGroup3 from '../temp/compGroup3'
 
   import Konva from 'konva'
   import _ from 'lodash'
   import hotkeys from 'hotkeys-js'
 
   import ContextMenu from 'vue-context-menu'
-  // import { ScadaCompsLibrary } from '../components/Scada'
-
-  // import utils from '../utils'
-  // import styleDefs from '../utils/styleDefs'
 
   import CompCtrl from '../class/CompCtrl'
 
@@ -335,6 +327,7 @@
           pathAuxLine: null,
         },
         curSelComps: [],
+        curSelCompsCopied: [],
         groupLastPos: { x: 0, y: 0 },
         isDragSelecting: false,
         testData: 2,
@@ -360,7 +353,7 @@
           visGroupId: 1
         },
         scadaDoc: null,
-        isShowSettingsDialog: false
+        isShowSettingsDialog: false,
       }
     },
     mounted() {
@@ -403,6 +396,15 @@
             this.unGroupSelAll()
             this.curSelComps.push(compCtrl)
           }
+        })
+
+        compCtrl.konvaCtrl().on('dragend', (e) => {
+          //alt 拖拽复制
+          if (e.evt.altKey && this.curSelCompsCopied.length > 0) {
+            this.addCompsFromConfig(this.curSelCompsCopied)
+          }
+          //更新选中的comps config记录
+          this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
         })
       },
       addComp(compCtrl) {
@@ -589,47 +591,40 @@
         this.addComp(c)
         return c
       },
-      testImport() {
-        // CompConfig.comps.forEach((comp) => {
-        //   this.addCompToCanvas(comp)
-        // })
-        this.onActionLoadDocLocal()
-      },
-      testExport() {
-        // const t = ScadaVueTpl.getTplStr(this.comps, this.docSettings)
-        // this.previewTplStr = t
-
-        // this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
-        this.onActionSaveDocLocal()
-      },
-      copyCompsTolocalStorage() {
-        // console.log(JSON.stringify(this.curSelComp.toConfig()))
-        // this.addCompToCanvas(this.curSelComp.toConfig())
+      getCompsConfig(comps) {
         const compConfig = []
-        this.curSelComps.forEach((comp) => {
+        comps.forEach((comp) => {
           compConfig.push(comp.toConfig())
         })
-        localStorage.setItem('copiedComps', JSON.stringify(compConfig))
+        return compConfig
       },
-      addCompsFromStr(compStr, offset = { x: 0, y: 0 }) {
-        const compConfig = JSON.parse(compStr)
+      copyCompsTolocalStorage(storageKey = 'copiedComps') {
+        const compConfig = this.getCompsConfig(this.curSelComps)
+        localStorage.setItem(storageKey, JSON.stringify(compConfig))
+      },
+
+      addCompsFromConfig(compConfig, offset = { x: 0, y: 0 }, selAfterAdd = false) {
+        offset = offset || { x: 0, y: 0 }
         const newAddComps = []
         compConfig.forEach((comp => {
           comp.layout.x += offset.x
           comp.layout.y += offset.y
           newAddComps.push(this.addCompToCanvas(comp))
         }))
-        if (newAddComps.length > 0) {
-          this.unGroupSelAll()
-          newAddComps.forEach(compCtrl => {
-            this.curSelComps.push(compCtrl)
-          })
+        if (selAfterAdd) {
+          if (newAddComps.length > 0) {
+            this.unGroupSelAll()
+            newAddComps.forEach(compCtrl => {
+              this.curSelComps.push(compCtrl)
+            })
+          }
         }
       },
-      loadCompsFromlocalStorage() {
-        const compStr = localStorage.getItem('copiedComps')
+      loadCompsFromlocalStorage(storageKey = 'copiedComps') {
+        const compStr = localStorage.getItem(storageKey)
         if (compStr) {
-          this.addCompsFromStr(compStr)
+          const compConfig = JSON.parse(compStr)
+          this.addCompsFromConfig(compConfig, { x: 0, y: 0 }, true)
         }
       },
       onCompOptionsChanged(changedOptions) {
@@ -812,17 +807,19 @@
         // console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
-            // this.initCompCtrlPanel()
             this.curSelComps[0].addTransformer()
             this.cancelSelGroup()
           } else {
-            // this.initMulitCompCtrlPanel()
             this.addToGroup()
           }
+
+          //将选中的comps config记录
+          this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
         } else {
           this.detchCompTransformer()
           this.cancelSelGroup()
           this.curSelCompStyleOptions = null
+          this.curSelCompsCopied = []
         }
         this.syncKonvaZIndex()
         this.curSelComps = val
@@ -860,9 +857,11 @@
               comp.konvaCtrl().draggable(true)
             }
           })
-          this.curSelComps.forEach((comp) => {
-            comp.konvaCtrl().draggable(false)
-          })
+          if (this.curSelComps.length > 1) {
+            this.curSelComps.forEach((comp) => {
+              comp.konvaCtrl().draggable(false)
+            })
+          }
           this.konvaObjs.stage.draggable(false)
           this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle
         }
