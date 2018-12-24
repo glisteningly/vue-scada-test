@@ -1,8 +1,10 @@
 import hotkeys from 'hotkeys-js'
 
-const HOTKEYS = 'delete, ctrl+g, ctrl+shift+g, space, ctrl+-, ctrl+=, ctrl+0, ctrl+9' +
-  'up, down, left, right, ctrl+up, ctrl+down, ctrl+left, ctrl+right' +
-  'ctrl+c, ctrl+v, ctrl+d, ctrl+l, ctrl+shift+[, ctrl+shift+]'
+const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9',
+  'up', 'down', 'left', 'right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right',
+  'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+[', 'ctrl+shift+]']
+
+const HOTKEYS_DEF = HOTKEYS.join(',')
 
 export default {
   data() {
@@ -13,9 +15,9 @@ export default {
   },
   methods: {
     initHotkeyBinding() {
-      hotkeys(HOTKEYS, (e, handler) => {
+      hotkeys(HOTKEYS_DEF, (e, handler) => {
         // hotkeys('*', (e, handler) => {
-        // console.log(e)
+        console.log(e)
         if (e.ctrlKey) {
           switch (e.keyCode) {
             case 67: // copy

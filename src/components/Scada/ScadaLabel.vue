@@ -1,5 +1,5 @@
 <template>
-  <g class="scada-label" @click="onCompClicked" @mouseover="onCompMouseOver">
+  <g class="scada-comp scada-label" @click="onCompClicked" @mouseover="onCompMouseOver">
     <rect class="scada-label-bg"
           rx="5"
           ry="5"
@@ -7,7 +7,6 @@
           :transform="rectTransformStr"
           :width="comp.width * comp.scaleX"
           :height="comp.height * comp.scaleY">
-
     </rect>
     <text :class="alarmClass"
           :fill="options.style.fill"
@@ -19,7 +18,6 @@
         <tspan v-if="options.param.prefixText"
                class="scada-label-prefix"
                :class="alarmClass"
-               alignment-baseline="middle"
                :x="options.style.fontSize / 2"
                :fill="options.style.prefixFill"
                text-anchor="start">
@@ -27,7 +25,6 @@
         </tspan>
         <tspan v-if="!options.param.suffixText"
                class="scada-label-text"
-               alignment-baseline="middle"
                :x="comp.width * comp.scaleX / 2"
                :font-family="fontFamily"
                :font-size="labelFontSize"
@@ -39,14 +36,12 @@
                text-anchor="end">
           <tspan class="scada-label-text"
                  :font-family="fontFamily"
-                 :font-size="labelFontSize"
-                 alignment-baseline="middle">
+                 :font-size="labelFontSize">
             {{ labelText }}
           </tspan>
           <tspan class="scada-label-suffix"
                  :class="alarmClass"
-                 :fill="options.style.suffixFill"
-                 alignment-baseline="middle">
+                 :fill="options.style.suffixFill">
             {{ options.param.suffixText }}
           </tspan>
         </tspan>
@@ -143,9 +138,6 @@
       val: {
         label: '数值显示'
       },
-      // alarm: {
-      //   label: '告警状态'
-      // }
     }
   }
 
@@ -239,7 +231,6 @@
       letter-spacing: 1px;
     }
     &:hover {
-      cursor: pointer;
       .scada-label-bg {
         fill: rgba(255, 255, 255, 0.1);
       }
@@ -250,7 +241,8 @@
   }
 
   .scada-label-text, .scada-label-prefix, .scada-label-suffix {
-    alignment-baseline: middle;
+    /*alignment-baseline: central;*/
+    dominant-baseline: central;
   }
 
 </style>

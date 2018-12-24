@@ -7,6 +7,7 @@ import ScadaGroupWrap from './ScadaGroupWrap'
 import ScadaTube from './ScadaTube'
 import ScadaStates from './ScadaStates'
 import ScadaProgress from './ScadaProgress'
+import ScadaRotation from './ScadaRotation'
 
 
 const components = [
@@ -18,6 +19,7 @@ const components = [
   ScadaTube,
   ScadaStates,
   ScadaProgress,
+  ScadaRotation,
   ScadaGroupWrap
 ]
 
@@ -41,6 +43,7 @@ const ScadaCompsLibrary = {
   ScadaTube,
   ScadaStates,
   ScadaProgress,
+  ScadaRotation,
   ScadaGroupWrap
 }
 

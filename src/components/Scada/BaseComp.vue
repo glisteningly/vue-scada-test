@@ -43,7 +43,7 @@
         }
       },
       onCompClicked() {
-        this.$emit('CompClick', this.getEventPayload())
+        this.$events.emit('CompClick', this.getEventPayload())
       },
       onCompMouseOver(e) {
         // const rect = e.target.getBoundingClientRect()
@@ -58,12 +58,17 @@
           targetRect: e.target.getBoundingClientRect()
         })
         // console.log(payload)
-        this.$emit('CompHover', payload)
+        this.$events.emit('CompHover', payload)
       }
     }
   }
 </script>
 
-<style>
+<style lang="scss">
+  .scada-comp {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 
 </style>

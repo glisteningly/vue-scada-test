@@ -115,6 +115,21 @@
     },
     computed: {},
     mounted() {
+      // this.$events.on('CompClick', eventData => this.$notify.info({
+      //   title: '点击组件',
+      //   message: JSON.stringify(eventData)
+      // }))
+
+      this.$events.on('CompClick', (data) => {
+        console.log(data)
+        this.$notify.info({
+          title: '点击组件',
+          message: JSON.stringify(data)
+        })
+      })
+    },
+    destroyed() {
+      this.$events.removeAll()
     },
     created() {
       this.initMappingData()

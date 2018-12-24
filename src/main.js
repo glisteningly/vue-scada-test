@@ -3,14 +3,15 @@ import App from './App.vue'
 import store from './store'
 import router from './router'
 import ScadaComps from './components/Scada'
+Vue.use(ScadaComps)
 
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './styles/index.scss'
-
 Vue.use(Element, { size: 'mini', zIndex: 3000 })
 
-Vue.use(ScadaComps)
+import VueEvents from 'vue-event-handler'
+Vue.use(VueEvents)
 
 import { MQTTService } from 'as-utils'
 import VueMqtt from 'vue-mqtt'

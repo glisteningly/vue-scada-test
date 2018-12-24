@@ -21,6 +21,7 @@
     "vue": "^2.5.16",
     "vue-context-menu": "^2.0.6",
     "vue-drag-drop": "^1.1.4",
+    "vue-event-handler": "^1.1.0",
     "vue-mqtt": "^2.0.3",
     "vue-router": "^3.0.2",
     "vuex": "^3.0.1"

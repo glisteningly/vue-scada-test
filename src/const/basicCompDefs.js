@@ -53,7 +53,14 @@ export default [
       width: 60,
       height: 15
     },
-    options: {
-    }
+    options: {}
+  },
+  {
+    type: 'ScadaRotation',
+    layout: {
+      width: 80,
+      height: 80
+    },
+    options: {}
   }
 ]

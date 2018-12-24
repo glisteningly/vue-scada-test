@@ -12,6 +12,9 @@ input::-webkit-inner-spin-button {
 .el-button {
   border: 1px solid #333;
   box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+  &:focus {
+    border: 1px solid #333;
+  }
 }
 
 .el-button + .el-button {
@@ -358,4 +361,15 @@ input::-webkit-inner-spin-button {
   background-color: rgba(60, 151, 224, 0.21)!important;
 }
 
+.el-notification {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 430px;
+  padding: 14px 26px 14px 13px;
+  border-radius: 8px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+
+}
 

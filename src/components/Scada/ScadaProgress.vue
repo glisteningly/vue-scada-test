@@ -1,5 +1,5 @@
 <template>
-  <g class="scada-progress" @click="onCompClicked" :class="alarmClass">
+  <g class="scada-comp scada-progress" @click="onCompClicked" :class="alarmClass">
     <rect class="scada-progress-bg"
           :fill="options.style.bgColor"
           :transform="rectTransformStr"

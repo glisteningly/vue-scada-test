@@ -1113,6 +1113,7 @@
       .el-button {
         padding: 9px 12px;
         font-size: 13px;
+        outline:none;
       }
 
       .zoom-btn {
@@ -1196,7 +1197,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    z-index: 9999;
+    z-index: 999;
     position: fixed;
     top: 0;
     width: 100vw;

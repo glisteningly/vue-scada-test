@@ -1,5 +1,5 @@
 <template>
-  <rect class="scada-rect"
+  <rect class="scada-comp scada-rect"
         :class="alarmClass"
         :fill="options.style.fill"
         :stroke="options.style.stroke"

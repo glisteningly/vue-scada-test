@@ -1,5 +1,5 @@
 <template>
-  <rect class="scada-state"
+  <rect class="scada-comp scada-state"
         :fill="fillColor"
         :stroke="strokeColor"
         :stroke-width="options.style.strokeWidth"
