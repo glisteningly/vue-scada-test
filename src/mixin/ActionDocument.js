@@ -1,6 +1,6 @@
 import VizResourceService from '../api/vizRes'
 
-import ScadaVueTpl from '../utils/scadaVueTpl'
+import ScadaVueTpl from '../components/scadaVueTpl'
 
 export default {
   data() {
@@ -129,21 +129,7 @@ export default {
         this.$message.error(`打开可视化资源失败 - ${error}`)
       })
     },
-    initDocFromParam() {
-      if (this.$route.params.id && this.$route.params.id !== '0') {
-//          console.log(this.$route.params)
-        this.docInfo.draftId = this.$route.params.id
-        this.openDraft(this.docInfo.draftId)
-      } else {
-        this.docInfo.name = this.$route.query.name
-      }
-      if (this.$route.query.uid) {
-        this.docInfo.editorId = this.$route.query.uid
-      }
-      if (this.$route.query.pid) {
-        this.docInfo.visGroupId = this.$route.query.pid
-      }
-    },
+
   },
   computed: {
     docName() {

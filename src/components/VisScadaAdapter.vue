@@ -1,20 +1,20 @@
 <template>
-  <component :is="scadaView" :value="bindData"></component>
+  <component class="scada-adapter_view" :is="scadaView" :value="bindData"></component>
 </template>
 
 <script>
   import SvgColorFilter from './SvgColorFilter'
 
-  import ScadaVueTpl from '../utils/scadaVueTpl'
+  import ScadaVueTpl from './scadaVueTpl'
   import { BaseService } from 'as-utils'
 
   export default {
-    components: { SvgColorFilter },
-    name: 'VisScadaAdapter',
+    // components: { SvgColorFilter },
+    name: 'VisScadaAdapter2',
     props: {
       config: null,
       extraConfig: null,
-      isPreviewMode: false,
+      // isPreviewMode: false,
     },
     data() {
       return {
@@ -25,20 +25,25 @@
         topicList: [],
         topicMap: {},
         lastMqttMsg: '',
+        // scadaDoc: {}
       }
     },
     methods: {
       initMappingData() {
-        const queryConfig = ScadaVueTpl.getQueryConfig(this.config.comps)
-        this.bindData = ScadaVueTpl.generateMappingObj(queryConfig)
+        // const queryConfig = ScadaVueTpl.getQueryConfig(this.scadaDoc.comps)
+        this.bindData = ScadaVueTpl.generateMappingObj(this.config.queryConfig)
       },
 
       initScadaView() {
-        const tpl = ScadaVueTpl.getTplStr(this.config, this.isPreviewMode)
+        // const tpl = ScadaVueTpl.getTplStr(this.scadaDoc, this.isPreviewMode)
+        const tpl = this.config.scadaTpl
+
+        // console.log(tpl)
 
         this.scadaView = {
           name: 'scadaSvg',
           // extends: BaseScadaView,
+          components: { SvgColorFilter },
           template: tpl,
           props: {
             value: {
@@ -49,7 +54,7 @@
       },
 
       initSqlList() {
-        const queryConfig = ScadaVueTpl.getQueryConfig(this.config.comps)
+        const queryConfig = this.config.queryConfig
         this.sqlList = ScadaVueTpl.generateQuerySqlList(queryConfig)
         this.bindList = ScadaVueTpl.generateBindingList(queryConfig)
       },
@@ -91,7 +96,9 @@
     mqtt: {
       '+/report/+'(message, topic) {
         const msgStr = message.toString()
-        console.log(topic + ' : ' + msgStr)
+        if (this.$root._isShowLog) {
+          console.log(topic + ' : ' + msgStr)
+        }
         if (msgStr === this.lastMqttMsg) {
           return
         }
@@ -115,23 +122,10 @@
     },
     computed: {},
     mounted() {
-      // this.$events.on('CompClick', eventData => this.$notify.info({
-      //   title: '点击组件',
-      //   message: JSON.stringify(eventData)
-      // }))
-
-      this.$events.on('CompClick', (data) => {
-        console.log(data)
-        this.$notify.info({
-          title: '点击组件',
-          message: JSON.stringify(data)
-        })
-      })
-    },
-    destroyed() {
-      this.$events.removeAll()
     },
     created() {
+      // console.log(this.config)
+      // console.log(_.isObject(this.config))
       this.initMappingData()
       this.initSqlList()
       this.initScadaView()
@@ -139,3 +133,7 @@
     },
   }
 </script>
+
+<style>
+
+</style>

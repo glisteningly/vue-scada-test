@@ -1,8 +1,8 @@
 import hotkeys from 'hotkeys-js'
 
-const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9',
+const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9', 'f9', 'f10', 'escape',
   'up', 'down', 'left', 'right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right',
-  'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+[', 'ctrl+shift+]']
+  'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+[', 'ctrl+shift+]', 'ctrl+alt+l']
 
 const HOTKEYS_DEF = HOTKEYS.join(',')
 
@@ -30,7 +30,6 @@ export default {
         }
 
         e.preventDefault()
-        // console.log(hotkeys.isPressed("space"))
         switch (handler.key) {
           case 'delete':
             this.compsDelete()
@@ -43,7 +42,6 @@ export default {
             break;
           case 'space':
             this.isKeySpacepressing = true
-            console.log('escape')
             break;
           case 'ctrl+-':
             this.zoomPointPos = null
@@ -100,6 +98,23 @@ export default {
           case 'ctrl+shift+[':
             this.compsMoveBottom()
             break;
+          case 'ctrl+alt+l':
+            this.$root._isShowLog = !this.$root._isShowLog
+            break;
+          case 'escape':
+            this.toolState = ''
+            this.showPreview = false
+            break;
+          case 'f9':
+            if (!this.showPreview) {
+              this.doPreview()
+            } else {
+              this.showPreview = false
+            }
+            break;
+          case 'f10':
+            this.onPublishDoc()
+            break;
         }
       })
     },
@@ -108,10 +123,10 @@ export default {
         this.isKeySpacepressing = false
       }
 
-      if (e.code === 'Escape') {
-        this.toolState = ''
-        this.showPreview = false
-      }
+      // if (e.code === 'Escape') {
+      //   this.toolState = ''
+      //   this.showPreview = false
+      // }
     },
     doCanvasZoom(e) {
       if (e.ctrlKey) {

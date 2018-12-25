@@ -12,6 +12,7 @@
       return {}
     },
     mounted() {
+      this.$root._isShowLog = false
     },
   }
 

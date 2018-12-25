@@ -33,7 +33,6 @@ export default {
 
   generateQuerySqlList(queryConfig) {
     const queryList = []
-    const bindList = []
     for (const dataSource in queryConfig) {
       queryConfig[dataSource].forEach(ds => {
         let wqStr = ''
@@ -85,10 +84,6 @@ export default {
       if (!bindingObj) {
         return null
       }
-
-      // console.log(bindingObj)
-
-      // const bind = {}
 
       _.keys(bindingObj).forEach(key => {
         const _type = bindingObj[key].type || ''
@@ -206,18 +201,10 @@ export default {
     // console.log(comps)
     return jstoxml.toXML(comps)
   },
-  // getTplStr(components, docSettings) {
-  //   const compStr = this.getCompStr(components)
-  //   // console.log(compStr)
-  //   return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docSettings.width} ${docSettings.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${docSettings.bgColor}"></rect>${compStr}</svg>`
-  // }
-
   getTplStr(docConfig, isShowBg = true) {
     const compStr = this.getCompStr(docConfig.comps)
     const filterStr = `<SvgColorFilter :blink="true"/>`
     const bgRectStr = isShowBg ? `<rect width="100%" height="100%" fill="${docConfig.docSettings.bgColor}"></rect>` : ''
-    // console.log(compStr)
-    // return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docConfig.docSettings.width} ${docConfig.docSettings.height}" preserveAspectRatio="xMidYMid meet"><rect width="100%" height="100%" fill="${docConfig.docSettings.bgColor}"></rect>${compStr}</svg>`
     return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${docConfig.docSettings.width} ${docConfig.docSettings.height}" preserveAspectRatio="xMidYMid meet">${filterStr}${bgRectStr}${compStr}</svg>`
   }
 }

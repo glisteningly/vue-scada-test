@@ -33,11 +33,14 @@
           return null
       },
       hoverClass() {
-        if (this.comp.bid || this.comp.eventMsg || !_.isEmpty(this.comp.binding)) {
+        if (this.eventBinded) {
           return 'scada-comp'
         } else {
           return null
         }
+      },
+      eventBinded() {
+        return (this.comp.bid || this.comp.eventMsg || !_.isEmpty(this.comp.binding))
       }
     },
     methods: {
@@ -50,7 +53,9 @@
         }
       },
       onCompClicked() {
-        this.$events.emit('CompClick', this.getEventPayload())
+        if (this.$events && this.eventBinded) {
+          this.$events.emit('CompClick', this.getEventPayload())
+        }
       },
       onCompMouseOver(e) {
         // const rect = e.target.getBoundingClientRect()
@@ -65,7 +70,9 @@
           targetRect: e.target.getBoundingClientRect()
         })
         // console.log(payload)
-        this.$events.emit('CompHover', payload)
+        if (this.$events && this.eventBinded) {
+          this.$events.emit('CompHover', payload)
+        }
       }
     }
   }

@@ -274,6 +274,8 @@
 
   import VisScadaAdapter from '../components/VisScadaAdapter'
 
+  import ScadaVueTpl from './scadaVueTpl'
+
   import { TOOL_STATE } from '../const'
 
   const ZoomScaleSettings = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5, 2, 3, 4]
@@ -355,6 +357,7 @@
       this.initKonvaWorkArea()
       this.initDocFromParam()
       this.initDeviceType()
+      this.initEventHandle()
     },
     methods: {
       addCompEvent(compCtrl) {
@@ -681,7 +684,7 @@
       },
       zoomFit() {
         const width = this.$refs['workCanvas'].clientWidth
-        const height = this.$refs['workCanvas'].clientHeight
+        // const height = this.$refs['workCanvas'].clientHeight
 
         const scale = (width - 40) / this.docSettings.width
         // console.log(scale)
@@ -755,9 +758,11 @@
         this.konvaObjs.stage.batchDraw()
       },
       doPreview() {
-        // this.testExport()
-        this.scadaDoc = { comps: this.comps, docSettings: this.docSettings }
-
+        const doc = { comps: this.comps, docSettings: this.docSettings }
+        this.scadaDoc = {
+          scadaTpl: ScadaVueTpl.getTplStr(doc, true),
+          queryConfig: ScadaVueTpl.getQueryConfig(this.comps)
+        }
         this.showPreview = true
       },
       //移除组件的tr
@@ -1113,7 +1118,7 @@
       .el-button {
         padding: 9px 12px;
         font-size: 13px;
-        outline:none;
+        outline: none;
       }
 
       .zoom-btn {
