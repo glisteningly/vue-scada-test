@@ -1,5 +1,6 @@
 <template>
-  <g class="scada-comp scada-image-wrap"
+  <g class="scada-image-wrap"
+     :class="hoverClass"
      @click="onCompClicked"
      @mouseover="onCompMouseOver">
     <image v-if="this.values.val"
@@ -17,8 +18,7 @@
           fill="transparent"
           :transform="rectTransformStr"
           :width="comp.width * comp.scaleX"
-          :height="comp.height * comp.scaleY"
-    >
+          :height="comp.height * comp.scaleY">
     </rect>
   </g>
 </template>
@@ -75,11 +75,11 @@
         filter: url("#filter-red-overlay");
       }
     }
-    &:hover {
-      .scada-cover {
-        fill: rgba(255, 255, 255, 0.1);
-        stroke: rgba(32, 160, 255, 0.2);
-      }
-    }
+    /*&:hover {*/
+      /*.scada-cover {*/
+        /*fill: rgba(255, 255, 255, 0.1);*/
+        /*stroke: rgba(32, 160, 255, 0.2);*/
+      /*}*/
+    /*}*/
   }
 </style>

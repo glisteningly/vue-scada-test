@@ -51,9 +51,11 @@
           return
         }
 
+        const scale = (img.naturalWidth / 4 < 20 || img.naturalHeight / 4 < 20) ? 2 : 4
+
         const size = {
-          width: img.naturalWidth / 4,
-          height: img.naturalHeight / 4
+          width: img.naturalWidth / scale,
+          height: img.naturalHeight / scale
         }
 
         const comp = {

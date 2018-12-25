@@ -1,13 +1,9 @@
 <template>
-  <g class="scada-comp scada-label" @click="onCompClicked" @mouseover="onCompMouseOver">
-    <rect class="scada-label-bg"
-          rx="5"
-          ry="5"
-          fill="transparent"
-          :transform="rectTransformStr"
-          :width="comp.width * comp.scaleX"
-          :height="comp.height * comp.scaleY">
-    </rect>
+  <g class="scada-label"
+     :class="hoverClass"
+     @click="onCompClicked"
+     @mouseover="onCompMouseOver">
+
     <text :class="alarmClass"
           :fill="options.style.fill"
           :x="comp.width * comp.scaleX / 2"
@@ -68,6 +64,14 @@
         </tspan>
       </template>
     </text>
+    <rect class="scada-cover"
+          rx="5"
+          ry="5"
+          fill="transparent"
+          :transform="rectTransformStr"
+          :width="comp.width * comp.scaleX"
+          :height="comp.height * comp.scaleY">
+    </rect>
   </g>
 </template>
 

@@ -1,5 +1,7 @@
 <template>
-  <g class="scada-comp scada-group" @click="onCompClicked"
+  <g class="scada-group"
+     :class="hoverClass"
+     @click="onCompClicked"
      @mouseover="onCompMouseOver">
     <slot></slot>
     <rect class="scada-cover"
@@ -26,11 +28,11 @@
 </script>
 
 <style lang="scss">
-  .scada-cover {
-    &:hover {
-      fill: rgba(255, 255, 255, 0.1);
-      stroke: rgba(32, 160, 255, 0.2);
-    }
-  }
+  /*.scada-cover {*/
+    /*&:hover {*/
+      /*fill: rgba(255, 255, 255, 0.1);*/
+      /*stroke: rgba(32, 160, 255, 0.2);*/
+    /*}*/
+  /*}*/
 
 </style>

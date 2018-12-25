@@ -31,6 +31,13 @@
           return 'alarm'
         } else
           return null
+      },
+      hoverClass() {
+        if (this.comp.bid || this.comp.eventMsg || !_.isEmpty(this.comp.binding)) {
+          return 'scada-comp'
+        } else {
+          return null
+        }
       }
     },
     methods: {
@@ -68,6 +75,12 @@
   .scada-comp {
     &:hover {
       cursor: pointer;
+      .scada-cover {
+        &:hover {
+          fill: rgba(255, 255, 255, 0.1);
+          /*stroke: rgba(32, 160, 255, 0.2);*/
+        }
+      }
     }
   }
 
