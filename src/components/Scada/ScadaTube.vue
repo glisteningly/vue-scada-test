@@ -5,7 +5,7 @@
           :stroke-width="options.style.tubeWidth"
           :d="roundPath"
           :transform="rectTransformStr"/>
-    <path class="flow-path"
+    <path class="flow-path scada-anime"
           :style="dashLineStyle"
           :stroke="options.style.flowLineColor"
           :stroke-width="options.style.flowLineWidth"

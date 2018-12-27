@@ -32,10 +32,7 @@
       offStroke: {
         label: 'OFF-边框',
         type: 'Color'
-      },
-    },
-    param: {
-
+      }
     },
     binding: {
       val: {

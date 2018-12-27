@@ -1,5 +1,5 @@
 <template>
-  <g class="scada-comp scada-rotation"
+  <g class="scada-comp scada-rotation scada-anime"
      :class="alarmClass"
      :style="rotatingStyle"
      @click="onCompClicked"

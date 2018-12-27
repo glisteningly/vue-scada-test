@@ -1,15 +1,16 @@
 {
   "name": "as-scada-comp",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
-  "main": "./dist/as-scada-comp.umd.js",
+  "main": "./lib/as-scada-comp.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name as-scada-comp src/components/Scada/index.js"
+    "lib": "vue-cli-service build --target lib --name as-scada-comp --dest lib src/components/Scada/index.js"
   },
   "dependencies": {
+    "dayjs": "^1.7.8",
     "element-ui": "^2.4.9",
     "hotkeys-js": "^3.3.8",
     "jstoxml": "^1.4.3",

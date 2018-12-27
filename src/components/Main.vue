@@ -58,6 +58,11 @@
             <span class="toolbar-gutter-h"/>
             <ImgButton title="全部解锁" :icon="'ic-action-unlock-all'" @click="doUnlockAll"/>
             <span class="toolbar-gutter-h"/>
+            <!--<el-switch v-model="isAnimationEnabled"></el-switch>-->
+            <ImgButton v-show="!isAnimationEnabled" title="打开动画预览" :icon="'ic-action-anime-enable'"
+                       @click="isAnimationEnabled = true"/>
+            <ImgButton v-show="isAnimationEnabled" title="关闭动画预览" :icon="'ic-action-anime-disable'"
+                       @click="isAnimationEnabled = false"/>
             <!--<el-switch v-model="debug_hideCanvas"></el-switch>-->
           </div>
           <div class="toolbar-right">
@@ -77,7 +82,9 @@
             <el-tab-pane label="设备" name="deviceComp">
               <DeviceCompLib/>
             </el-tab-pane>
-            <el-tab-pane label="图层" name="layer"></el-tab-pane>
+            <el-tab-pane label="图层" name="layer">
+              <LayerPanel :treedata="comps" :curNode="curSelCompUid"/>
+            </el-tab-pane>
           </el-tabs>
         </div>
         <div id="work_area">
@@ -256,6 +263,7 @@
   import InitConfig from '../mixin/InitConfig'
   import DocSettings from '../mixin/DocSettings'
   import ActionDocument from '../mixin/ActionDocument'
+  import ActionAnimated from '../mixin/ActionAnimated'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -266,6 +274,7 @@
   import OptionPanel from './panels/OptionPanel'
   import BasicCompLib from './panels/BasicCompLib'
   import DeviceCompLib from './panels/DeviceCompLib'
+  import LayerPanel from './panels/LayerPanel'
 
   import ImgButton from '../components/ImgButton'
   import SvgScadaView from '../components/SvgScadaView'
@@ -287,6 +296,7 @@
       BindingPanel,
       EventPanel,
       OptionPanel,
+      LayerPanel,
       ImgButton,
       SvgScadaView,
       CanvasNav,
@@ -295,7 +305,7 @@
       DeviceCompLib,
       SettingsDialog
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionDocument,
+    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionDocument, ActionAnimated,
       ActionAlign, ActionMove, DataBinding, StateStore, InitConfig, DocSettings],
     name: 'MainEditor',
     data() {
@@ -329,8 +339,8 @@
         testData: 2,
         curSelCompStyleOptions: {},
         curFixedPathPoint: null,
-        activeLeftTab: 'basicComp',
-        // activeRightTab: 'nav',
+        // activeLeftTab: 'basicComp',
+        activeLeftTab: 'layer',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
         activeBindingTab: 'binding',
@@ -349,7 +359,7 @@
           visGroupId: 1
         },
         scadaDoc: null,
-        isShowSettingsDialog: false,
+        isShowSettingsDialog: false
       }
     },
     mounted() {
@@ -794,6 +804,13 @@
       curSelComp() {
         if (this.curSelComps.length >= 1) {
           return this.curSelComps[0]
+        } else {
+          return null
+        }
+      },
+      curSelCompUid() {
+        if (this.curSelComp) {
+          return this.curSelComp.name
         } else {
           return null
         }

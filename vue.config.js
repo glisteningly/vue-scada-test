@@ -17,5 +17,10 @@ module.exports = {
     }
   },
   runtimeCompiler: true,
-  css: { extract: false }
+  css: { extract: false },
+  // configureWebpack: {
+  //   externals: process.env.NODE_ENV === 'production'
+  //     ? ['vue', 'vue-router', 'lodash']
+  //     : [],
+  // }
 }

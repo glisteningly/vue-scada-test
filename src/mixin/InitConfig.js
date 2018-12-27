@@ -10,6 +10,7 @@ export default {
   methods: {
     initDocSettings() {
       this.docSettings = DOC_DEFAULT_SETTING
+      this.disableCompAnime()
     },
     initDeviceType() {
       DeviceType.getDeviceTypes().then(rootType => {

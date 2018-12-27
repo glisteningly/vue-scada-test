@@ -191,18 +191,20 @@
         })
         this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
 
-        const o = {}
+        if (this.curSelComp.type === 'ScadaLabel') {
+          const o = {}
 
-        if (device.unit) {
-          _.merge(o, { param: { suffixText: device.unit } })
-        }
-        if (device.fieldLabel) {
-          _.merge(o, { param: { prefixText: device.fieldLabel } })
-        }
+          if (device.unit) {
+            _.merge(o, { param: { suffixText: device.unit } })
+          }
+          if (device.fieldLabel) {
+            _.merge(o, { param: { prefixText: device.fieldLabel } })
+          }
 
-        if (!_.isEmpty(o)) {
-          // console.log(o)
-          this.$emit('compOptionsChanged', o)
+          if (!_.isEmpty(o)) {
+            // console.log(o)
+            this.$emit('compOptionsChanged', o)
+          }
         }
       },
       onBindingClear() {

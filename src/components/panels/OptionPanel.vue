@@ -13,6 +13,7 @@
           <component
               :is="getCtrlTyp(ctrl.type)"
               v-model="ctrl.value"
+              :placeholder="ctrl.hint"
               @change="compValInputChanged(ctrl.value, key)"
               controls-position="right"
               :min="0"
@@ -87,6 +88,7 @@
           // console.log(compStyles)
           const optionCtrls = {}
           for (const key in compOpts) {
+            // console.log(compDefine)
             const ctrl = _.has(compDefine, key) ? {
               value: compOpts[key],
               label: compDefine[key].label,
@@ -139,7 +141,8 @@
       },
       getCompOptions(comp) {
         if (comp) {
-          return _.merge({}, this.getCompDefaultOptions(), comp.options)
+          // return _.merge({}, this.getCompDefaultOptions(), comp.options)
+          return _.merge({}, this.getCompDefaultOptions())
         }
         return null
       },

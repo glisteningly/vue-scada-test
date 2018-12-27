@@ -17,7 +17,7 @@ export default {
     initHotkeyBinding() {
       hotkeys(HOTKEYS_DEF, (e, handler) => {
         // hotkeys('*', (e, handler) => {
-        console.log(e)
+        // console.log(e)
         if (e.ctrlKey) {
           switch (e.keyCode) {
             case 67: // copy

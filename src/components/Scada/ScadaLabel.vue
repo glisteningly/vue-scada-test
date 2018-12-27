@@ -78,6 +78,7 @@
 <script>
   import BaseComp from './BaseComp'
   import _ from 'lodash'
+  import formatter from './utils/formatter'
 
   const CompDefine = {
     style: {
@@ -136,6 +137,19 @@
       decTrim: {
         label: '小数保留',
         type: 'Int',
+      },
+      formatter: {
+        label: '格式方法',
+        type: 'Enum',
+        opts: [
+          { label: '无', value: '' },
+          { label: '时间戳', value: 'timeFormat' },
+          { label: '倍率', value: 'multiplier' }
+        ]
+      },
+      formatParam: {
+        label: '格式参数',
+        type: 'String',
       }
     },
     binding: {
@@ -176,7 +190,10 @@
               defaultText: '',
               prefixText: '',
               suffixText: '',
-              decTrim: 0
+              decTrim: 0,
+              // timeFormatStr: '',
+              formatter: '',
+              formatParam: ''
             }
           }
         }
@@ -185,6 +202,10 @@
     computed: {
       labelText() {
         if (!_.isNil(this.values.val) && this.values.val !== '' && this.options.param.dataBinding) {
+          // 格式化函数
+          if (this.options.param.formatter) {
+            return formatter[this.options.param.formatter](this.values.val, this.options.param.formatParam)
+          }
           // 小数点保留
           if (!isNaN(parseFloat(this.values.val))) {
             return _.round(this.values.val, parseInt(this.options.param.decTrim))
