@@ -2,6 +2,7 @@
   <g class="scada-group"
      :class="hoverClass"
      @click="onCompClicked"
+     @mouseout="onCompMouseOut"
      @mouseover="onCompMouseOver">
     <slot></slot>
     <rect class="scada-cover"

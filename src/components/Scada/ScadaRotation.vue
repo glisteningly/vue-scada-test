@@ -3,6 +3,7 @@
      :class="alarmClass"
      :style="rotatingStyle"
      @click="onCompClicked"
+     @mouseout="onCompMouseOut"
      @mouseover="onCompMouseOver">
     <image :xlink:href="options.param.imgUrl || './images/scada-res/scada-rotation-default.svg'"
            :transform="rectTransformStr"

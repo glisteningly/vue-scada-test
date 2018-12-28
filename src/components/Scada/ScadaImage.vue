@@ -2,6 +2,7 @@
   <g class="scada-image-wrap"
      :class="hoverClass"
      @click="onCompClicked"
+     @mouseout="onCompMouseOut"
      @mouseover="onCompMouseOver">
     <image v-if="this.values.val"
            class="scada-image"

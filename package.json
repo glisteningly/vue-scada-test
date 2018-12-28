@@ -1,6 +1,6 @@
 {
   "name": "as-scada-comp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "main": "./lib/as-scada-comp.umd.js",
   "scripts": {

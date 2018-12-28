@@ -2,6 +2,7 @@
   <g class="scada-label"
      :class="hoverClass"
      @click="onCompClicked"
+     @mouseout="onCompMouseOut"
      @mouseover="onCompMouseOver">
 
     <text :class="alarmClass"

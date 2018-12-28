@@ -85,9 +85,11 @@
         if (this.getCompOptions(this.curSelComp)) {
           const compOpts = Object.assign({}, this.getCompOptions(this.curSelComp)[this.optionCategory] || {})
           const compDefine = Object.assign({}, this.getCompOptionsDefine()[this.optionCategory] || {})
+          // const optKeys = _.keys(this.getCompDefaultOptions()[this.optionCategory])
           // console.log(compStyles)
           const optionCtrls = {}
-          for (const key in compOpts) {
+          // for (const key in compOpts) {
+          for (const key in this.getCompDefaultOptions()[this.optionCategory]) {
             // console.log(compDefine)
             const ctrl = _.has(compDefine, key) ? {
               value: compOpts[key],
@@ -141,8 +143,11 @@
       },
       getCompOptions(comp) {
         if (comp) {
-          // return _.merge({}, this.getCompDefaultOptions(), comp.options)
-          return _.merge({}, this.getCompDefaultOptions())
+          // const optionKeys = _.keys(this.getCompDefaultOptions())
+          // const curOptions = _.pick(comp.options, optionKeys)
+          // console.log(this.getCompDefaultOptions())
+          return _.merge({}, this.getCompDefaultOptions(), comp.options)
+          // return _.merge({}, this.getCompDefaultOptions())
         }
         return null
       },

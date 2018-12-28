@@ -83,7 +83,9 @@
               <DeviceCompLib/>
             </el-tab-pane>
             <el-tab-pane label="图层" name="layer">
-              <LayerPanel :treedata="comps" :curNode="curSelCompUid"/>
+              <LayerPanel :treedata="comps"
+                          :curNode="curSelCompUid"
+                          @layerCompClick="onLayerCompClick"/>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -245,7 +247,7 @@
 
   import Konva from 'konva'
   import _ from 'lodash'
-  import hotkeys from 'hotkeys-js'
+  // import hotkeys from 'hotkeys-js'
 
   import ContextMenu from 'vue-context-menu'
 
@@ -257,13 +259,17 @@
   import ComputeLayout from '../mixin/ComputeLayout'
   import Keyboard from '../mixin/Keyboard'
   import InitKonva from '../mixin/InitKonva'
+  import InitConfig from '../mixin/InitConfig'
+  import InitCompCtrl from '../mixin/InitCompCtrl'
+
   import ActionAlign from '../mixin/ActionAlign'
   import ActionMove from '../mixin/ActionMove'
   import StateStore from '../mixin/StateStore'
-  import InitConfig from '../mixin/InitConfig'
   import DocSettings from '../mixin/DocSettings'
   import ActionDocument from '../mixin/ActionDocument'
   import ActionAnimated from '../mixin/ActionAnimated'
+  import LayerComps from '../mixin/LayerComps'
+  import CurSelCompsComputed from '../mixin/CurSelCompsComputed'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -305,8 +311,24 @@
       DeviceCompLib,
       SettingsDialog
     },
-    mixins: [CommonUtils, InitKonva, ComputeLayout, Keyboard, ActionDocument, ActionAnimated,
-      ActionAlign, ActionMove, DataBinding, StateStore, InitConfig, DocSettings],
+    mixins: [
+      CommonUtils,
+      CurSelCompsComputed,
+      InitKonva,
+      InitConfig,
+      InitCompCtrl,
+      ComputeLayout,
+      Keyboard,
+      ActionDocument,
+      ActionAnimated,
+      ActionAlign,
+      ActionMove,
+      DataBinding,
+      StateStore,
+      DocSettings,
+      LayerComps,
+      InitCompCtrl
+    ],
     name: 'MainEditor',
     data() {
       return {
@@ -370,55 +392,15 @@
       this.initEventHandle()
     },
     methods: {
-      addCompEvent(compCtrl) {
-        // comp.setContext(this.konvaObjs)
-        compCtrl.konvaCtrl().on('click', (e) => {
-          if (e.evt.button === 0) {
-            if (!this.isInSelGroup(compCtrl)) {
-              // 不在多选组内
-              if (!hotkeys.shift) {
-                this.detchCompTransformer()
-                this.unGroupSelAll()
-                this.curSelComps.push(compCtrl)
-              } else {
-                if (!this.isInSelGroup(compCtrl)) {
-                  this.curSelComps.push(compCtrl)
-                }
-              }
-            } else {
-              // 在多选组内
-              if (hotkeys.shift) {
-                if (this.isInSelGroup(compCtrl)) {
-                  compCtrl.removeCompfromGroupSel()
-                  this.curSelComps.splice(_.findIndex(this.curSelComps, compCtrl), 1)
-                }
-              }
-            }
-          }
-        })
-
-        compCtrl.konvaCtrl().on('dragstart', () => {
-          // console.log('dragstart')
-          if (!this.isInSelGroup(compCtrl)) {
-            this.unGroupSelAll()
-            this.curSelComps.push(compCtrl)
-          }
-        })
-
-        compCtrl.konvaCtrl().on('dragend', (e) => {
-          //alt 拖拽复制
-          if (e.evt.altKey && this.curSelCompsCopied.length > 0) {
-            this.addCompsFromConfig(this.curSelCompsCopied)
-          }
-          //更新选中的comps config记录
-          this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
-        })
-      },
-      addComp(compCtrl) {
+      addComp(compCtrl, addOptions) {
+        addOptions = addOptions || {}
         this.addCompEvent(compCtrl)
-        this.comps.push(compCtrl)
+        if (addOptions.index) {
+          this.comps.splice(addOptions.index, 0, compCtrl)
+        } else {
+          this.comps.push(compCtrl)
+        }
       },
-
       handleCompDrop(e) {
         const data = e.dataTransfer.getData("data")
         // console.log(data)
@@ -592,10 +574,10 @@
           console.log(`${index} : ${comp.konvaCtrl().name()} ${comp.konvaCtrl().getZIndex()}`)
         })
       },
-      addCompToCanvas(comp) {
+      addCompToCanvas(comp, addOptions) {
         // console.log(comp)
         const c = new CompCtrl(comp)
-        this.addComp(c)
+        this.addComp(c, addOptions)
         return c
       },
       getCompsConfig(comps) {
@@ -610,16 +592,22 @@
         localStorage.setItem(storageKey, JSON.stringify(compConfig))
       },
 
-      addCompsFromConfig(compConfig, offset = { x: 0, y: 0 }, selAfterAdd = false) {
+      addCompsFromConfig(compConfig, addOptions) {
         const configs = _.cloneDeep(compConfig)
-        offset = offset || { x: 0, y: 0 }
+        const defAddOptions = {
+          offset: { x: 0, y: 0 },
+          selAfterAdd: false,
+          index: 0
+        }
+        const options = addOptions || defAddOptions
+        const offset = options.offset || { x: 0, y: 0 }
         const newAddComps = []
         configs.forEach((comp => {
           comp.layout.x += offset.x
           comp.layout.y += offset.y
-          newAddComps.push(this.addCompToCanvas(comp))
+          newAddComps.push(this.addCompToCanvas(comp, options))
         }))
-        if (selAfterAdd) {
+        if (options.selAfterAdd) {
           if (newAddComps.length > 0) {
             this.unGroupSelAll()
             newAddComps.forEach(compCtrl => {
@@ -632,7 +620,11 @@
         const compStr = localStorage.getItem(storageKey)
         if (compStr) {
           const compConfig = JSON.parse(compStr)
-          this.addCompsFromConfig(compConfig, { x: 0, y: 0 }, true)
+          const options = {
+            selAfterAdd: false
+          }
+          this.addCompsFromConfig(compConfig, options)
+          // this.addCompsFromConfig(compConfig, { x: 0, y: 0 }, true)
         }
       },
       onCompOptionsChanged(changedOptions) {
@@ -801,45 +793,11 @@
       }
     },
     computed: {
-      curSelComp() {
-        if (this.curSelComps.length >= 1) {
-          return this.curSelComps[0]
-        } else {
-          return null
-        }
-      },
-      curSelCompUid() {
-        if (this.curSelComp) {
-          return this.curSelComp.name
-        } else {
-          return null
-        }
-      },
-      curSingleSelComp() {
-        if (this.curSelComps.length === 1) {
-          return this.curSelComps[0]
-        } else {
-          return null
-        }
-      },
-      multiCompsSelected() {
-        return this.curSelComps.length > 1
-      },
-      canDoSelCompAction() {
-        return this.curSelComps.length > 0
-      },
-      canUnGroupComps() {
-        return (this.curSelComps.length === 1 && this.curSelComps[0].type === 'ScadaGroupWrap')
-      },
       canvasZoom() {
         return this.canvasLayout.scale
       },
       curZoomScale() {
         return ZoomScaleSettings[this.zoomScaleIndex]
-      },
-      isToolStatePath() {
-        // return (this.toolState === TOOL_STATE.addPathPoint) ? 'primary' : 'default'
-        return (this.toolState === TOOL_STATE.addPathPoint) ? 'primary' : 'default'
       },
       canvasCursorStyle() {
         switch (this.toolState) {
@@ -858,19 +816,6 @@
         } else {
           return null
         }
-      },
-      curSelCompsType() {
-        if (this.curSelComps.length >= 1) {
-          const compType = this.curSelComps[0].type
-          let _isSameType = true
-          this.curSelComps.forEach(comp => {
-            _isSameType = (comp.type === compType)
-          })
-          if (_isSameType) {
-            return compType
-          }
-        }
-        return null
       },
       workFrameBgColor() {
         return {

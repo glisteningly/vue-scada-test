@@ -10,6 +10,7 @@
         :rx="options.style.cornerRadius"
         :ry="options.style.cornerRadius"
         @click="onCompClicked"
+        @mouseout="onCompMouseOut"
         @mouseover="onCompMouseOver"/>
 </template>
 

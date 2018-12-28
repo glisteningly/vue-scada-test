@@ -19,8 +19,12 @@
                empty-text="无组件"
                @node-click="handleNodeClick">
         <span class="layer-tree-node" slot-scope="{ node, data }">
-          <span>{{ data.type}}</span>
-          <label v-if="data.locked"> o</label>
+          <label>{{ data.type}}</label>
+          <img v-if="data.locked"
+               class="locked-icon"
+               @click="handleNodeUnlock(data)"
+               :src="'./images/icons/ic-comp-locked.png'">
+          <!--<span class="locked" v-if="data.locked"></span>-->
         </span>
       </el-tree>
     </div>
@@ -43,12 +47,19 @@
       }
     },
     methods: {
-      handleNodeClick(data, node) {
-        console.log(data)
+      handleNodeClick(data) {
+        // console.log(data)
+        this.$emit('layerCompClick', data)
       },
       filterNode(value, data) {
         if (!value) return true
         return (data.type.indexOf(value.trim()) !== -1)
+      },
+      handleNodeUnlock(data) {
+        const compCtrl = _.find(this.treedata, { name: data.name })
+        if (compCtrl) {
+          compCtrl.locked = false
+        }
       }
     },
     computed: {
@@ -70,7 +81,6 @@
           })
           return list
         }
-
         return getTree(this.treedata)
       }
     },
@@ -106,11 +116,29 @@
         @include scrollBar;
         margin-top: 6px;
         .layer-tree-node {
-          font-size: 12px;
+          width: 100%;
+          font-size: 13px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          label {
+            flex: 1;
+          }
+          .locked-icon {
+            width: 11px;
+            height: 11px;
+            margin-right: 4px;
+          }
+          /*.locked {*/
+          /*justify-content: flex-end;*/
+
+          /*}*/
         }
         .el-tree-node__content {
           border-bottom: 1px solid #222;
+          border-right: 1px solid #222;
           height: 22px;
+          cursor: default;
         }
       }
     }

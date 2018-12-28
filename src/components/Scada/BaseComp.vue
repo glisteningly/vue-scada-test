@@ -73,6 +73,11 @@
         if (this.$events && this.eventBinded) {
           this.$events.emit('CompHover', payload)
         }
+      },
+      onCompMouseOut() {
+        if (this.$events && this.eventBinded) {
+          this.$events.emit('CompMouseOut', this.getEventPayload())
+        }
       }
     }
   }
