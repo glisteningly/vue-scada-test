@@ -101,6 +101,8 @@
 
 <style lang="scss">
   .scada-rotation {
+    /*will-change: transform;*/
+    /*transform: translateZ(0);*/
     &.alarm {
       filter: url("#filter-red-overlay");
     }

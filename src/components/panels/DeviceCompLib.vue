@@ -78,9 +78,6 @@
         }
         return null
       },
-      onCompClick(type) {
-
-      },
       changeType(data) {
         this.typeInfo = data
         this.imageError = false

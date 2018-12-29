@@ -9,7 +9,10 @@ const DOC_DEFAULT_SETTING = {
   height: 800
 }
 
+const ZOOM_SCALE_SETTING = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5, 2, 3, 4]
+
 export {
   TOOL_STATE,
-  DOC_DEFAULT_SETTING
+  DOC_DEFAULT_SETTING,
+  ZOOM_SCALE_SETTING
 }

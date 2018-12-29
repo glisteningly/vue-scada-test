@@ -19,7 +19,7 @@
                empty-text="无组件"
                @node-click="handleNodeClick">
         <span class="layer-tree-node" slot-scope="{ node, data }">
-          <label>{{ data.type}}</label>
+          <label>{{ data.type}}<span class="comp-text" v-if="data.label"> - {{ data.label }}</span></label>
           <img v-if="data.locked"
                class="locked-icon"
                @click="handleNodeUnlock(data)"
@@ -72,6 +72,9 @@
             if (c.type === 'ScadaGroupWrap') {
               c.type = 'ScadaGroup'
             }
+            if (comp.type === 'ScadaLabel') {
+              c.label = comp.options.param.defaultText || comp.options.param.prefixText || comp.options.param.suffixText || ''
+            }
             c.type = c.type.substring(5).toLowerCase()
             c.locked = !!(comp.locked)
             if (comp.children) {
@@ -123,6 +126,10 @@
           align-items: center;
           label {
             flex: 1;
+            overflow: hidden;
+            .comp-text {
+              color: #999;
+            }
           }
           .locked-icon {
             width: 11px;

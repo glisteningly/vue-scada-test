@@ -93,7 +93,8 @@
           <div id="work_frame" :style="workFrameBgColor">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
-                 v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"></div>
+                 v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"
+                 @wheel="onCanvasMouseWheel"></div>
           </div>
         </div>
         <div id="right_sidebar">
@@ -245,7 +246,6 @@
 
 <script>
 
-  import Konva from 'konva'
   import _ from 'lodash'
   // import hotkeys from 'hotkeys-js'
 
@@ -264,10 +264,12 @@
 
   import ActionAlign from '../mixin/ActionAlign'
   import ActionMove from '../mixin/ActionMove'
-  import StateStore from '../mixin/StateStore'
-  import DocSettings from '../mixin/DocSettings'
+  import ActionCanvas from '../mixin/ActionCanvas'
+  import ActionGroup from '../mixin/ActionGroup'
   import ActionDocument from '../mixin/ActionDocument'
   import ActionAnimated from '../mixin/ActionAnimated'
+  import StateStore from '../mixin/StateStore'
+  import DocSettings from '../mixin/DocSettings'
   import LayerComps from '../mixin/LayerComps'
   import CurSelCompsComputed from '../mixin/CurSelCompsComputed'
 
@@ -291,9 +293,7 @@
 
   import ScadaVueTpl from './scadaVueTpl'
 
-  import { TOOL_STATE } from '../const'
-
-  const ZoomScaleSettings = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5, 2, 3, 4]
+  import { TOOL_STATE, ZOOM_SCALE_SETTING } from '../const'
 
   export default {
     components: {
@@ -323,6 +323,8 @@
       ActionAnimated,
       ActionAlign,
       ActionMove,
+      ActionCanvas,
+      ActionGroup,
       DataBinding,
       StateStore,
       DocSettings,
@@ -340,7 +342,7 @@
           height: 0,
           x: 20,
           y: 20,
-          scale: ZoomScaleSettings[5],
+          scale: ZOOM_SCALE_SETTING[5],
         },
         zoomScaleIndex: 5,
         konvaObjs: {
@@ -361,8 +363,8 @@
         testData: 2,
         curSelCompStyleOptions: {},
         curFixedPathPoint: null,
-        // activeLeftTab: 'basicComp',
-        activeLeftTab: 'layer',
+        activeLeftTab: 'basicComp',
+        // activeLeftTab: 'layer',
         activeRightTab: 'transform',
         activeOptionsTab: 'style',
         activeBindingTab: 'binding',
@@ -453,106 +455,6 @@
         this.unGroupSelAll()
         this.curSelComps = newSels
       },
-
-      unGroupToComps() {
-        if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap') {
-          const childComps = []
-          if (this.curSelComp.children) {
-            this.curSelComp.children.forEach((childrenComp) => {
-              childrenComp.setContext(this.konvaObjs)
-              childrenComp.initKonva()
-              this.addComp(childrenComp)
-              childComps.push(childrenComp)
-            })
-          }
-          this.compsDelete()
-          this.curSelComps = childComps
-        }
-      },
-      jointCompsToGroup() {
-        // console.log(this.konvaObjs.selCompsGroup.getAbsoluteScale())
-        if (this.curSelComps.length > 1) {
-          // const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
-          const groupRect = this.konvaObjs.selCompsGroup.getClientRect({ relativeTo: this.konvaObjs.stage })
-          const g = {
-            type: 'ScadaGroupWrap',
-            layout: {
-              x: groupRect.x + 1,
-              y: groupRect.y + 1,
-              width: groupRect.width - 2,
-              height: groupRect.height - 2,
-            },
-            konvaContext: this.konvaObjs
-          }
-          const children = []
-          this.curSelComps.forEach((comp) => {
-            comp.removeTempTransformer()
-            comp.x = comp.x - g.layout.x
-            comp.y = comp.y - g.layout.y
-            comp.initBaseLayout()
-            comp.syncCompLayout()
-            // comp.konvaRect().destroy()
-            children.push(comp)
-          })
-          this.compsDelete()
-          const c = new CompCtrl(g)
-          c.children = children
-          this.addComp(c)
-          this.curSelComps.push(c)
-        }
-      },
-      unGroupSelAll() {
-        this.curSelComps.forEach((comp) => {
-          comp.removeCompfromGroupSel()
-        })
-        this.curSelComps = []
-      },
-      addToGroup() {
-        this.detchCompTransformer()
-        this.curSelComps.forEach((comp) => {
-          this.konvaObjs.selCompsGroup.add(comp.konvaCtrl())
-          comp.konvaCtrl().draggable(false)
-          // 每个对象加上tr，拖动变形时更直观
-          // 但如果一次选中的对象数量过多，会明显影响性能，因此限制在10个
-          if (this.curSelComps.length <= 10) {
-            if (!comp.tempTr) {
-              comp.tempTr = new Konva.Transformer({
-                node: comp.konvaCtrl(),
-                name: 'tempTr',
-                keepRatio: true,
-                resizeEnabled: false,
-                rotateEnabled: false,
-              })
-              this.konvaObjs.selCompsGroup.add(comp.tempTr)
-            }
-          }
-        })
-        this.konvaObjs.layers[0].add(this.konvaObjs.selCompsGroup)
-        this.konvaObjs.layers[0].add(this.konvaObjs.groupTransformer)
-        this.konvaObjs.groupTransformer.attachTo(this.konvaObjs.selCompsGroup)
-        this.konvaObjs.groupTransformer.forceUpdate()
-        this.konvaObjs.layers[0].draw()
-      },
-      cancelSelGroup() {
-        this.konvaObjs.groupTransformer.detach()
-        this.konvaObjs.selCompsGroup.remove()
-        this.konvaObjs.selCompsGroup.x(0)
-        this.konvaObjs.selCompsGroup.y(0)
-        this.konvaObjs.selCompsGroup.scaleX(1)
-        this.konvaObjs.selCompsGroup.scaleY(1)
-        this.konvaObjs.selCompsGroup.rotation(0)
-        this.konvaObjs.layers[0].draw()
-      },
-      isInSelGroup(comp) {
-        return _.findIndex(this.curSelComps, comp) >= 0
-      },
-      syncGroupSel() {
-        this.curSelComps.forEach((comp) => {
-          comp.removeCompfromGroupSel()
-        })
-        this.cancelSelGroup()
-        this.addToGroup()
-      },
       syncKonvaZIndex() {
         this.comps.forEach((comp, index) => {
           comp.konvaCtrl().setZIndex(index)
@@ -624,7 +526,6 @@
             selAfterAdd: false
           }
           this.addCompsFromConfig(compConfig, options)
-          // this.addCompsFromConfig(compConfig, { x: 0, y: 0 }, true)
         }
       },
       onCompOptionsChanged(changedOptions) {
@@ -656,109 +557,6 @@
           comp.eventMsg = v.eventMsg
         })
       },
-      zoomIn() {
-        if (_.indexOf(ZoomScaleSettings, this.canvasLayout.scale) === -1) {
-          const scale = _.round(this.canvasLayout.scale, 1)
-          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale)
-        }
-
-        if (this.zoomScaleIndex < ZoomScaleSettings.length - 1) {
-          this.zoomScaleIndex += 1
-          this.canvasLayout.scale = this.curZoomScale
-        }
-      },
-      zoomOut() {
-        if (_.indexOf(ZoomScaleSettings, this.canvasLayout.scale) === -1) {
-          const scale = _.round(this.canvasLayout.scale, 1)
-          this.zoomScaleIndex = _.indexOf(ZoomScaleSettings, scale)
-        }
-
-        if (this.zoomScaleIndex > 0) {
-          this.zoomScaleIndex -= 1
-          this.canvasLayout.scale = this.curZoomScale
-        }
-      },
-      zoom100() {
-        if (this.zoomScaleIndex !== 8) {
-          this.zoomScaleIndex = 8
-          this.canvasLayout.scale = this.curZoomScale
-        }
-      },
-      zoomFit() {
-        const width = this.$refs['workCanvas'].clientWidth
-        // const height = this.$refs['workCanvas'].clientHeight
-
-        const scale = (width - 40) / this.docSettings.width
-        // console.log(scale)
-
-        this.zoomPointPos = null
-        this.setCanvasPos({ x: 20, y: 20 })
-        this.canvasLayout.scale = scale
-        this.setCanvasZoom({ scale: scale })
-        // console.log(scale)
-      },
-      setCanvasPos(pos = { x: 0, y: 0 }) {
-        this.konvaObjs.stage.position(pos)
-        this.canvasLayout.x = this.konvaObjs.stage.x()
-        this.canvasLayout.y = this.konvaObjs.stage.y()
-      },
-      setCanvasZoom(zoomParam = { scale: 1, px: 0, py: 0 }) {
-        // console.log(zoomParam)
-        this.konvaObjs.stage.scaleX(zoomParam.scale)
-        this.konvaObjs.stage.scaleY(zoomParam.scale)
-
-        if (zoomParam.px && zoomParam.py && this.konvaObjs.stage.getPointerPosition()) {
-          const newPos = {
-            x: -(zoomParam.px - this.konvaObjs.stage.getPointerPosition().x / zoomParam.scale) * zoomParam.scale,
-            y: -(zoomParam.py - this.konvaObjs.stage.getPointerPosition().y / zoomParam.scale) * zoomParam.scale
-          }
-          this.setCanvasPos(newPos)
-        }
-
-        if (this.curSelComp) {
-          this.konvaObjs.transformer.forceUpdate()
-        }
-        if (this.multiCompsSelected) {
-          this.konvaObjs.groupTransformer.forceUpdate()
-        }
-        this.konvaObjs.selCompsRect.strokeWidth(1 / zoomParam.scale)
-        this.konvaObjs.paperRect.strokeWidth(1 / zoomParam.scale)
-        this.canvasRedraw()
-      },
-      onCanvasPosNav(pos) {
-        const container = this.$refs['workCanvas']
-        // const width = container.clientWidth
-        // const height = container.clientHeight
-
-        const centerPos = {
-          x: container.clientWidth / 2,
-          y: container.clientHeight / 2
-        }
-        const hitPos = {
-          x: this.docSettings.width * this.canvasLayout.scale * pos.x,
-          y: this.docSettings.height * this.canvasLayout.scale * pos.y,
-        }
-        const offsetPos = {
-          x: centerPos.x - hitPos.x,
-          y: centerPos.y - hitPos.y,
-        }
-        console.log(pos)
-        this.setCanvasPos(offsetPos)
-        this.canvasRedraw()
-      },
-      canvasRedraw() {
-        const container = this.$refs['workCanvas']
-
-        const width = container.clientWidth
-        const height = container.clientHeight
-
-        this.canvasLayout.width = width
-        this.canvasLayout.height = height
-
-        this.konvaObjs.stage.width(width)
-        this.konvaObjs.stage.height(height)
-        this.konvaObjs.stage.batchDraw()
-      },
       doPreview() {
         const doc = { comps: this.comps, docSettings: this.docSettings }
         this.scadaDoc = {
@@ -766,15 +564,6 @@
           queryConfig: ScadaVueTpl.getQueryConfig(this.comps)
         }
         this.showPreview = true
-      },
-      //移除组件的tr
-      detchCompTransformer() {
-        this.konvaObjs.transformer.detach()
-        this.comps.forEach(comp => {
-          if (comp.isPathCtrl) {
-            comp.removeAnchors()
-          }
-        })
       },
       doLockComp() {
         this.curSelComps.forEach(comp => {
@@ -793,12 +582,6 @@
       }
     },
     computed: {
-      canvasZoom() {
-        return this.canvasLayout.scale
-      },
-      curZoomScale() {
-        return ZoomScaleSettings[this.zoomScaleIndex]
-      },
       canvasCursorStyle() {
         switch (this.toolState) {
           case TOOL_STATE.addPathPoint : {
@@ -833,7 +616,6 @@
           } else {
             this.addToGroup()
           }
-
           //将选中的comps config记录
           this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
         } else {
@@ -844,60 +626,6 @@
         }
         this.syncKonvaZIndex()
         this.curSelComps = val
-      },
-      curSelCompLayout: {
-        handler: function () {
-          if (this.curSingleSelComp) {
-            this.curSelComp.syncKonva()
-          }
-        },
-        // deep: true
-      },
-      // curSelComp: {
-      //   handler: function () {
-      //     console.log('comp layout changed')
-      //     this.curSelComps[0].syncKonva()
-      //   },
-      //   // deep: true
-      // }
-      canvasZoom() {
-        const param = {
-          scale: this.canvasLayout.scale
-
-        }
-
-        if (this.zoomPointPos) {
-          Object.assign(param, {
-            px: this.zoomPointPos.x,
-            py: this.zoomPointPos.y
-          })
-        }
-
-        this.setCanvasZoom(param)
-      },
-      isKeySpacepressing(val) {
-        // console.log(this.isKeySpacepressing)
-        if (val) {
-          this.comps.forEach((comp) => {
-            comp.konvaCtrl().draggable(false)
-          })
-          this.konvaObjs.stage.draggable(true)
-          this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
-        } else {
-          this.comps.forEach((comp) => {
-            // TODO: 判断组件是否锁定
-            if (!comp.locked) {
-              comp.konvaCtrl().draggable(true)
-            }
-          })
-          if (this.curSelComps.length > 1) {
-            this.curSelComps.forEach((comp) => {
-              comp.konvaCtrl().draggable(false)
-            })
-          }
-          this.konvaObjs.stage.draggable(false)
-          this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle
-        }
       },
       toolState() {
         this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle

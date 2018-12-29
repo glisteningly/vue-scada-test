@@ -82,21 +82,22 @@
         })
       },
       getCompCateOptions() {
-        if (this.getCompOptions(this.curSelComp)) {
-          const compOpts = Object.assign({}, this.getCompOptions(this.curSelComp)[this.optionCategory] || {})
+        const hasDefOptions = _.has(this.getCompDefaultOptions(), [this.optionCategory])
+        if (this.getCompOptions(this.curSelComp) && hasDefOptions) {
+          const compDefOpts = this.getCompDefaultOptions()[this.optionCategory]
+          const compCurOpts = Object.assign({}, this.getCompOptions(this.curSelComp)[this.optionCategory] || {})
           const compDefine = Object.assign({}, this.getCompOptionsDefine()[this.optionCategory] || {})
-          // const optKeys = _.keys(this.getCompDefaultOptions()[this.optionCategory])
           // console.log(compStyles)
           const optionCtrls = {}
           // for (const key in compOpts) {
-          for (const key in this.getCompDefaultOptions()[this.optionCategory]) {
+          for (const key in compDefOpts) {
             // console.log(compDefine)
             const ctrl = _.has(compDefine, key) ? {
-              value: compOpts[key],
+              value: compCurOpts[key],
               label: compDefine[key].label,
               type: compDefine[key].type
             } : {
-              value: compOpts[key],
+              value: compCurOpts[key],
               label: OptionDefs[this.optionCategory][key].label,
               type: OptionDefs[this.optionCategory][key].type
             }
@@ -116,15 +117,9 @@
         if (this.curSelComp) {
           const compType = this.curSelComp.type
           if (ScadaCompsLibrary[compType]) {
-            // TODO:
-            // if (ScadaCompsLibrary[compType].props) {
-            //   return ScadaCompsLibrary[compType].props.defaultOptions.default() || {}
-            // }
             if (_.has(ScadaCompsLibrary[compType], ['props', 'defaultOptions'])) {
               return ScadaCompsLibrary[compType].props.defaultOptions.default() || {}
             }
-            // console.log(ScadaCompsLibrary[compType].defaultOptions)
-            // return ScadaCompsLibrary[compType].defaultOptions || {}
           }
         }
         return null

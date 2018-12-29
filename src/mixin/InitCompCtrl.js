@@ -48,5 +48,15 @@ export default {
         this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
       })
     },
+  },
+  watch: {
+    curSelCompLayout: {
+      handler: function () {
+        if (this.curSingleSelComp) {
+          this.curSelComp.syncKonva()
+        }
+      },
+      // deep: true
+    },
   }
 }

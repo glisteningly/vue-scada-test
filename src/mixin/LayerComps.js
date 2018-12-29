@@ -5,8 +5,10 @@ export default {
     onLayerCompClick(data) {
       // console.log(data)
       const compCtrl = _.find(this.comps, { name: data.name })
-      console.log(compCtrl)
-      this.addCompToSelection(compCtrl)
+      // console.log(compCtrl)
+      if (compCtrl) {
+        this.addCompToSelection(compCtrl)
+      }
     }
   }
 }

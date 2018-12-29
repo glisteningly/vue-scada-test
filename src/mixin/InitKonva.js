@@ -20,6 +20,15 @@ export default {
         r1.y + r1.height >= r2.y + r2.height
       )
     },
+    //移除组件的tr
+    detchCompTransformer() {
+      this.konvaObjs.transformer.detach()
+      this.comps.forEach(comp => {
+        if (comp.isPathCtrl) {
+          comp.removeAnchors()
+        }
+      })
+    },
     initKonvaWorkArea() {
       this.curSelComps = []
       const width = this.$refs['workCanvas'].clientWidth
@@ -316,5 +325,5 @@ export default {
 
       this.canvasRedraw()
     },
-  }
+  },
 }

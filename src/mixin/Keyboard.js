@@ -6,6 +6,8 @@ const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+='
 
 const HOTKEYS_DEF = HOTKEYS.join(',')
 
+const MOVE_OFFSET = 30
+
 export default {
   data() {
     return {
@@ -131,7 +133,8 @@ export default {
       //   this.showPreview = false
       // }
     },
-    doCanvasZoom(e) {
+    onCanvasMouseWheel(e) {
+      //按住ctrl键缩放
       if (e.ctrlKey) {
         e.preventDefault()
 
@@ -153,6 +156,38 @@ export default {
         } else {
           this.zoomIn()
         }
+      } else {
+        if (e.shiftKey) {
+          //水平移动画布
+          if (e.deltaY > 0) {
+            const movedPos = {
+              x: this.canvasLayout.x - MOVE_OFFSET,
+              y: this.canvasLayout.y,
+            }
+            this.setCanvasPos(movedPos)
+          } else {
+            const movedPos = {
+              x: this.canvasLayout.x + MOVE_OFFSET,
+              y: this.canvasLayout.y,
+            }
+            this.setCanvasPos(movedPos)
+          }
+        } else {
+          //垂直移动画布
+          if (e.deltaY > 0) {
+            const movedPos = {
+              x: this.canvasLayout.x,
+              y: this.canvasLayout.y - MOVE_OFFSET,
+            }
+            this.setCanvasPos(movedPos)
+          } else {
+            const movedPos = {
+              x: this.canvasLayout.x,
+              y: this.canvasLayout.y + MOVE_OFFSET,
+            }
+            this.setCanvasPos(movedPos)
+          }
+        }
       }
     },
     doCopy(e) {
@@ -163,10 +198,35 @@ export default {
       this.loadCompsFromlocalStorage()
     }
   },
+  watch: {
+    isKeySpacepressing(val) {
+      // console.log(this.isKeySpacepressing)
+      if (val) {
+        this.comps.forEach((comp) => {
+          comp.konvaCtrl().draggable(false)
+        })
+        this.konvaObjs.stage.draggable(true)
+        this.konvaObjs.stage.container().style.cursor = '-webkit-grabbing'
+      } else {
+        this.comps.forEach((comp) => {
+          // TODO: 判断组件是否锁定
+          if (!comp.locked) {
+            comp.konvaCtrl().draggable(true)
+          }
+        })
+        if (this.curSelComps.length > 1) {
+          this.curSelComps.forEach((comp) => {
+            comp.konvaCtrl().draggable(false)
+          })
+        }
+        this.konvaObjs.stage.draggable(false)
+        this.konvaObjs.stage.container().style.cursor = this.canvasCursorStyle
+      }
+    },
+  },
   created() {
     document.addEventListener('keyup', this.setSpaceKeyState)
     document.addEventListener('copy', this.doCopy)
-    window.addEventListener('wheel', this.doCanvasZoom)
   },
   destroyed() {
     document.removeEventListener('keyup', this.setSpaceKeyState)
