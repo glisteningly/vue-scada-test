@@ -4,28 +4,13 @@ import CompCtrl from '../class/CompCtrl'
 
 export default {
   methods: {
-    unGroupToComps() {
-      if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap') {
-        const childComps = []
-        if (this.curSelComp.children) {
-          const options = {
-            index: this.curSelCompIndex
-          }
-          this.curSelComp.children.reverse().forEach((childrenComp) => {
-            childrenComp.setContext(this.konvaObjs)
-            childrenComp.initKonva()
-            this.addComp(childrenComp, options)
-            childComps.push(childrenComp)
-          })
-        }
-        this.compsDelete()
-        this.curSelComps = childComps
-      }
-    },
+    // 成组
     jointCompsToGroup() {
       // console.log(this.konvaObjs.selCompsGroup.getAbsoluteScale())
       if (this.curSelComps.length > 1) {
-        // const groupRect = this.konvaObjs.selCompsGroup.getClientRect()
+        const options = {
+          index: this.curSelCompIndex
+        }
         const groupRect = this.konvaObjs.selCompsGroup.getClientRect({ relativeTo: this.konvaObjs.stage })
         const g = {
           type: 'ScadaGroupWrap',
@@ -40,26 +25,39 @@ export default {
         const children = []
         this.curSelComps.forEach((comp) => {
           comp.removeTempTransformer()
-          comp.x = comp.x - g.layout.x
-          comp.y = comp.y - g.layout.y
+          comp.x -= g.layout.x
+          comp.y -= g.layout.y
           comp.initBaseLayout()
           comp.syncCompLayout()
-          // comp.konvaRect().destroy()
           children.push(comp)
         })
         this.compsDelete()
         const c = new CompCtrl(g)
         c.children = children
-        this.addComp(c)
+        this.addComp(c, options)
         this.curSelComps.push(c)
       }
     },
-    unGroupSelAll() {
-      this.curSelComps.forEach((comp) => {
-        comp.removeCompfromGroupSel()
-      })
-      this.curSelComps = []
+    // 拆组
+    unGroupToComps() {
+      if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap' && !this.curSelComp.isChild) {
+        const childComps = []
+        if (this.curSelComp.children) {
+          const options = {
+            index: this.curSelCompIndex
+          }
+          this.curSelComp.children.reverse().forEach((childrenComp) => {
+            childrenComp.setContext(this.konvaObjs)
+            childrenComp.initKonva()
+            this.addComp(childrenComp, options)
+            childComps.push(childrenComp)
+          })
+        }
+        this.compsDelete()
+        this.curSelComps = childComps.reverse()
+      }
     },
+    // 多选
     addToGroup() {
       this.detchCompTransformer()
       this.curSelComps.forEach((comp) => {
@@ -86,8 +84,16 @@ export default {
       this.konvaObjs.groupTransformer.forceUpdate()
       this.konvaObjs.layers[0].draw()
     },
+    // 取消多选
+    unGroupSelAll() {
+      this.curSelComps.forEach((comp) => {
+        comp.removeCompfromGroupSel()
+      })
+      this.curSelComps = []
+    },
     cancelSelGroup() {
       this.konvaObjs.groupTransformer.detach()
+      // 重置选取框控件
       this.konvaObjs.selCompsGroup.remove()
       this.konvaObjs.selCompsGroup.x(0)
       this.konvaObjs.selCompsGroup.y(0)

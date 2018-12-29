@@ -2,13 +2,21 @@ import _ from 'lodash'
 
 export default {
   methods: {
-    onLayerCompClick(data) {
+    onLayerCompClick(comp) {
       // console.log(data)
-      const compCtrl = _.find(this.comps, { name: data.name })
-      // console.log(compCtrl)
-      if (compCtrl) {
-        this.addCompToSelection(compCtrl)
-      }
+      this.unGroupSelAll()
+      this.$nextTick(() => {
+        const compCtrl = _.find(this.comps, { name: comp.name })
+        // console.log(compCtrl)
+        if (compCtrl) {
+          // const unGroupCueSel = true
+          this.addCompToSelection(compCtrl)
+        } else {
+          // const unGroupCueSel = true
+          this.addCompToSelection(comp)
+        }
+      })
+
     }
   }
 }

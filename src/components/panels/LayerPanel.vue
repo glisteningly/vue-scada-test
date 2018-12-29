@@ -34,6 +34,8 @@
 <script>
   import _ from 'lodash'
 
+  const _compsRefMap = new WeakMap()
+
   export default {
     name: 'LayerPanel',
     props: ['treedata', 'curNode'],
@@ -49,7 +51,8 @@
     methods: {
       handleNodeClick(data) {
         // console.log(data)
-        this.$emit('layerCompClick', data)
+        const comp = _compsRefMap.get(data)
+        this.$emit('layerCompClick', comp)
       },
       filterNode(value, data) {
         if (!value) return true
@@ -69,6 +72,7 @@
           const list = []
           comps.forEach(comp => {
             const c = _.pick(comp, ['name', 'type'])
+            _compsRefMap.set(c, comp)
             if (c.type === 'ScadaGroupWrap') {
               c.type = 'ScadaGroup'
             }

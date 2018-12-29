@@ -3,11 +3,16 @@ import _ from 'lodash'
 
 export default {
   methods: {
-    addCompToSelection(compCtrl) {
-      if (!this.isInSelGroup(compCtrl)) {
-        this.detchCompTransformer()
+    addCompToSelection(compCtrl, unGroupCueSel = false) {
+      if (unGroupCueSel) {
         this.unGroupSelAll()
         this.curSelComps.push(compCtrl)
+      } else {
+        if (!this.isInSelGroup(compCtrl)) {
+          this.detchCompTransformer()
+          this.unGroupSelAll()
+          this.curSelComps.push(compCtrl)
+        }
       }
     },
     addCompEvent(compCtrl) {

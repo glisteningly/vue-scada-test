@@ -63,6 +63,8 @@ class CompCtrl {
     if (!_.has(options, 'options.param')) {
       this.options.param = {}
     }
+
+    this.isChild = false
   }
 
   set locked(val) {
@@ -153,6 +155,8 @@ class CompCtrl {
   }
 
   initKonva() {
+    this.isChild = false
+
     this.draggable = !this.locked
     this.listening = !this.locked
 
@@ -479,6 +483,8 @@ class CompCtrl {
         comp.scaleY = comp.initLayout.scaleY * this.scaleY
         comp.rotation = comp.initLayout.rotation + this.rotation
         comp.syncChildrenCompLayout()
+
+        comp.isChild = true
       })
     }
   }
@@ -488,18 +494,20 @@ class CompCtrl {
     //   x: this.x,
     //   y: this.y
     // })
-    this.konvaCtrl().position({
-      x: this.x,
-      y: this.y
-    })
-    this.konvaCtrl().scale({
-      x: this.scaleX,
-      y: this.scaleY
-    })
-    this.konvaCtrl().rotation(this.rotation)
-    this.konvaCtrl().getLayer().draw()
-    this.syncChildrenCompLayout()
-    this.addAnchors()
+    if (this.konvaCtrl() && !this.isChild) {
+      this.konvaCtrl().position({
+        x: this.x,
+        y: this.y
+      })
+      this.konvaCtrl().scale({
+        x: this.scaleX,
+        y: this.scaleY
+      })
+      this.konvaCtrl().rotation(this.rotation)
+      this.konvaCtrl().getLayer().draw()
+      this.syncChildrenCompLayout()
+      this.addAnchors()
+    }
   }
 
   removeTempTransformer() {
@@ -512,7 +520,7 @@ class CompCtrl {
   removeCompfromGroupSel() {
     this.removeTempTransformer()
 
-    if (this.konvaCtrl()) {
+    if (this.konvaCtrl() && !this.isChild) {
       const compPosition = this.konvaCtrl().getAbsolutePosition()
       this.konvaCtrl().moveTo(this.konvaCtrl().getLayer())
       this.konvaCtrl().setAbsolutePosition(compPosition)
@@ -537,29 +545,32 @@ class CompCtrl {
 
   addTransformer() {
     this.removeCompfromGroupSel()
-    this.konvaCtrl().getLayer().add(CompCtrl.konvaContext.transformer)
-    //判断是否是添加到组上
-    if (this.type === 'ScadaGroup') {
-      // CompCtrl.konvaContext.transformer.rotateEnabled(false)
-      CompCtrl.konvaContext.transformer.keepRatio(true)
-      CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
-    } else {
-      // CompCtrl.konvaContext.transformer.rotateEnabled(true)
-      CompCtrl.konvaContext.transformer.keepRatio(false)
-      CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
+    if (this.konvaCtrl() && !this.isChild) {
+      this.konvaCtrl().getLayer().add(CompCtrl.konvaContext.transformer)
+      //判断是否是添加到组上
+      if (this.type === 'ScadaGroup') {
+        // CompCtrl.konvaContext.transformer.rotateEnabled(false)
+        CompCtrl.konvaContext.transformer.keepRatio(true)
+        CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right'])
+      } else {
+        // CompCtrl.konvaContext.transformer.rotateEnabled(true)
+        CompCtrl.konvaContext.transformer.keepRatio(false)
+        CompCtrl.konvaContext.transformer.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'middle-left', 'bottom-left', 'bottom-center', 'bottom-right'])
+      }
+
+      CompCtrl.konvaContext.transformer.attachTo(this.konvaCtrl())
+      // TODO: lock state
+      // CompCtrl.konvaContext.transformer.resizeEnabled(!this.locked)
+      // CompCtrl.konvaContext.transformer.rotateEnabled(!this.locked)
+      // this.setDragBound(true)
+
+      if (this.isPathCtrl) {
+        this.addAnchors()
+      }
+
+      this.konvaCtrl().getLayer().draw()
     }
 
-    CompCtrl.konvaContext.transformer.attachTo(this.konvaCtrl())
-    // TODO: lock state
-    // CompCtrl.konvaContext.transformer.resizeEnabled(!this.locked)
-    // CompCtrl.konvaContext.transformer.rotateEnabled(!this.locked)
-    // this.setDragBound(true)
-
-    if (this.isPathCtrl) {
-      this.addAnchors()
-    }
-
-    this.konvaCtrl().getLayer().draw()
   }
 
   toString() {

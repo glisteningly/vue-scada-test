@@ -100,33 +100,44 @@
         <div id="right_sidebar">
           <el-tabs v-model="activeRightTab" type="card">
             <el-tab-pane label="变换" name="transform">
-              <div id="layout_panel" v-show="curSelComp && curSelComps.length === 1">
-                <div v-if="curSelCompLayout">
-                  <div>
-                    <label>位置</label>
-                    <span class="layout_panel_label">X:</span>
-                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutX">
-                    </el-input-number>
-                    <span class="layout_panel_label">Y:</span>
-                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutY">
-                    </el-input-number>
+              <div id="layout_panel" class="ctrl-panel">
+                <div v-if="curSelComp">
+                  <div v-if="curSelComp.isChild && curSelComps.length === 1">
+                    <span class="type-hint"><i class="el-icon-info"></i> 子组件不可直接变换</span>
                   </div>
-                  <div>
-                    <label>尺寸</label>
-                    <span class="layout_panel_label">W:</span>
-                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutW">
-                    </el-input-number>
-                    <span class="layout_panel_label">H:</span>
-                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutH">
-                    </el-input-number>
+                  <div v-if="curSelComps.length > 1">
+                    <span class="type-hint"><i class="el-icon-info"></i> 多选组件不可直接变换</span>
                   </div>
-                  <div>
-                    <label>旋转</label>
-                    <span class="layout_panel_label">R:</span>
-                    <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
-                    </el-input-number>
-                    <span style="margin-left: 26px;"><el-checkbox v-model="curSelComp.locked">锁定</el-checkbox></span>
+                  <div v-if="curSelCompLayout && !curSelComp.isChild && curSelComps.length === 1">
+                    <div>
+                      <label>位置</label>
+                      <span class="layout_panel_label">X:</span>
+                      <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutX">
+                      </el-input-number>
+                      <span class="layout_panel_label">Y:</span>
+                      <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutY">
+                      </el-input-number>
+                    </div>
+                    <div>
+                      <label>尺寸</label>
+                      <span class="layout_panel_label">W:</span>
+                      <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutW">
+                      </el-input-number>
+                      <span class="layout_panel_label">H:</span>
+                      <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutH">
+                      </el-input-number>
+                    </div>
+                    <div>
+                      <label>旋转</label>
+                      <span class="layout_panel_label">R:</span>
+                      <el-input-number :controls=false class="layout-input" v-model.number="curSelCompLayoutR">
+                      </el-input-number>
+                      <span style="margin-left: 26px;"><el-checkbox v-model="curSelComp.locked">锁定</el-checkbox></span>
+                    </div>
                   </div>
+                </div>
+                <div v-else>
+                  <span class="type-hint"><i class="el-icon-info"></i> 未选择组件</span>
                 </div>
               </div>
             </el-tab-pane>
@@ -567,12 +578,16 @@
       },
       doLockComp() {
         this.curSelComps.forEach(comp => {
-          comp.locked = true
+          if (!comp.isChild) {
+            comp.locked = true
+          }
         })
       },
       doUnlockComp() {
         this.curSelComps.forEach(comp => {
-          comp.locked = false
+          if (!comp.isChild) {
+            comp.locked = false
+          }
         })
       },
       doUnlockAll() {
@@ -611,7 +626,9 @@
         // console.log('curSelComps:' + this.curSelComps.length)
         if (this.curSelComps.length > 0) {
           if (this.curSelComps.length === 1) {
-            this.curSelComps[0].addTransformer()
+            if (this.curSelComps[0].konvaCtrl()) {
+              this.curSelComps[0].addTransformer()
+            }
             this.cancelSelGroup()
           } else {
             this.addToGroup()
@@ -721,7 +738,7 @@
         flex: 0 0 260px;
         background: #3C3F41;
         #layout_panel {
-          padding: 8px 12px 2px 12px;
+          padding: 8px 12px 2px 6px;
           span.layout_panel_label {
             text-align: right;
             letter-spacing: 1px;
@@ -736,7 +753,7 @@
             display: inline-block;
             color: #DDD;
             font-size: 14px;
-            margin-right: 10px;
+            margin: 0 10px 0 6px;
           }
           .layout-input {
             width: 70px;
