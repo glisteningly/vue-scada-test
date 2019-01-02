@@ -10,16 +10,19 @@
       </div>
       <el-tree :data="complist"
                node-key="name"
-               :current-node-key="curNode"
+               :current-node-key="curSelNodeKey"
                :highlight-current="true"
                :props="defaultProps"
                :filter-node-method="filterNode"
                :expand-on-click-node="false"
+               :default-expanded-keys="nodeExpand"
                draggable
                ref="layerTree"
                empty-text="无组件"
                @node-click="handleNodeClick"
                @node-drop="handleDrop"
+               @node-expand="onNodeExpand"
+               @node-collapse="onNodeCollapse"
                :allow-drop="allowDrop"
                :allow-drag="allowDrag">
         <span class="layer-tree-node" slot-scope="{ node, data }">
@@ -49,7 +52,9 @@
           children: 'children',
           label: 'type'
         },
-        filterStr: ''
+        filterStr: '',
+        nodeExpand: [],
+        curSelNodeKey: ''
       }
     },
     methods: {
@@ -57,6 +62,7 @@
         // console.log(data)
         const comp = _compsRefMap.get(data)
         this.$emit('layerCompClick', comp)
+        this.curSelNodeKey = data.name
       },
       filterNode(value, data) {
         if (!value) return true
@@ -86,6 +92,19 @@
           this.$emit('layerCompDroped', dropInfo)
         }
       },
+      onNodeExpand(data) {
+        if (!this.nodeExpand.includes(data.name)) {
+          this.nodeExpand.push(data.name)
+        }
+      },
+      onNodeCollapse(data) {
+        if (this.nodeExpand.includes(data.name)) {
+          // this.nodeExpand.splice(_.findIndex(this.nodeExpand, data.name), 1)
+          _.remove(this.nodeExpand, function (n) {
+            return n === data.name
+          });
+        }
+      }
     },
     computed: {
       complist() {
@@ -120,6 +139,13 @@
       },
       curNode(val) {
         this.$refs.layerTree.setCurrentKey(val)
+        this.curSelNodeKey = val
+      },
+      complist() {
+        // console.log('changed')
+        this.$nextTick(() => {
+          this.$refs.layerTree.setCurrentKey(this.curSelNodeKey)
+        })
       }
     }
   }
