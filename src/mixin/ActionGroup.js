@@ -40,21 +40,23 @@ export default {
     },
     // 拆组
     unGroupToComps() {
-      if (this.curSelComp && this.curSelComp.type === 'ScadaGroupWrap' && !this.curSelComp.isChild) {
+      if (this.curSelComp && this.curSelComps.length === 1 && this.curSelComp.type === 'ScadaGroupWrap' && !this.curSelComp.isChild) {
         const childComps = []
         if (this.curSelComp.children) {
           const options = {
             index: this.curSelCompIndex
           }
+          console.log(options.index)
           this.curSelComp.children.reverse().forEach((childrenComp) => {
             childrenComp.setContext(this.konvaObjs)
             childrenComp.initKonva()
             this.addComp(childrenComp, options)
-            childComps.push(childrenComp)
+            // childComps.push(childrenComp)
+            childComps.unshift(childrenComp)
           })
         }
         this.compsDelete()
-        this.curSelComps = childComps.reverse()
+        this.curSelComps = childComps
       }
     },
     // 多选

@@ -15,9 +15,13 @@
                :props="defaultProps"
                :filter-node-method="filterNode"
                :expand-on-click-node="false"
+               draggable
                ref="layerTree"
                empty-text="无组件"
-               @node-click="handleNodeClick">
+               @node-click="handleNodeClick"
+               @node-drop="handleDrop"
+               :allow-drop="allowDrop"
+               :allow-drag="allowDrag">
         <span class="layer-tree-node" slot-scope="{ node, data }">
           <label>{{ data.type}}<span class="comp-text" v-if="data.label"> - {{ data.label }}</span></label>
           <img v-if="data.locked"
@@ -63,7 +67,25 @@
         if (compCtrl) {
           compCtrl.locked = false
         }
-      }
+      },
+      allowDrop(draggingNode, dropNode, type) {
+        // return type !== 'inner'
+        return true
+      },
+      allowDrag(draggingNode) {
+        // return draggingNode.data.label.indexOf('三级 3-2-2') === -1
+        return draggingNode.data.draggable
+      },
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+        // console.log(draggingNode.data.name, dropNode.data.name, dropType)
+        const draggingComp = _compsRefMap.get(draggingNode.data)
+        const dropComp = _compsRefMap.get(dropNode.data)
+        if (draggingComp && dropComp) {
+          const dropInfo = { draggingComp, dropComp, dropType }
+          console.log(dropInfo)
+          this.$emit('layerCompDroped', dropInfo)
+        }
+      },
     },
     computed: {
       complist() {
@@ -81,6 +103,7 @@
             }
             c.type = c.type.substring(5).toLowerCase()
             c.locked = !!(comp.locked)
+            c.draggable = !(comp.isChild)
             if (comp.children) {
               c.children = getTree(comp.children)
             }

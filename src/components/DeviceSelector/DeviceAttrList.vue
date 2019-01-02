@@ -40,7 +40,7 @@
       },
       updateAttrs(type) {
         DeviceType.getDeviceFields(type).then(fields => {
-          this.attrs = fields.slice(5)
+          this.attrs = fields.slice(8)
           // this.attrs = fields
         })
       }

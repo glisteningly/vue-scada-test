@@ -85,7 +85,8 @@
             <el-tab-pane label="图层" name="layer">
               <LayerPanel :treedata="comps"
                           :curNode="curSelCompUid"
-                          @layerCompClick="onLayerCompClick"/>
+                          @layerCompClick="onLayerCompClick"
+                          @layerCompDroped="onLayerCompDroped"/>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -408,7 +409,7 @@
       addComp(compCtrl, addOptions) {
         addOptions = addOptions || {}
         this.addCompEvent(compCtrl)
-        if (addOptions.index) {
+        if (_.has(addOptions, 'index')) {
           this.comps.splice(addOptions.index, 0, compCtrl)
         } else {
           this.comps.push(compCtrl)
