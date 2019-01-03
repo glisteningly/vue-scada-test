@@ -65,6 +65,8 @@ class CompCtrl {
     }
 
     this.isChild = false
+
+    this._dragstartPos = null
   }
 
   set locked(val) {
@@ -115,17 +117,15 @@ class CompCtrl {
     // this._dragstartPos = konvaShape.getAbsolutePosition()
     this._hMove = true
 
-    konvaShape.on('mouseenter', () => {
+    konvaShape.on('dragstart, dragend', () => {
       this._dragstartPos = konvaShape.getAbsolutePosition()
     })
 
-    // konvaShape.on('mousedown', () => {
-    //   this._dragstartPos = konvaShape.getAbsolutePosition()
-    //   console.log('------')
-    //   console.log(this._dragstartPos)
-    // })
-
     konvaShape.on('dragmove', () => {
+      if (!this._dragstartPos) {
+        this._dragstartPos = konvaShape.getAbsolutePosition()
+      }
+
       this._hMove = Math.abs(konvaShape.getAbsolutePosition().x - this._dragstartPos.x) >= Math.abs(konvaShape.getAbsolutePosition().y - this._dragstartPos.y)
     })
 

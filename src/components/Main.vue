@@ -18,10 +18,10 @@
           <!--<el-button @click="showNodeZIndex">z index</el-button>-->
           <span class="toolbar-gutter-h"/>
           <label class="zoom-label">{{ canvasZoom | numPercent }}</label>
-          <el-button @click="zoomOut" class="zoom-btn"><i class="el-icon-minus"></i></el-button>
-          <el-button @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
-          <el-button @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
-          <el-button @click="zoomFit" class="zoom-btn"><i class="el-icon-rank"></i></el-button>
+          <el-button title="画布缩小" @click="zoomOut" class="zoom-btn"><i class="el-icon-minus"></i></el-button>
+          <el-button title="原始尺寸" @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
+          <el-button title="画布放大" @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
+          <el-button title="适合屏幕" @click="zoomFit" class="zoom-btn"><i class="el-icon-rank"></i></el-button>
 
           <span class="toolbar-gutter-h"/>
           <ImgButton title="刷新" :icon="'ic-action-refresh'" @click="initKonvaWorkArea"/>
