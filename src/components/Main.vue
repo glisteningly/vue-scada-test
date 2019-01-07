@@ -7,12 +7,13 @@
           <span class="toolbar-gutter-h"/>
           <ImgButton title="文档设置" :icon="'ic-action-settings'" @click="isShowSettingsDialog=true"/>
           <span class="toolbar-gutter-h"/>
+          <ImgButton title="帮助" :icon="'ic-action-help'" @click="isShowHelpDialog=true"/>
+          <span class="toolbar-gutter-h"/>
           <div class="img-btn-group">
             <ImgButton title="暂存" :icon="'ic-action-save-local'" @click="onActionSaveDocLocal"/>
             <ImgButton title="读取暂存" :icon="'ic-action-load-local'" @click="onActionLoadDocLocal"/>
           </div>
-          <span class="toolbar-gutter-h"/>
-          <ImgButton title="帮助" :icon="'ic-action-help'"/>
+
           <!--<el-button @click="addCompGroup">add group</el-button>-->
           <!--<el-button @click="unGroupToComps">ungroup</el-button>-->
           <!--<el-button @click="showNodeZIndex">z index</el-button>-->
@@ -20,7 +21,8 @@
           <label class="zoom-label">{{ canvasZoom | numPercent }}</label>
           <el-button title="画布缩小" @click="zoomOut" class="zoom-btn"><i class="el-icon-minus"></i></el-button>
           <el-button title="原始尺寸" @click="zoom100" class="zoom-btn" style="margin-left: 0">100%</el-button>
-          <el-button title="画布放大" @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i></el-button>
+          <el-button title="画布放大" @click="zoomIn" class="zoom-btn" style="margin-left: 0"><i class="el-icon-plus"></i>
+          </el-button>
           <el-button title="适合屏幕" @click="zoomFit" class="zoom-btn"><i class="el-icon-rank"></i></el-button>
 
           <span class="toolbar-gutter-h"/>
@@ -253,6 +255,8 @@
                     @dialogClose="isShowSettingsDialog=false"
                     @settingsChanged="onSettingsChanged"
                     :config="docSettings"/>
+    <HelpDialog :isShowDialog.sync="isShowHelpDialog"
+                @dialogClose="isShowHelpDialog=false"/>
   </div>
 </template>
 
@@ -284,6 +288,7 @@
   import DocSettings from '../mixin/DocSettings'
   import LayerComps from '../mixin/LayerComps'
   import CurSelCompsComputed from '../mixin/CurSelCompsComputed'
+  import ActionCmdHistory from '../mixin/ActionCmdHistory'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -300,12 +305,14 @@
   import SvgScadaView from '../components/SvgScadaView'
   import CanvasNav from '../components/CanvasNav'
   import SettingsDialog from '../components/SettingsDialog'
+  import HelpDialog from '../components/HelpDialog'
 
   import VisScadaAdapter from '../components/VisScadaAdapter'
 
   import ScadaVueTpl from './scadaVueTpl'
 
   import { TOOL_STATE, ZOOM_SCALE_SETTING } from '../const'
+
 
   export default {
     components: {
@@ -321,7 +328,8 @@
       VisScadaAdapter,
       BasicCompLib,
       DeviceCompLib,
-      SettingsDialog
+      SettingsDialog,
+      HelpDialog
     },
     mixins: [
       CommonUtils,
@@ -341,7 +349,8 @@
       StateStore,
       DocSettings,
       LayerComps,
-      InitCompCtrl
+      InitCompCtrl,
+      ActionCmdHistory
     ],
     name: 'MainEditor',
     data() {
@@ -395,7 +404,9 @@
           visGroupId: 1
         },
         scadaDoc: null,
-        isShowSettingsDialog: false
+        isShowSettingsDialog: false,
+        isShowHelpDialog: false,
+
       }
     },
     mounted() {

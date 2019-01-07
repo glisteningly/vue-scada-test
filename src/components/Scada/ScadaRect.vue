@@ -50,7 +50,7 @@
   .scada-rect {
     &.alarm {
       /*filter: url("#filter-red-overlay");*/
-      fill: rgba(255, 0, 0, 0.07);
+      fill: rgba(30, 0, 0, 0.85);
       stroke: #d00000;
     }
   }

@@ -58,7 +58,7 @@ export default {
         width: this.docSettings.width,
         height: this.docSettings.height,
         stroke: '#888',
-        strokeWidth: 1,
+        strokeWidth: 1 / this.canvasLayout.scale,
         listening: false
       })
       layerPaper.add(this.konvaObjs.paperRect)

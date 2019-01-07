@@ -5,7 +5,8 @@
         :visible.sync="dialogVisible"
         width="1000px">
       <div class="device-selector-container">
-        <device-type-tree class="child-panel" @change="changeType" :type="type" :treedata="deviceTypeTree"></device-type-tree>
+        <device-type-tree class="child-panel" @change="changeType" :type="type"
+                          :treedata="deviceTypeTree"></device-type-tree>
         <device-ins :type="type" class="child-panel" :uid="uid" @change="changeIns"></device-ins>
         <device-attrs :type="type" class="child-panel" @change="changeAttr" :attr="attr"></device-attrs>
       </div>
@@ -78,9 +79,10 @@
         this.dialogVisible = val
       },
       device(val) {
-        this.type = val.type
-        this.attr = val.field
-        this.uid = val.uid
+        // console.log(val)
+        this.type = val.type || this.type
+        this.attr = val.field || this.attr
+        this.uid = val.uid || this.uid
       }
     },
     methods: {

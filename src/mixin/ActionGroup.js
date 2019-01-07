@@ -46,7 +46,7 @@ export default {
           const options = {
             index: this.curSelCompIndex
           }
-          console.log(options.index)
+          // console.log(options.index)
           this.curSelComp.children.reverse().forEach((childrenComp) => {
             childrenComp.setContext(this.konvaObjs)
             childrenComp.initKonva()

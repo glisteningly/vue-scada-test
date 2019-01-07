@@ -117,13 +117,13 @@
   .scada-progress {
     &.alarm {
       .scada-progress-bg {
-        fill: rgba(255, 0, 0, .1);
+        fill: rgba(30, 0, 0, 0.85);
       }
       .scada-progress-bar {
         fill: #d20000;
       }
       .scada-progress-border {
-        stroke: #d20000;
+        /*stroke: #d20000;*/
       }
     }
   }

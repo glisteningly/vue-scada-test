@@ -1,8 +1,9 @@
 import hotkeys from 'hotkeys-js'
 
-const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9', 'f9', 'f10', 'escape',
-  'up', 'down', 'left', 'right', 'ctrl+up', 'ctrl+down', 'ctrl+left', 'ctrl+right',
-  'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+l', 'ctrl+shift+[', 'ctrl+shift+]', 'ctrl+alt+l']
+const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9', 'f1', 'f9', 'f10', 'escape',
+  'up', 'down', 'left', 'right', 'shift+up', 'shift+down', 'shift+left', 'shift+right',
+  'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+l', 'ctrl+[', 'ctrl+]', 'ctrl+shift+[', 'ctrl+shift+]', 'ctrl+alt+l',
+  'ctrl+z', 'ctrl+shift+z']
 
 const HOTKEYS_DEF = HOTKEYS.join(',')
 
@@ -63,7 +64,7 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutY -= 1
             break;
-          case 'ctrl+up':
+          case 'shift+up':
             if (this.curSingleSelComp)
               this.curSelCompLayoutY -= 10
             break;
@@ -71,7 +72,7 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutY += 1
             break;
-          case 'ctrl+down':
+          case 'shift+down':
             if (this.curSingleSelComp)
               this.curSelCompLayoutY += 10
             break;
@@ -79,7 +80,7 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutX -= 1
             break;
-          case 'ctrl+left':
+          case 'shift+left':
             if (this.curSingleSelComp)
               this.curSelCompLayoutX -= 10
             break;
@@ -87,7 +88,7 @@ export default {
             if (this.curSingleSelComp)
               this.curSelCompLayoutX += 1
             break;
-          case 'ctrl+right':
+          case 'shift+right':
             if (this.curSingleSelComp)
               this.curSelCompLayoutX += 10
             break;
@@ -96,6 +97,12 @@ export default {
             break;
           case 'ctrl+shift+l':
             this.doUnlockComp()
+            break;
+          case 'ctrl+]':
+            this.compsMoveUp()
+            break;
+          case 'ctrl+[':
+            this.compsMoveDown()
             break;
           case 'ctrl+shift+]':
             this.compsMoveTop()
@@ -110,6 +117,9 @@ export default {
             this.toolState = ''
             this.showPreview = false
             break;
+          case 'f1':
+            this.isShowHelpDialog = !this.isShowHelpDialog
+            break;
           case 'f9':
             if (!this.showPreview) {
               this.doPreview()
@@ -119,6 +129,12 @@ export default {
             break;
           case 'f10':
             this.onPublishDoc()
+            break;
+          case 'ctrl+z':
+            this.undo()
+            break;
+          case 'ctrl+shift+z':
+            this.redo()
             break;
         }
       })
