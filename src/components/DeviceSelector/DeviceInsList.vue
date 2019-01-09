@@ -28,6 +28,7 @@
 </template>
 <script>
   import { DeviceTypeService } from 'service-module-api'
+  import utils from '../../utils'
 
   const DeviceType = DeviceTypeService.DeviceType
 
@@ -48,9 +49,17 @@
     },
     methods: {
       updateInstanceList(type) {
-        DeviceType.getDeviceInstances({type}).then(ins => {
+        DeviceType.getDeviceInstances({ type }).then(ins => {
           this.allInstanceList = ins.data
           this.filterIns(this.filterStr)
+
+          this.$nextTick(() => {
+            const devTree = document.getElementsByClassName('device-selector-root')[0]
+            const curItemDom = devTree.getElementsByClassName('device-instance-item item active')
+            if (curItemDom && curItemDom.length > 0) {
+              utils.scrollElementToshow(curItemDom[0])
+            }
+          })
         })
       },
       filterIns(str) {

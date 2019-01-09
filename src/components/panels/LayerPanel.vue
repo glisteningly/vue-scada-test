@@ -40,6 +40,7 @@
 
 <script>
   import _ from 'lodash'
+  import utils from '../../utils'
 
   const _compsRefMap = new WeakMap()
 
@@ -140,6 +141,14 @@
       curNode(val) {
         this.$refs.layerTree.setCurrentKey(val)
         this.curSelNodeKey = val
+
+        this.$nextTick(() => {
+          const curNodeDom = document.getElementsByClassName('el-tree-node is-current')
+
+          if (curNodeDom && curNodeDom.length > 0) {
+            utils.scrollElementToshow(curNodeDom[0])
+          }
+        })
       },
       complist() {
         // console.log('changed')

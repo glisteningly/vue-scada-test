@@ -17,6 +17,7 @@
 </template>
 <script>
   import { DeviceTypeService } from 'service-module-api'
+  import utils from '../../utils'
 
   const DeviceType = DeviceTypeService.DeviceType
 
@@ -42,6 +43,13 @@
         DeviceType.getDeviceFields(type).then(fields => {
           this.attrs = fields.slice(8)
           // this.attrs = fields
+          this.$nextTick(() => {
+            const devTree = document.getElementsByClassName('device-selector-root')[0]
+            const curFieldDom = devTree.getElementsByClassName('attr-item active')
+            if (curFieldDom && curFieldDom.length > 0) {
+              utils.scrollElementToshow(curFieldDom[0])
+            }
+          })
         })
       }
     },

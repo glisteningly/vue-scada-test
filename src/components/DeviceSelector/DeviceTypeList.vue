@@ -13,14 +13,15 @@
       </div>
     </div>
     <el-tree
-        class="device-type-tree"
+        class="device-type-tree binding-panel"
         :data="treedata"
         node-key="name"
         :highlight-current="true"
         :props="defaultProps"
         :filter-node-method="filterNode"
-        :default-checked-keys="defaultKeys"
-        @node-click="changeType"
+        :default-expanded-keys="defaultKeys"
+        :current-node-key="type"
+        @current-change="changeType"
         ref="typeTree">
             <span class="custom-tree-node" slot-scope="{ node, data }"
                   :title="`${node.label} ${data.name}`"
@@ -78,8 +79,10 @@
         this.$refs.typeTree.filter(val)
       },
       type(val) {
+        console.log(val)
         this.activeNode = val ? { name: val } : {}
         this.defaultKeys = val ? [val] : []
+        this.$refs.typeTree.setCurrentKey(val)
       }
     }
   }

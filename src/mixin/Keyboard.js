@@ -3,7 +3,7 @@ import hotkeys from 'hotkeys-js'
 const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9', 'f1', 'f9', 'f10', 'escape',
   'up', 'down', 'left', 'right', 'shift+up', 'shift+down', 'shift+left', 'shift+right',
   'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+l', 'ctrl+[', 'ctrl+]', 'ctrl+shift+[', 'ctrl+shift+]', 'ctrl+alt+l',
-  'ctrl+z', 'ctrl+shift+z']
+  'ctrl+z', 'ctrl+shift+z', 'ctrl+s']
 
 const HOTKEYS_DEF = HOTKEYS.join(',')
 
@@ -25,117 +25,127 @@ export default {
           switch (e.keyCode) {
             case 67: // copy
               this.doCopy()
-              break;
+              break
             case 86: // paste
               this.doPaste()
-              break;
+              break
           }
         }
-
         e.preventDefault()
         switch (handler.key) {
           case 'delete':
             this.compsDelete()
-            break;
+            break
           case 'ctrl+g':
             this.jointCompsToGroup()
-            break;
+            break
           case 'ctrl+shift+g':
             this.unGroupToComps()
-            break;
+            break
           case 'space':
             this.isKeySpacepressing = true
-            break;
+            break
           case 'ctrl+-':
             this.zoomPointPos = null
             this.zoomOut()
-            break;
+            break
           case 'ctrl+=':
             this.zoomPointPos = null
             this.zoomIn()
-            break;
+            break
           case 'ctrl+9':
             this.zoom100()
-            break;
+            break
           case 'ctrl+0':
             this.zoomFit()
-            break;
+            break
           case 'up':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutY -= 1
-            break;
+            }
+            break
           case 'shift+up':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutY -= 10
-            break;
+            }
+            break
           case 'down':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutY += 1
-            break;
+            }
+            break
           case 'shift+down':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutY += 10
-            break;
+            }
+            break
           case 'left':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutX -= 1
-            break;
+            }
+            break
           case 'shift+left':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutX -= 10
-            break;
+            }
+            break
           case 'right':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutX += 1
-            break;
+            }
+            break
           case 'shift+right':
-            if (this.curSingleSelComp)
+            if (this.curSingleSelComp) {
               this.curSelCompLayoutX += 10
-            break;
+            }
+            break
           case 'ctrl+l':
             this.doLockComp()
-            break;
+            break
           case 'ctrl+shift+l':
             this.doUnlockComp()
-            break;
+            break
           case 'ctrl+]':
             this.compsMoveUp()
-            break;
+            break
           case 'ctrl+[':
             this.compsMoveDown()
-            break;
+            break
           case 'ctrl+shift+]':
             this.compsMoveTop()
-            break;
+            break
           case 'ctrl+shift+[':
             this.compsMoveBottom()
-            break;
+            break
           case 'ctrl+alt+l':
             this.$root._isShowLog = !this.$root._isShowLog
-            break;
+            break
           case 'escape':
             this.toolState = ''
             this.showPreview = false
-            break;
+            break
           case 'f1':
             this.isShowHelpDialog = !this.isShowHelpDialog
-            break;
+            break
           case 'f9':
             if (!this.showPreview) {
               this.doPreview()
             } else {
               this.showPreview = false
             }
-            break;
+            break
           case 'f10':
             this.onPublishDoc()
-            break;
+            break
           case 'ctrl+z':
             this.undo()
-            break;
+            break
           case 'ctrl+shift+z':
             this.redo()
-            break;
+            break
+          case 'ctrl+s':
+            this.onActionSaveDraft()
+            break
         }
       })
     },
@@ -206,12 +216,17 @@ export default {
         }
       }
     },
-    doCopy(e) {
+    doCopy() {
       this.copyCompsTolocalStorage()
       // console.log('copy!')
     },
-    doPaste(e) {
+    doPaste() {
       this.loadCompsFromlocalStorage()
+    },
+    onWheelScroll(e) {
+      if (e.ctrlKey) {
+        e.preventDefault()
+      }
     }
   },
   watch: {
@@ -243,6 +258,7 @@ export default {
   created() {
     document.addEventListener('keyup', this.setSpaceKeyState)
     document.addEventListener('copy', this.doCopy)
+    document.addEventListener('wheel', this.onWheelScroll)
   },
   destroyed() {
     document.removeEventListener('keyup', this.setSpaceKeyState)

@@ -63,9 +63,9 @@
         type: Object,
         default: function () {
           return {
-            style: {
-              fill: '#52a6e7'
-            },
+            // style: {
+            //   fill: '#52a6e7'
+            // },
             param: {
               imgUrl: '',
               rotating: false,

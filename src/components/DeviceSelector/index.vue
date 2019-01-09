@@ -32,6 +32,7 @@
   import DeviceIns from './DeviceInsList'
 
   import StateStore from '../../mixin/StateStore'
+  import utils from '../../utils'
 
   export default {
     name: 'DeviceSelector',
@@ -77,15 +78,40 @@
       },
       visible(val) {
         this.dialogVisible = val
+
+        if (val) {
+          this.$nextTick(() => {
+            this.scrollCurrentToShow()
+          })
+        }
       },
       device(val) {
-        // console.log(val)
+        console.log(val)
         this.type = val.type || this.type
         this.attr = val.field || this.attr
         this.uid = val.uid || this.uid
       }
     },
     methods: {
+      scrollCurrentToShow() {
+        const devTree = document.getElementsByClassName('device-selector-root')[0]
+
+        const curTypeDom = devTree.getElementsByClassName('el-tree-node is-current')
+        if (curTypeDom && curTypeDom.length > 0) {
+          utils.scrollElementToshow(curTypeDom[0])
+        }
+
+        const curItemDom = devTree.getElementsByClassName('device-instance-item item active')
+        if (curItemDom && curItemDom.length > 0) {
+          utils.scrollElementToshow(curItemDom[0])
+        }
+
+
+        const curFieldDom = devTree.getElementsByClassName('attr-item active')
+        if (curFieldDom && curFieldDom.length > 0) {
+          utils.scrollElementToshow(curFieldDom[0])
+        }
+      },
       modelChange() {
         this.$emit('modelChange', {
           type: this.type,

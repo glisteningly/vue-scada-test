@@ -29,7 +29,11 @@
           <ImgButton title="刷新" :icon="'ic-action-refresh'" @click="initKonvaWorkArea"/>
 
           <div class="toolbar-center">
-
+            <div class="img-btn-group">
+              <ImgButton :disabled="!canUndo" title="撤销" :icon="'ic-action-undo'" @click="undo"/>
+              <ImgButton :disabled="!canRedo" title="重做" :icon="'ic-action-redo'" @click="redo"/>
+            </div>
+            <span class="toolbar-gutter-h"/>
             <div class="img-btn-group">
               <ImgButton title="移至顶层" :icon="'ic-move-top'" @click="compsMoveTop"/>
               <ImgButton title="移至底层" :icon="'ic-move-bottom'" @click="compsMoveBottom"/>
@@ -72,7 +76,6 @@
             <ImgButton title="保存" :icon="'ic-action-save'" @click="onActionSaveDraft"/>
             <el-button @click="onPublishDoc" class="publish" type="primary" icon="el-icon-upload">发布</el-button>
           </div>
-
         </div>
       </header>
       <main>
@@ -145,7 +148,9 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="导航" name="nav">
-              <CanvasNav :docSettings="docSettings" @canvasPosNav="onCanvasPosNav"/>
+              <CanvasNav :docSettings="docSettings"
+                         :canvasLayout="canvasLayout"
+                         @canvasPosNav="onCanvasPosNav"/>
             </el-tab-pane>
           </el-tabs>
           <el-tabs v-model="activeBindingTab" type="card" v-show="curSelComp">
@@ -552,20 +557,21 @@
         }
       },
       onCompOptionsChanged(changedOptions) {
-        // console.log(changedOptions)
-
         const cate = _.keys(changedOptions)[0]
 
         if (this.curSelComp) {
           this.curSelComps.forEach((comp) => {
             comp.options[cate] = Object.assign({}, comp.options[cate], changedOptions[cate])
           })
+          console.log('optionChanged!')
+          this.recordToHistoryDebounce()
         }
       },
       onCompBindingChanged(changedBinding) {
         this.curSelComps.forEach((comp) => {
           _.merge(comp.binding, changedBinding)
         })
+        this.recordToHistoryDebounce()
       },
       onCompValChanged(newValue) {
         this.curSelComps.forEach((comp) => {

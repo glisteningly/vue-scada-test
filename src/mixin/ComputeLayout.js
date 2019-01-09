@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export default {
   computed: {
     curSelCompLayoutX: {
@@ -9,8 +11,10 @@ export default {
         }
       },
       set(v) {
-        if (v) {
+        if (_.isNumber(v)) {
           this.curSelComp.x = v + this.curSelComp.offsetX * this.curSelComp.scaleX
+          // console.log('xchange')
+          // this.recordToHistoryDebounce()
         }
       }
     },
@@ -23,7 +27,7 @@ export default {
         }
       },
       set(v) {
-        if (v) {
+        if (_.isNumber(v)) {
           this.curSelComp.y = v + this.curSelComp.offsetY * this.curSelComp.scaleY
         }
       }
@@ -37,7 +41,7 @@ export default {
         }
       },
       set(v) {
-        if (v) {
+        if (_.isNumber(v)) {
           if (!this.curSelComp.points) {
             this.curSelComp.x = this.curSelComp.x + (v - this.curSelComp.width * this.curSelComp.scaleX) / 2
           }
@@ -54,7 +58,7 @@ export default {
         }
       },
       set(v) {
-        if (v) {
+        if (_.isNumber(v)) {
           if (!this.curSelComp.points) {
             this.curSelComp.y = this.curSelComp.y + (v - this.curSelComp.height * this.curSelComp.scaleY) / 2
           }
@@ -71,7 +75,7 @@ export default {
         }
       },
       set(v) {
-        if (v) {
+        if (_.isNumber(v)) {
           this.curSelComp.rotation = v
         }
       }
@@ -91,6 +95,13 @@ export default {
         } else {
           return null
         }
+      }
+    }
+  },
+  watch: {
+    curSelCompLayout(newVal, oldVal) {
+      if (oldVal && newVal && !this.historyState) {
+        this.recordToHistoryDebounce()
       }
     }
   }

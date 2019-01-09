@@ -13,41 +13,15 @@
             <ul class="hotkey-list">
               <li><span>F1</span><label>帮助</label></li>
               <li><span>F9</span><label>预览 / 关闭预览</label></li>
+              <li><span>Ctrl</span>+<span>Z</span><label>撤销</label></li>
+              <li><span>Ctrl</span>+<span>Shift</span>+<span>Z</span><label>重做</label></li>
             </ul>
           </el-col>
           <el-col :span="12">
             <ul class="hotkey-list">
-              <li><span>F10</span><label>发布</label></li>
               <li><span>Esc</span><label>关闭预览 / 关闭当前工具</label></li>
-            </ul>
-          </el-col>
-        </el-row>
-        <h4>组件操作</h4>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <ul class="hotkey-list">
-              <li><span>↑</span>,<span>↓</span>,<span>←</span>,<span>→</span><label>移动选中组件 1px</label></li>
-              <li><span>Shift</span>+<span>↑</span>,<span>↓</span>,<span>←</span>,<span>→</span><label>移动选中组件 10px</label>
-              </li>
-              <li><span>Ctrl</span>+<span>C</span><label>复制选中组件</label></li>
-              <li><span>Ctrl</span>+<span>V</span><label>粘贴组件</label></li>
-              <li><span>Ctrl</span>+<span>L</span><label>锁定选中组件</label></li>
-              <li><span>Ctrl</span>+<span>Shift</span>+<span>L</span><label>解除选中组件锁定</label></li>
-              <li><span>Ctrl</span>+<span>G</span><label>多选组件成组</label></li>
-              <li><span>Ctrl</span>+<span>Shift</span>+<span>G</span><label>选中成组组件拆组</label></li>
-
-            </ul>
-          </el-col>
-          <el-col :span="12">
-            <ul class="hotkey-list">
-              <li><span>Ctrl</span>+<span>]</span><label>组件上移一层</label></li>
-              <li><span>Ctrl</span>+<span>[</span><label>组件下移一层</label></li>
-              <li><span>Ctrl</span>+<span>Shift</span>+<span>]</span><label>组件移至顶层</label></li>
-              <li><span>Ctrl</span>+<span>Shift</span>+<span>[</span><label>组件移至底层</label></li>
-              <li><span>Shift</span>+<i class="icon ic-dragmove"></i><label>水平/垂直方向锁定移动</label></li>
-              <li><span>Alt</span>+<i class="icon ic-dragmove"></i><label>移动组件并复制</label></li>
-              <li><span>Shift</span>+<i class="icon ic-resize"></i><label>组件保持比例缩放</label></li>
-              <li><span>Alt</span>+<i class="icon ic-resize"></i><label>组件以中心点缩放</label></li>
+              <li><span>Ctrl</span>+<span>S</span><label>保存当前文档</label></li>
+              <li><span>F10</span><label>发布当前文档</label></li>
             </ul>
           </el-col>
         </el-row>
@@ -67,6 +41,35 @@
               <li><span>Ctrl</span>+<span>-</span><label>缩小画布</label></li>
               <li><span>Ctrl</span>+<span>9</span><label>显示画布原始尺寸</label></li>
               <li><span>Ctrl</span>+<span>0</span><label>画布尺寸适合窗口</label></li>
+            </ul>
+          </el-col>
+        </el-row>
+        <h4>组件操作</h4>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <ul class="hotkey-list">
+              <li><span>↑</span>,<span>↓</span>,<span>←</span>,<span>→</span><label>移动选中组件 1px</label></li>
+              <li><span>Shift</span>+<span>↑</span>,<span>↓</span>,<span>←</span>,<span>→</span><label>移动选中组件
+                10px</label>
+              </li>
+              <li><span>Ctrl</span>+<span>C</span><label>复制选中组件</label></li>
+              <li><span>Ctrl</span>+<span>V</span><label>粘贴组件</label></li>
+              <li><span>Ctrl</span>+<span>L</span><label>锁定选中组件</label></li>
+              <li><span>Ctrl</span>+<span>Shift</span>+<span>L</span><label>解除选中组件锁定</label></li>
+              <li><span>Ctrl</span>+<span>G</span><label>多选组件成组</label></li>
+              <li><span>Ctrl</span>+<span>Shift</span>+<span>G</span><label>选中成组组件拆组</label></li>
+            </ul>
+          </el-col>
+          <el-col :span="12">
+            <ul class="hotkey-list">
+              <li><span>Ctrl</span>+<span>]</span><label>组件上移一层</label></li>
+              <li><span>Ctrl</span>+<span>[</span><label>组件下移一层</label></li>
+              <li><span>Ctrl</span>+<span>Shift</span>+<span>]</span><label>组件移至顶层</label></li>
+              <li><span>Ctrl</span>+<span>Shift</span>+<span>[</span><label>组件移至底层</label></li>
+              <li><span>Shift</span>+<i class="icon ic-dragmove"></i><label>水平/垂直方向锁定移动</label></li>
+              <li><span>Alt</span>+<i class="icon ic-dragmove"></i><label>移动组件并复制</label></li>
+              <li><span>Shift</span>+<i class="icon ic-resize"></i><label>组件保持比例缩放</label></li>
+              <li><span>Alt</span>+<i class="icon ic-resize"></i><label>组件以中心点缩放</label></li>
             </ul>
           </el-col>
         </el-row>

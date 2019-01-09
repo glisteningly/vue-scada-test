@@ -6,6 +6,9 @@
     <div v-if="curSelCompsCount > 1 && !curSelCompsType">
       <span class="type-hint"><i class="el-icon-info"></i> 已选择 {{curSelCompsCount}} 个不同类型对象</span>
     </div>
+    <div v-if="noOptions">
+      <span class="type-hint"><i class="el-icon-info"></i> 无可设置{{optionType}}</span>
+    </div>
     <div class="ctrl-item" v-for="(ctrl,key) in compOptions" :key="key">
       <el-row>
         <el-col :span="8"><label>{{ctrl.label}}</label></el-col>
@@ -163,6 +166,17 @@
     computed: {
       curSelCompOptions() {
         return this.curSelComp ? this.curSelComp.options : null
+      },
+      optionType() {
+        switch (this.optionCategory) {
+          case 'param':
+            return '参数'
+          case 'style':
+            return '样式'
+        }
+      },
+      noOptions() {
+        return _.isEmpty(this.compOptions)
       }
     },
     watch: {

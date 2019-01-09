@@ -52,6 +52,11 @@ export default {
         //更新选中的comps config记录
         this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
       })
+      // 组件变换记录到历史纪录
+      compCtrl.konvaCtrl().on('dragend transformend', () => {
+        // this.recordToHistory()
+        this.recordToHistoryDebounce()
+      })
     },
   },
   watch: {

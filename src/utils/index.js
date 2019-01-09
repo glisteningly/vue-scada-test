@@ -46,9 +46,39 @@ const getPathRect = (points) => {
   }
 }
 
+const isElementVisible = (el) => {
+  const rect = el.getBoundingClientRect()
+  const vWidth = window.innerWidth
+  const vHeight = window.innerHeight
+  const efp = function (x, y) {
+    return document.elementFromPoint(x, y)
+  }
+
+  // Return false if it's not in the viewport
+  if (rect.right < 0 || rect.bottom < 0
+    || rect.left > vWidth || rect.top > vHeight)
+    return false
+
+  // Return true if any of its four corners are visible
+  return (
+    el.contains(efp(rect.left, rect.top))
+    || el.contains(efp(rect.right, rect.top))
+    || el.contains(efp(rect.right, rect.bottom))
+    || el.contains(efp(rect.left, rect.bottom))
+  )
+}
+
+const scrollElementToshow = (el) => {
+  if (!isElementVisible(el)) {
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
+}
+
 export default {
   diff,
   getHVPos,
   getPathOriginPoints,
-  getPathRect
+  getPathRect,
+  isElementVisible,
+  scrollElementToshow
 }

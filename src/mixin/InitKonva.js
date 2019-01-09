@@ -113,6 +113,19 @@ export default {
         return newBox
       })
 
+      this.konvaObjs.groupTransformer.on('transform', () => {
+        // console.log('transform')
+        this.curSelComps.forEach((comp) => {
+          // console.log(compScale)
+          // this.updateLayout(comp)
+          if (comp.tempTr) {
+            comp.tempTr.forceUpdate()
+          }
+        })
+        this.konvaObjs.groupTransformer.forceUpdate()
+        this.konvaObjs.layers[0].draw()
+      })
+
       this.konvaObjs.groupTransformer.on('transformend', () => {
         // console.log('transformend ')
         // this.syncGroupSel()
@@ -124,19 +137,6 @@ export default {
           // }
         })
         this.syncGroupSel()
-        this.konvaObjs.groupTransformer.forceUpdate()
-        this.konvaObjs.layers[0].draw()
-      })
-
-      this.konvaObjs.groupTransformer.on('transform', () => {
-        // console.log('transform')
-        this.curSelComps.forEach((comp) => {
-          // console.log(compScale)
-          // this.updateLayout(comp)
-          if (comp.tempTr) {
-            comp.tempTr.forceUpdate()
-          }
-        })
         this.konvaObjs.groupTransformer.forceUpdate()
         this.konvaObjs.layers[0].draw()
       })
@@ -161,6 +161,7 @@ export default {
         dash: [6, 4]
       })
 
+      // 多选组 组件
       this.konvaObjs.selCompsGroup = new Konva.Group({
         draggable: true,
       })
@@ -189,6 +190,11 @@ export default {
         }
         //更新选中的comps config记录
         this.curSelCompsCopied = this.getCompsConfig(this.curSelComps)
+      })
+
+      // 多选组件变换记录到历史纪录
+      this.konvaObjs.selCompsGroup.on('dragend transformend', () => {
+        this.recordToHistoryDebounce()
       })
 
       //click
@@ -273,6 +279,7 @@ export default {
             if (this.curSelComp && this.curSelComp.points) {
               // this.curSelComp.addNewAnchor({ x, y })
               this.curSelComp.addNewAnchor(this.curFixedPathPoint)
+              this.recordToHistoryDebounce()
             } else {
               this.addPathStartPoint({ x, y })
             }
