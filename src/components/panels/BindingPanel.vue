@@ -13,8 +13,22 @@
           <!--<el-button plain size="mini" class="btn-unbinding" icon="el-icon-close" @click="onBindingClear"/>-->
           <el-button title="清除绑定" plain size="mini" class="btn-unbinding" @click="onBindingClear">✕</el-button>
           <el-button plain size="mini" v-show="key === 'alarm'">关联</el-button>
-          <el-input-number class="value-preview" @change="compValChanged(ctrl.value)"
-                           placeholder="预览值" controls-position="right"
+          <el-button plain size="mini"
+                     style="padding: 4px 6px;"
+                     @click="onGroupChildBinding"
+                     v-show="curSelSingleGroup"
+                     class="btn-child-binding">
+            <span style="display: flex; align-items: center">
+              <img :src="'./images/icons/ic-group-hierarchy.png'" style="width: 16px; height: 16px;"/>
+              <span style="margin-left: 4px; color: #FFF">绑定子组件</span>
+            </span>
+
+          </el-button>
+          <el-input-number v-show="!curSelSingleGroup"
+                           class="value-preview"
+                           @change="compValChanged(ctrl.value)"
+                           placeholder="预览值"
+                           controls-position="right"
                            v-model="ctrl.value"/>
         </div>
         <div class="ctrl-item">
@@ -41,6 +55,7 @@
             <el-col :span="4"><label class="label-bid">属性</label></el-col>
             <el-col :span="20">
               <el-input @change="compBindingChanged(ctrl.binding.field,'field')"
+                        :disabled="curSelSingleGroup"
                         v-model="ctrl.binding.field"/>
             </el-col>
           </el-row>
@@ -56,8 +71,12 @@
         </el-row>
       </el-tab-pane>
     </el-tabs>
-    <DeviceSelector ref="deviceSelector" v-model="deviceBinding" :visible.sync="selectorVisible"
-                    @change="onBindingChange" @clear="onBindingClear"></DeviceSelector>
+    <DeviceSelector ref="deviceSelector"
+                    v-model="deviceBinding"
+                    :visible.sync="selectorVisible"
+                    :options="selectorOptions"
+                    @change="onBindingChange"
+                    @clear="onBindingClear"/>
   </div>
 </template>
 
@@ -84,6 +103,10 @@
           type: '',
           field: '',
           uid: ''
+        },
+        selectorOptions: {
+          showBindingOpts: false,
+          showFieldList: true,
         }
       }
     },
@@ -179,6 +202,9 @@
       openSelDialog() {
         this.deviceBinding = this.compBindings[this.activeTab].binding
 
+        this.selectorOptions.showBindingOpts = (this.curSelComp.type === 'ScadaLabel')
+        this.selectorOptions.showFieldList = (this.curSelComp.type !== 'ScadaGroupWrap')
+
         this.selectorVisible = true
       },
       onBindingChange(device) {
@@ -214,9 +240,9 @@
         })
         this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
       },
-      // onTabClick() {
-      //   this.lastSelTab = this.activeTab
-      // }
+      onGroupChildBinding() {
+        this.$emit('compGroupChildBinding', this.compBindings[this.activeTab].binding)
+      }
     },
     computed: {
       compValueBindingCount() {
@@ -263,8 +289,9 @@
       }
       .btn-unbinding {
         padding: 6px 3px 6px 4px;
-        /*font-size: 11px;*/
-        /*min-height: 25px;*/
+      }
+      .btn-child-binding {
+        float: right;
       }
     }
     .ctrl-item {

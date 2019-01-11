@@ -57,5 +57,8 @@ export default {
       }
       return null
     },
-  },
+    canAddToTpl () {
+      return (this.curSelComps.length === 1 && (this.curSelComps[0].type === 'ScadaGroupWrap' || this.curSelComps[0].type === 'ScadaImage') )
+    }
+  }
 }

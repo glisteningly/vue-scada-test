@@ -119,14 +119,17 @@ export default {
       localStorage.setItem('saveSlot', saveSlot)
     },
     openDraft(id) {
+      this.isDocLoading = true
       VizResourceService.getDraftById(id).then((config) => {
         // console.log(config)
         this.loadDocFromTplStr(config.config)
         this.docInfo.name = config.label
         this.docInfo.editorId = config.modifierId || this.$route.query.uid
         this.zoomFit()
+        this.isDocLoading = false
       }).catch(error => {
         this.$message.error(`打开可视化资源失败 - ${error}`)
+        this.isDocLoading = false
       })
     },
 

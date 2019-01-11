@@ -79,7 +79,7 @@
         this.$refs.typeTree.filter(val)
       },
       type(val) {
-        console.log(val)
+        // console.log(val)
         this.activeNode = val ? { name: val } : {}
         this.defaultKeys = val ? [val] : []
         this.$refs.typeTree.setCurrentKey(val)

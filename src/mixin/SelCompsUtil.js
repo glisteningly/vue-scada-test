@@ -37,6 +37,9 @@ export default {
         }
       }
       return null
+    },
+    curSelSingleGroup() {
+      return (this.selComps.length === 1 && this.selComps[0].type === 'ScadaGroupWrap')
     }
   },
 }

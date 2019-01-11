@@ -17,11 +17,17 @@
         <span>名称</span>
         <span>位置</span>
       </div>
-      <div class="device-instance-item item" v-for="(item, index) in instanceList" :key="index"
+      <div class="device-instance-item item"
+           v-for="(item, index) in instanceList" :key="index"
+           :title="item.label"
            :class="{ active: item.uid === activeIns }"
            @click="select(item, index)">
-        <span>{{item.label}}</span>
-        <span>{{item.location}}</span>
+        <span class="ins-label">
+          <label v-if="item.state === '在线'" class="state-on">● </label>
+          <label v-else class="state-off">● </label>
+          {{item.label}}
+        </span>
+        <span class="ins-location">{{item.location}}</span>
       </div>
     </div>
   </div>
@@ -52,6 +58,7 @@
         DeviceType.getDeviceInstances({ type }).then(ins => {
           this.allInstanceList = ins.data
           this.filterIns(this.filterStr)
+          this.$emit('instanceCountChange', this.allInstanceList.length)
 
           this.$nextTick(() => {
             const devTree = document.getElementsByClassName('device-selector-root')[0]
@@ -121,6 +128,21 @@
         flex-flow: row;
         justify-content: space-between;
         padding: 6px 8px;
+        .ins-label {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          label {
+            font-size: 12px;
+            margin-right: 3px;
+          }
+          .state-on {
+            color: #5ba804;
+          }
+          .state-off {
+            color: #a7001b;
+          }
+        }
       }
 
       .header {

@@ -102,7 +102,7 @@ export default {
         // resizeEnabled: false,
         // rotateEnabled: false,
         rotationSnaps: [0, 90, 180, 270],
-        enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+        // enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
         rotateAnchorOffset: 30
       })
 

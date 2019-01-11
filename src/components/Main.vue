@@ -85,7 +85,8 @@
               <BasicCompLib/>
             </el-tab-pane>
             <el-tab-pane label="设备" name="deviceComp">
-              <DeviceCompLib/>
+              <DeviceCompLib :canAddToTpl="canAddToTpl"
+                             :curSelComp="curSelComp"/>
             </el-tab-pane>
             <el-tab-pane label="图层" name="layer">
               <LayerPanel :treedata="comps"
@@ -95,7 +96,10 @@
             </el-tab-pane>
           </el-tabs>
         </div>
-        <div id="work_area">
+        <div id="work_area" v-loading="isDocLoading"
+             element-loading-text="文档加载中"
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.5)">
           <div id="work_frame" :style="workFrameBgColor">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
@@ -158,6 +162,7 @@
               <BindingPanel :selComps="curSelComps"
                             @compBindingChanged="onCompBindingChanged"
                             @compOptionsChanged="onCompOptionsChanged"
+                            @compGroupChildBinding="onCompGroupChildBinding"
                             @compValChanged="onCompValChanged"/>
             </el-tab-pane>
             <el-tab-pane label="事件绑定" name="event">
@@ -411,7 +416,7 @@
         scadaDoc: null,
         isShowSettingsDialog: false,
         isShowHelpDialog: false,
-
+        isDocLoading: false
       }
     },
     mounted() {
@@ -570,8 +575,39 @@
       onCompBindingChanged(changedBinding) {
         this.curSelComps.forEach((comp) => {
           _.merge(comp.binding, changedBinding)
+
+          // this.groupCompBinding(comp, changedBinding)
+          // comp.setGroupBinding(changedBinding)
         })
         this.recordToHistoryDebounce()
+      },
+      onCompGroupChildBinding(binding) {
+        this.curSelComp.setGroupBinding(binding)
+      },
+      groupCompBinding(comp, binding) {
+        // const _bindFields = ['type', 'uid']
+        if (!_.isEmpty(binding.val) && (comp.type === 'ScadaGroupWrap') && comp.children && comp.children.length > 0) {
+          comp.children.forEach(childrenComp => {
+            if (!_.isEmpty(childrenComp.binding)) {
+              const newUid = binding.val.uid
+              if (newUid) {
+                const keys = _.keys(childrenComp.binding)
+                if (keys.length > 0) {
+                  keys.forEach(key => {
+                    if (!_.isEmpty(childrenComp.binding[key])) {
+                      console.log('compCur')
+                      console.log(JSON.stringify(childrenComp.binding))
+                      console.log('newBindingUid')
+                      console.log(binding.val.uid)
+
+                      childrenComp.binding[key].uid = newUid
+                    }
+                  })
+                }
+              }
+            }
+          })
+        }
       },
       onCompValChanged(newValue) {
         this.curSelComps.forEach((comp) => {

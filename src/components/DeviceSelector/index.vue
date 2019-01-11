@@ -5,19 +5,30 @@
         :visible.sync="dialogVisible"
         width="1000px">
       <div class="device-selector-container">
-        <device-type-tree class="child-panel" @change="changeType" :type="type"
-                          :treedata="deviceTypeTree"></device-type-tree>
-        <device-ins :type="type" class="child-panel" :uid="uid" @change="changeIns"></device-ins>
-        <device-attrs :type="type" class="child-panel" @change="changeAttr" :attr="attr"></device-attrs>
+        <device-type-tree class="child-panel"
+                          @change="changeType"
+                          :type="type"
+                          :treedata="deviceTypeTree"/>
+        <device-ins :type="type"
+                    class="child-panel"
+                    :uid="uid"
+                    @change="changeIns"/>
+        <device-attrs v-show="options.showFieldList"
+                      :type="type"
+                      class="child-panel"
+                      @change="changeAttr"
+                      :attr="attr"/>
       </div>
       <span slot="footer">
-        <div class="binding-opts-item">
-          <span>填入属性名至前缀</span>
-          <el-switch v-model="autoLabel"/>
-        </div>
-        <div class="binding-opts-item">
-          <span>填入单位至后缀</span>
-          <el-switch v-model="autoUnit"/>
+        <div v-if="options.showBindingOpts">
+          <div class="binding-opts-item">
+            <span>填入属性名至前缀</span>
+            <el-switch v-model="autoLabel"/>
+          </div>
+          <div class="binding-opts-item">
+            <span>填入单位至后缀</span>
+            <el-switch v-model="autoUnit"/>
+          </div>
         </div>
         <!--<el-button @click="clearBinding" size="small">清除绑定</el-button>-->
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -56,6 +67,15 @@
       visible: {
         type: Boolean,
         default: false
+      },
+      options: {
+        type: Object,
+        default: function () {
+          return {
+            showBindingOpts: false,
+            showFieldList: true,
+          }
+        }
       }
     },
     data() {
@@ -86,7 +106,7 @@
         }
       },
       device(val) {
-        console.log(val)
+        // console.log(val)
         this.type = val.type || this.type
         this.attr = val.field || this.attr
         this.uid = val.uid || this.uid

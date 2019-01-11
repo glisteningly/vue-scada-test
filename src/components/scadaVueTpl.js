@@ -122,15 +122,17 @@ export default {
       })
     }
 
-    components.forEach(item => {
-      addQueryConfig(item.binding)
+    const compBindingGen = (comp) => {
+      comp.forEach(item => {
+        addQueryConfig(item.binding)
 
-      if (item.children && item.children.length > 0) {
-        item.children.forEach(child => {
-          addQueryConfig(child.binding)
-        })
-      }
-    })
+        if (item.children && item.children.length > 0) {
+          compBindingGen(item.children)
+        }
+      })
+    }
+
+    compBindingGen(components)
 
     return dc
   },

@@ -23,7 +23,6 @@
                @node-drop="handleDrop"
                @node-expand="onNodeExpand"
                @node-collapse="onNodeCollapse"
-               :allow-drop="allowDrop"
                :allow-drag="allowDrag">
         <span class="layer-tree-node" slot-scope="{ node, data }">
           <label>{{ data.type}}<span class="comp-text" v-if="data.label"> - {{ data.label }}</span></label>
@@ -75,15 +74,15 @@
           compCtrl.locked = false
         }
       },
-      allowDrop(draggingNode, dropNode, type) {
-        // return type !== 'inner'
-        return true
-      },
+      // allowDrop(draggingNode, dropNode, type) {
+      //   // return type !== 'inner'
+      //   return true
+      // },
       allowDrag(draggingNode) {
         // return draggingNode.data.label.indexOf('三级 3-2-2') === -1
         return draggingNode.data.draggable
       },
-      handleDrop(draggingNode, dropNode, dropType, ev) {
+      handleDrop(draggingNode, dropNode, dropType) {
         // console.log(draggingNode.data.name, dropNode.data.name, dropType)
         const draggingComp = _compsRefMap.get(draggingNode.data)
         const dropComp = _compsRefMap.get(dropNode.data)

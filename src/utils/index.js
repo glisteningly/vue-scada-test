@@ -74,11 +74,34 @@ const scrollElementToshow = (el) => {
   }
 }
 
+const setGroupBinding = (comp, binding) => {
+  if (!_.isEmpty(binding) && (comp.type === 'ScadaGroupWrap') && comp.children && comp.children.length > 0) {
+    comp.children.forEach(childrenComp => {
+      if (!_.isEmpty(childrenComp.binding)) {
+        const newUid = binding.uid
+        if (newUid) {
+          const keys = _.keys(childrenComp.binding)
+          if (keys.length > 0) {
+            keys.forEach(key => {
+              if (!_.isEmpty(childrenComp.binding[key])) {
+                childrenComp.binding[key].uid = newUid
+              }
+            })
+          }
+        }
+      }
+      // childrenComp.setGroupBinding(binding)
+      setGroupBinding(childrenComp, binding)
+    })
+  }
+}
+
 export default {
   diff,
   getHVPos,
   getPathOriginPoints,
   getPathRect,
   isElementVisible,
-  scrollElementToshow
+  scrollElementToshow,
+  setGroupBinding
 }

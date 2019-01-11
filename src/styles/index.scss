@@ -38,3 +38,10 @@ li {
     }
   }
 }
+
+.ellip {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  //-webkit-line-clamp: 1;
+}

@@ -136,7 +136,7 @@ class CompCtrl {
       }
       // console.log(p)
       // console.log(this._dragstartPos)
-      if (hotkeys.shift) {
+      if (hotkeys.shift && this._dragstartPos) {
         if (this._hMove) {
           p = {
             x: pos.x,
@@ -624,6 +624,35 @@ class CompCtrl {
 
     return layout
   }
+
+  setGroupBinding(binding) {
+    utils.setGroupBinding(this, binding)
+  }
+
+  // setGroupBinding(binding) {
+  //   if (!_.isEmpty(binding) && (this.type === 'ScadaGroupWrap') && this.children && this.children.length > 0) {
+  //     this.children.forEach(childrenComp => {
+  //       if (!_.isEmpty(childrenComp.binding)) {
+  //         const newUid = binding.uid
+  //         if (newUid) {
+  //           const keys = _.keys(childrenComp.binding)
+  //           if (keys.length > 0) {
+  //             keys.forEach(key => {
+  //               if (!_.isEmpty(childrenComp.binding[key])) {
+  //                 // console.log('compCur')
+  //                 // console.log(JSON.stringify(childrenComp.binding))
+  //                 // console.log('newBindingUid')
+  //                 // console.log(binding.uid)
+  //                 childrenComp.binding[key].uid = newUid
+  //               }
+  //             })
+  //           }
+  //         }
+  //       }
+  //       childrenComp.setGroupBinding(binding)
+  //     })
+  //   }
+  // }
 
   toConfig() {
     const compConfig = {
