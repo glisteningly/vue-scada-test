@@ -1,6 +1,27 @@
 import _ from 'lodash'
 
 export default {
+  data() {
+    return {
+      groupChildCompSelRect: null
+    }
+  },
+  computed: {
+    groupChildCompSelStyle() {
+      if (this.groupChildCompSelRect) {
+        return {
+          left: this.groupChildCompSelRect.x - 2 + 'px',
+          top: this.groupChildCompSelRect.y - 2 + 'px',
+          width: this.groupChildCompSelRect.width + 3 + 'px',
+          height: this.groupChildCompSelRect.height + 3 + 'px'
+        }
+      } else {
+        return {
+          display: 'none'
+        }
+      }
+    }
+  },
   methods: {
     onLayerCompClick(comp) {
       // console.log(data)
@@ -9,11 +30,14 @@ export default {
         const compCtrl = _.find(this.comps, { name: comp.name })
         // console.log(compCtrl)
         if (compCtrl) {
-          // const unGroupCueSel = true
           this.addCompToSelection(compCtrl)
+          this.groupChildCompSelRect = null
         } else {
-          // const unGroupCueSel = true
           this.addCompToSelection(comp)
+          const rect = document.getElementById(comp.name).getBoundingClientRect()
+          if (rect) {
+            this.groupChildCompSelRect = rect
+          }
         }
       })
     },

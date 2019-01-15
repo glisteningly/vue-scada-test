@@ -103,6 +103,8 @@
              element-loading-background="rgba(0, 0, 0, 0.5)">
           <div id="work_frame" :style="workFrameBgColor">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
+            <div id="child_comp_sel_box" style="position: fixed; border: 1px solid #F00"
+                 :style="groupChildCompSelStyle"></div>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
                  v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"
                  @wheel="onCanvasMouseWheel"></div>

@@ -1,6 +1,7 @@
 <template>
   <g>
     <component v-for="childrenComp in comp.children"
+               :id="childrenComp.name"
                :key="childrenComp.name"
                :is="childrenComp.type"
                :bindingValue="childrenComp.bindingValue"

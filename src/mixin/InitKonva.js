@@ -28,6 +28,7 @@ export default {
           comp.removeAnchors()
         }
       })
+      this.groupChildCompSelRect = null
     },
     initKonvaWorkArea() {
       this.curSelComps = []
