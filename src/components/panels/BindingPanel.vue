@@ -12,7 +12,8 @@
           <el-button plain size="mini" @click="openSelDialog">对象选择</el-button>
           <!--<el-button plain size="mini" class="btn-unbinding" icon="el-icon-close" @click="onBindingClear"/>-->
           <el-button title="清除绑定" plain size="mini" class="btn-unbinding" @click="onBindingClear">✕</el-button>
-          <el-button plain size="mini" v-show="key === 'alarm'">关联</el-button>
+          <el-button plain size="mini" v-show="key === 'alarm' && canLinkAlarm" @click="onLinkAlarmCompanion">关联
+          </el-button>
           <el-button plain size="mini"
                      style="padding: 4px 6px;"
                      @click="onGroupChildBinding"
@@ -22,7 +23,6 @@
               <img :src="'./images/icons/ic-group-hierarchy.png'" style="width: 16px; height: 16px;"/>
               <span style="margin-left: 4px; color: #FFF">绑定子组件</span>
             </span>
-
           </el-button>
           <el-input-number v-show="!curSelSingleGroup"
                            class="value-preview"
@@ -241,12 +241,29 @@
         this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
       },
       onGroupChildBinding() {
-        this.$emit('compGroupChildBinding', this.compBindings[this.activeTab].binding)
+        if (this.compBindings[this.activeTab].binding.uid) {
+          this.$emit('compGroupChildBinding', this.compBindings[this.activeTab].binding)
+        }
+      },
+      onLinkAlarmCompanion() {
+        if (this.compBindings.val && this.compBindings.alarm) {
+          const compVal = _.cloneDeep(this.compBindings.val.binding)
+          console.log(compVal)
+          if (compVal.type) {
+            compVal.type += '__companion__'
+            this.compBindings.alarm.binding = compVal
+            this.$emit('compBindingChanged', { [this.activeTab]: this.compBindings[this.activeTab].binding })
+          }
+        }
       }
     },
     computed: {
       compValueBindingCount() {
         return _.keys(this.compBindings).length
+      },
+      canLinkAlarm() {
+        const alarmTypes = ['ScadaLabel']
+        return alarmTypes.includes(this.curSelComp.type)
       }
     },
     watch: {
@@ -256,9 +273,6 @@
           this.activeTab = this.lastSelTab
         } else {
           this.activeTab = _.keys(this.compBindings)[0]
-          // if (this.activeTab) {
-          //   this.lastSelTab = this.activeTab
-          // }
         }
       },
       activeTab(val) {

@@ -82,7 +82,8 @@
         <div id="left_sidebar">
           <el-tabs v-model="activeLeftTab" type="card">
             <el-tab-pane label="组件" name="basicComp">
-              <BasicCompLib/>
+              <BasicCompLib :canAddToTpl="canAddToTpl"
+                            :curSelComp="curSelComp"/>
             </el-tab-pane>
             <el-tab-pane label="设备" name="deviceComp">
               <DeviceCompLib :canAddToTpl="canAddToTpl"
@@ -575,39 +576,13 @@
       onCompBindingChanged(changedBinding) {
         this.curSelComps.forEach((comp) => {
           _.merge(comp.binding, changedBinding)
-
-          // this.groupCompBinding(comp, changedBinding)
-          // comp.setGroupBinding(changedBinding)
         })
         this.recordToHistoryDebounce()
       },
       onCompGroupChildBinding(binding) {
         this.curSelComp.setGroupBinding(binding)
-      },
-      groupCompBinding(comp, binding) {
-        // const _bindFields = ['type', 'uid']
-        if (!_.isEmpty(binding.val) && (comp.type === 'ScadaGroupWrap') && comp.children && comp.children.length > 0) {
-          comp.children.forEach(childrenComp => {
-            if (!_.isEmpty(childrenComp.binding)) {
-              const newUid = binding.val.uid
-              if (newUid) {
-                const keys = _.keys(childrenComp.binding)
-                if (keys.length > 0) {
-                  keys.forEach(key => {
-                    if (!_.isEmpty(childrenComp.binding[key])) {
-                      console.log('compCur')
-                      console.log(JSON.stringify(childrenComp.binding))
-                      console.log('newBindingUid')
-                      console.log(binding.val.uid)
-
-                      childrenComp.binding[key].uid = newUid
-                    }
-                  })
-                }
-              }
-            }
-          })
-        }
+        this.$message.success('子组件的uid已批量绑定')
+        this.recordToHistoryDebounce()
       },
       onCompValChanged(newValue) {
         this.curSelComps.forEach((comp) => {

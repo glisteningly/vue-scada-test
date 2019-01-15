@@ -187,6 +187,8 @@ input::-webkit-inner-spin-button {
 }
 
 .el-popover {
+  min-width: 50px;
+  padding: 10px;
   background: #3b3e40;
   border: 1px solid #666;
   color: #FFF;
@@ -337,6 +339,21 @@ input::-webkit-inner-spin-button {
     line-height: 24px;
     font-size: 18px;
     color: #DDD;
+  }
+  .el-dialog__body {
+    padding: 10px 20px;
+  }
+}
+
+//el-msgbox
+.el-message-box {
+  background: $dark_dialog_bgcolor;
+  border: 1px solid #222;
+  .el-message-box__title {
+    color: #DDD;
+  }
+  .el-message-box__message {
+    color: #CCC;
   }
 }
 

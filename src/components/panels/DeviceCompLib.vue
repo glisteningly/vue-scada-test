@@ -8,19 +8,24 @@
           @dragstart="dragDefault($event)">
         <img :src="defaultImageUrl" @error="onImageLoadFailed" ref="defImg">
       </li>
-      <li v-for="(tpl,index) in curTypeTpls" :key="index" class="comps-item"
-          draggable="true"
-          @dragstart="dragTypeTpl($event, tpl)">
-        <div class="tpl-preview">
-          <svg class="tpl-preview-svg" :viewBox="getViewBox(tpl.config)">
-            <component :is="tpl.preview.type"
-                       :comp="tpl.preview"/>
-          </svg>
-          <div class="tpl-preview-cover"></div>
+      <li v-for="(tpl) in curTypeTpls" :key="tpl.id" class="comps-item">
+        <div :title="tpl.name" class="tpl-wrap" draggable="true" @dragstart="dragTypeTpl($event, tpl)">
+          <el-popover placement="bottom">
+            <div>
+              <el-button style="padding: 6px; font-size: 16px;"
+                         :disabled="!canAddToTpl || !typeInfo || isShowInsList"
+                         @click="updateTplConfirm(tpl.id)"
+                         icon="el-icon-refresh"/>
+              <el-button type="danger"
+                         style="padding: 6px; font-size: 16px;"
+                         @click="deleteTplConfirm(tpl.id)"
+                         icon="el-icon-delete"/>
+            </div>
+            <TplSvgPreview :config="tpl.config" slot="reference"/>
+          </el-popover>
         </div>
       </li>
-      <li title="添加为模板"
-          class="add-tpl">
+      <li title="添加为模板" class="add-tpl-wrap">
         <button class="add-tpl-btn"
                 :disabled="!canAddToTpl || !typeInfo || isShowInsList"
                 @click="onAddTplClick">
@@ -44,6 +49,7 @@
                     :showTypeName="false"/>
     <DeviceInsList v-show="isShowInsList"
                    class="device-ins-list"
+                   :uid="curSelInstanceUid"
                    @change="changeIns"
                    @instanceCountChange="onInstanceCountChange"
                    :type="curSeltype"/>
@@ -52,32 +58,27 @@
 
 <script>
   import basicCompDefs from '../../const/basicCompDefs'
-  import { ScadaCompsLibrary } from '../Scada/index'
+  // import { ScadaCompsLibrary } from '../Scada/index'
   import _ from 'lodash'
   import DeviceTypeList from '../DeviceSelector/DeviceTypeList'
   import DeviceInsList from '../DeviceSelector/DeviceInsList'
   import StateStore from '../../mixin/StateStore'
 
   const holderImagePath = './images/icons/ic-comp-no-preview.png'
-  const addTplImagePath = './images/icons/ic-comp-add-tpl.png'
+  // const addTplImagePath = './images/icons/ic-comp-add-tpl.png'
 
-  import CompCtrl from '../../class/CompCtrl'
-  import utils from '../../utils'
+  import TplSvgPreview from '../TplSvgPreview'
+
+  // import utils from '../../utils'
+  // import ScadaTemplate from '../../api/scadaTemplate'
+
+  import TplService from '../../mixin/TplService'
 
 
   export default {
     name: 'DeviceCompLib',
-    mixins: [StateStore],
-    components: { DeviceTypeList, DeviceInsList },
-    props: {
-      canAddToTpl: {
-        type: Boolean,
-        default: false
-      },
-      curSelComp: {
-        type: Object
-      }
-    },
+    mixins: [StateStore, TplService],
+    components: { DeviceTypeList, DeviceInsList, TplSvgPreview },
     data() {
       return {
         basicComps: basicCompDefs,
@@ -86,10 +87,11 @@
         typeInfo: null,
         imageError: true,
         defaultImageLoading: false,
-        addTplImagePath: addTplImagePath,
-        curTypeTpls: [],
+        // addTplImagePath: addTplImagePath,
+        // curTypeTpls: [],
         isShowInsList: false,
         curTypeInsCount: 0,
+        tplEditPopoverVisable: false
       }
     },
     methods: {
@@ -119,24 +121,25 @@
         config.bindingValue = this.getCompDefaultOptions(config.type)
         e.dataTransfer.setData('data', JSON.stringify(config))
       },
-      dragTypeTpl(e, tpl) {
-        const config = _.cloneDeep(tpl.config)
-        config.bindingValue = this.getCompDefaultOptions(config.type)
-
-        if (this.curSelInstanceUid && (config.type === "ScadaGroupWrap")) {
-          utils.setGroupBinding(config, { uid: this.curSelInstanceUid })
-        }
-
-        e.dataTransfer.setData('data', JSON.stringify(config))
-      },
-      getCompDefaultOptions(compType) {
-        if (ScadaCompsLibrary[compType]) {
-          if (_.has(ScadaCompsLibrary[compType], ['props', 'defaultValue'])) {
-            return ScadaCompsLibrary[compType].props.defaultValue.default() || {}
-          }
-        }
-        return null
-      },
+      // dragTypeTpl(e, tpl) {
+      //   console.log('drag')
+      //   const config = _.cloneDeep(tpl.config)
+      //   config.bindingValue = this.getCompDefaultOptions(config.type)
+      //
+      //   if (this.curSelInstanceUid && (config.type === "ScadaGroupWrap")) {
+      //     utils.setGroupBinding(config, { uid: this.curSelInstanceUid })
+      //   }
+      //
+      //   e.dataTransfer.setData('data', JSON.stringify(config))
+      // },
+      // getCompDefaultOptions(compType) {
+      //   if (ScadaCompsLibrary[compType]) {
+      //     if (_.has(ScadaCompsLibrary[compType], ['props', 'defaultValue'])) {
+      //       return ScadaCompsLibrary[compType].props.defaultValue.default() || {}
+      //     }
+      //   }
+      //   return null
+      // },
       changeType(typeInfo) {
         this.typeInfo = typeInfo
         this.imageError = false
@@ -156,23 +159,8 @@
       },
       onAddTplClick() {
         if (this.typeInfo && this.curSelComp) {
-          // this.$emit('addTplBtnClick', this.typeInfo)
-          const tplConfig = this.curSelComp.toConfig()
-          tplConfig.layout.x = 0
-          tplConfig.layout.y = 0
-          // console.log(tplConfig)
-
-          const newTpl = {
-            config: tplConfig,
-            type: this.typeInfo.name,
-            preview: new CompCtrl(tplConfig, false)
-          }
-
-          this.curTypeTpls.push(newTpl)
+          this.publishTplConfirm()
         }
-      },
-      getViewBox(config) {
-        return `0 0 ${config.layout.width * config.layout.scaleX} ${config.layout.height * config.layout.scaleY}`
       }
     },
     computed: {
@@ -198,7 +186,33 @@
         if (!val) {
           this.curSelInstanceUid = ''
         }
+      },
+      curSeltype(val) {
+        if (val) {
+          this.getCurTypeTplList(val)
+        }
       }
+    },
+    mounted() {
+      // ScadaTemplate.getScadaTplList().then(list => {
+      //   console.log(list)
+      // })
+      // ScadaTemplate.getScadaTplByType('custom').then(list => {
+      //   console.log(list)
+      // })
+      // const t = {
+      //   name: '测试tpl',
+      //   scada: 'scada',
+      //   tpl: '78655467673',
+      //   typeName: 'custom',
+      //   image: ''
+      // }
+      // ScadaTemplate.createScadaTpl(t).then(data => {
+      //   console.log(data)
+      // })
+      // ScadaTemplate.deleteScadaTpl('1e77c7689c01000').then(data => {
+      //   console.log(data)
+      // })
     }
   }
 </script>
@@ -227,49 +241,6 @@
           max-height: 90%;
           padding: 5%;
           margin: auto auto;
-        }
-        .tpl-preview {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          .tpl-preview-svg {
-            position: absolute;
-            margin: 5%;
-            width: 90%;
-            height: 90%;
-          }
-          .tpl-preview-cover {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-          }
-        }
-      }
-      .add-tpl {
-        padding: 1px;
-        width: 58px;
-        height: 58px;
-        button.add-tpl-btn {
-          outline: none;
-          width: 100%;
-          height: 100%;
-          padding: 0;
-          margin: 0;
-          background: none;
-          border: none;
-          cursor: pointer;
-          img {
-            width: 100%;
-            height: 100%;
-          }
-          &:disabled {
-            img {
-              filter: grayscale(100%) opacity(30%);
-            }
-            &:hover {
-              cursor: not-allowed;
-            }
-          }
         }
       }
     }
@@ -335,6 +306,39 @@
         }
       }
     }
+  }
+
+  .add-tpl-wrap {
+    padding: 1px;
+    width: 58px;
+    height: 58px;
+    button.add-tpl-btn {
+      outline: none;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+      &:disabled {
+        img {
+          filter: grayscale(100%) opacity(30%);
+        }
+        &:hover {
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .tpl-wrap {
+    width: 100%;
+    height: 100%;
   }
 
 </style>
