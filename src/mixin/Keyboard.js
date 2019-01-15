@@ -1,13 +1,13 @@
 import hotkeys from 'hotkeys-js'
 
 const HOTKEYS = ['delete', 'ctrl+g', 'ctrl+shift+g', 'space', 'ctrl+-', 'ctrl+=', 'ctrl+0', 'ctrl+9', 'f1', 'f9', 'f10', 'escape',
-  'up', 'down', 'left', 'right', 'shift+up', 'shift+down', 'shift+left', 'shift+right',
+  'up', 'down', 'left', 'right', 'shift+up', 'shift+down', 'shift+left', 'shift+right', 'p',
   'ctrl+c', 'ctrl+v', 'ctrl+d', 'ctrl+l', 'ctrl+shift+l', 'ctrl+[', 'ctrl+]', 'ctrl+shift+[', 'ctrl+shift+]', 'ctrl+alt+l',
-  'ctrl+z', 'ctrl+shift+z', 'ctrl+s']
-
+  'ctrl+z', 'ctrl+shift+z', 'ctrl+s', 'ctrl+alt+f']
 const HOTKEYS_DEF = HOTKEYS.join(',')
-
 const MOVE_OFFSET = 30
+import { TOOL_STATE } from '../const'
+
 
 export default {
   data() {
@@ -146,6 +146,13 @@ export default {
           case 'ctrl+s':
             this.onActionSaveDraft()
             break
+          case 'p':
+            this.toggleTubePathTool()
+            break
+          case 'ctrl+alt+f':
+            this.toggleWorkAreaFullSize()
+            break
+
         }
       })
     },
@@ -153,11 +160,9 @@ export default {
       if (e.code === 'Space') {
         this.isKeySpacepressing = false
       }
-
-      // if (e.code === 'Escape') {
-      //   this.toolState = ''
-      //   this.showPreview = false
-      // }
+    },
+    toggleTubePathTool() {
+      this.toolState = this.toolState ? '' : TOOL_STATE.addPathPoint
     },
     onCanvasMouseWheel(e) {
       //按住ctrl键缩放

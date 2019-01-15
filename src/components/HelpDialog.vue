@@ -22,6 +22,7 @@
               <li><span>Esc</span><label>关闭预览 / 关闭当前工具</label></li>
               <li><span>Ctrl</span>+<span>S</span><label>保存当前文档</label></li>
               <li><span>F10</span><label>发布当前文档</label></li>
+              <li><span>Ctrl</span>+<span>Alt</span>+<span>F</span><label>工作区最大化 / 恢复</label></li>
             </ul>
           </el-col>
         </el-row>

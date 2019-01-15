@@ -2,12 +2,16 @@
   <div id="basic_comp_panel">
     <label class="comp-cate-title">基本组件</label>
     <ul class="comps-list">
-      <li v-for="comp in basicComps" :key="comp.type" class="comps-item"
+      <li class="comps-item"
+          :title="comp.label"
+          v-for="comp in basicComps"
+          :key="comp.type"
           draggable="true"
           @dragstart="drag($event, comp)">
         <img :src="getImagePath(comp.type)">
       </li>
       <li class="comps-item"
+          title="tube 管道 [P]"
           :class="{using: isPathUsing}"
           draggable="true"
           @click="onCompClick(tubeComp.type)"

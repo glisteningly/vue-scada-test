@@ -13,7 +13,7 @@ export default {
       this.disableCompAnime()
     },
     initDeviceType() {
-      DeviceType.getDeviceTypes().then(rootType => {
+      DeviceType.getDeviceTypes('TypeRoot').then(rootType => {
         this.deviceTypeTree = TreeFormatUtil.treeFormat(rootType.children)
       }).catch(() => {
         this.$message.error('设备类型系统获取失败')

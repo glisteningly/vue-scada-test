@@ -1,7 +1,7 @@
 <template>
   <div id="main_frame">
     <section id="scada_editor">
-      <header>
+      <header v-show="editorLayout.topToolbar">
         <div class="toolbar">
           <img class="app-logo" :src="'./images/icons/ic-main-logo.png'"/>
           <span class="toolbar-gutter-h"/>
@@ -25,6 +25,15 @@
           </el-button>
           <el-button title="适合屏幕" @click="zoomFit" class="zoom-btn"><i class="el-icon-rank"></i></el-button>
 
+          <span class="toolbar-gutter-h"/>
+          <el-popover v-model="editorLayoutPopoverVisible">
+            <div class="img-btn-group">
+              <ImgButton title="左侧面板" :icon="'ic-editor-layout-lp'" @click="toggleLeftPanel"/>
+              <ImgButton title="工作区最大化" :icon="'ic-editor-layout-full'" @click="workAreaFullSize"/>
+              <ImgButton title="右侧面板" :icon="'ic-editor-layout-rp'" @click="toggleRightPanel"/>
+            </div>
+            <ImgButton title="编辑器布局" slot="reference" :icon="'ic-editor-layout'"/>
+          </el-popover>
           <span class="toolbar-gutter-h"/>
           <ImgButton title="刷新" :icon="'ic-action-refresh'" @click="initKonvaWorkArea"/>
 
@@ -79,7 +88,7 @@
         </div>
       </header>
       <main>
-        <div id="left_sidebar">
+        <div id="left_sidebar" v-show="editorLayout.leftPanel">
           <el-tabs v-model="activeLeftTab" type="card">
             <el-tab-pane label="组件" name="basicComp">
               <BasicCompLib :canAddToTpl="canAddToTpl"
@@ -103,14 +112,16 @@
              element-loading-background="rgba(0, 0, 0, 0.5)">
           <div id="work_frame" :style="workFrameBgColor">
             <SvgScadaView :comps="comps" :canvasLayout="canvasLayout" :dataBinding="dataBinding"></SvgScadaView>
-            <div id="child_comp_sel_box" style="position: fixed; border: 1px solid #F00"
-                 :style="groupChildCompSelStyle"></div>
+            <div id="child_comp_sel_box" :style="groupChildCompSelStyle"></div>
             <div id="work_canvas" @contextmenu.prevent="$refs.ctxMenu.open" ref="workCanvas"
                  v-show="!debug_hideCanvas" @dragover.prevent @drop="handleCompDrop($event)"
                  @wheel="onCanvasMouseWheel"></div>
+            <div id="workarea_return_btn" v-show="!editorLayout.topToolbar">
+              <ImgButton title="预览" :icon="'ic-editor-full-return'" @click="workAreaFullSizeReturn"/>
+            </div>
           </div>
         </div>
-        <div id="right_sidebar">
+        <div id="right_sidebar" v-show="editorLayout.rightPanel">
           <el-tabs v-model="activeRightTab" type="card">
             <el-tab-pane label="变换" name="transform">
               <div id="layout_panel" class="ctrl-panel">
@@ -302,6 +313,7 @@
   import LayerComps from '../mixin/LayerComps'
   import CurSelCompsComputed from '../mixin/CurSelCompsComputed'
   import ActionCmdHistory from '../mixin/ActionCmdHistory'
+  import ActionEditorLayout from '../mixin/ActionEditorLayout'
 
 
   import DataBinding from '../mixin/DataBinding'
@@ -363,7 +375,8 @@
       DocSettings,
       LayerComps,
       InitCompCtrl,
-      ActionCmdHistory
+      ActionCmdHistory,
+      ActionEditorLayout
     ],
     name: 'MainEditor',
     data() {
@@ -419,7 +432,7 @@
         scadaDoc: null,
         isShowSettingsDialog: false,
         isShowHelpDialog: false,
-        isDocLoading: false
+        isDocLoading: false,
       }
     },
     mounted() {
@@ -963,6 +976,17 @@
     padding: 2px 6px 3px 4px;
     border: 1px solid #222;
     border-radius: 3px;
+  }
+
+  #child_comp_sel_box {
+    position: fixed;
+    border: 1px dashed #F00;
+  }
+
+  #workarea_return_btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
   }
 
 </style>
